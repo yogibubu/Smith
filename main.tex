@@ -182,25 +182,27 @@ special-coordinate protection and point-group projectors.
 \section{Molecular State and Atom Equivalence}
 
 \NEO\ does not rediscover the molecule at every downstream step.  Its input is a
-validated \MATRIX\ molecular state containing Cartesian geometry, covalent
-bonds, rings, point-group operations, optional fragments and optional
-interaction centers.  The output is a frozen \(\#\)GIC definition: primitive
-coordinate records, final generalized coordinates, coefficients, family labels,
-irreducible representations, total-symmetric subsets and the metadata required
-to reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
+validated ORACLE/\MATRIX\ molecular state containing Cartesian geometry,
+covalent bonds, rings, point-group operations, optional fragments, optional
+interaction centers and the continuous chemical perception produced upstream.
+The output is a frozen \(\#\)GIC definition: primitive coordinate records,
+final generalized coordinates, coefficients, family labels, irreducible
+representations, total-symmetric subsets and the metadata required to
+reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
 they do not rebuild topology, ring sets or coordinate rows.
 
-Initial local equivalence is not based only on element symbols.  The current
-runtime uses effective atomic numbers that combine nuclear charge with local
-coordination, distance-derived bond-order information, angular rigidity and
-delocalization-like terms.  These continuous descriptors order atoms and
-ligands in cases where a pure graph label would be ambiguous.  The broader
-\MATRIX\ topology layer also exposes synthon descriptors--charge, covalency,
-delocalization, strain and effective nuclear charge--which provide a natural
-route to more refined equivalence classes.  In the present implementation, this
-continuous perception enters ring orientation, ligand grouping, local stretch
-equivalence, high-coordination templates and the one-dihedral exocyclic torsion
-rule.
+Initial local equivalence is not based only on element symbols.  ORACLE supplies
+continuous atom perception and synthon descriptors, and \NEO\ uses them to make
+deterministic local choices.  The current runtime uses effective atomic numbers
+that combine nuclear charge with local coordination, distance-derived
+bond-order information, angular rigidity and delocalization-like terms.  These
+continuous descriptors order atoms and ligands in cases where a pure graph
+label would be ambiguous.  The broader \MATRIX\ topology layer also exposes
+synthon descriptors--charge, covalency, delocalization, strain and effective
+nuclear charge--which provide a natural route to more refined equivalence
+classes.  In the present implementation, this continuous perception enters ring
+orientation, ligand grouping, local stretch equivalence, high-coordination
+templates and the one-dihedral exocyclic torsion rule.
 
 \section{Coordinate Functions and Downstream Models}
 
@@ -227,10 +229,15 @@ functions without changing topology, rank selection or symmetry labels.
 Examples include \(r^{-1}\), \(\exp(-\alpha r)\) and damped contact functions
 for distances; \(\sin\theta\), \(\cos\theta\), \(\sin n\phi\) and
 \(\cos n\phi\) for bends and torsions; and Cremer--Pople-like \(q\) and
-\(\phi\) descriptors derived from linear \(RPck\) components.  The active
-Gaussian-readable coordinate basis should remain linear and rank complete,
-while such nonlinear functions become named observables or model variables in
-GF/PED, future TRINITY and SMITH workflows, or MORPHEUS.
+\(\phi\) descriptors derived from linear \(RPck\) components.  Recent work by
+Lema-Saavedra and Fern{\'a}ndez-Ramos shows why this separation is useful for
+rings: Cremer--Pople amplitudes provide an efficient conformational search
+space, while chemically viable 3D geometries require ring closure, angular
+redistribution, treatment of rigid or multiple bonds and invariant local
+references for substituents.\cite{LemaSaavedraFernandezRamos2026RingCP}  The
+active Gaussian-readable coordinate basis should remain linear and rank
+complete, while such nonlinear functions become named observables or model
+variables in GF/PED, future TRINITY and SMITH workflows, or MORPHEUS.
 
 This distinction also prevents a common ambiguity in the word ``GIC.''  A
 general GIC expression can be an optimizer coordinate.  A \NEO\ coordinate
@@ -342,6 +349,20 @@ than three atoms.  The polar Cremer--Pople-like descriptors \(Q\) and \(\phi\)
 are useful for interpretation, but the active coordinate basis stores linear
 \(RPck\) rows because their \(\Bmat\) rows are analytic linear combinations of
 dihedral derivatives.\cite{CremerPople1975}
+
+Unsaturated rings and locally rigid ring fragments require more than a generic
+\(n-3\) puckering count.  The reconstruction method of Lema-Saavedra and
+Fern{\'a}ndez-Ramos explicitly reduces the puckering dimensionality in the
+presence of rigid or multiple bonds and then recovers the full ring geometry by
+distributing the remaining distortions under constraints.\cite{LemaSaavedraFernandezRamos2026RingCP}
+The current \NEO\ implementation already introduces bond-order-dependent
+flexibility factors in \(RPck\) source vectors, so dihedrals centered on more
+rigid bonds contribute less to the puckering row.  A natural next step is to
+promote this weighting into a formal rigid-subspace reduction when ORACLE
+perception identifies double bonds, conjugated fragments or other locally stiff
+ring units.  This would keep the active GIC basis linear while exposing
+Cremer--Pople amplitudes and phases as derived functions for sampling, PES
+fitting and conformer classification.
 
 Fused, spiro and bridged systems are handled as connected ring-source spaces
 rather than as ordinary acyclic torsions.  When two rings share a bond, \NEO\
