@@ -12,6 +12,11 @@
 
 \newcommand{\NEO}{NEO}
 \newcommand{\MATRIX}{MATRIX}
+\newcommand{\ORACLE}{ORACLE}
+\newcommand{\MORPHEUS}{MORPHEUS}
+\newcommand{\TRINITY}{TRINITY}
+\newcommand{\SMITH}{SMITH}
+\newcommand{\SYCART}{SYCART}
 \newcommand{\GIC}{GIC}
 \newcommand{\Bmat}{\mathbf{B}}
 \newcommand{\bmat}{\mathbf{b}}
@@ -51,7 +56,8 @@ of fused rings, high coordination, point-group symmetry and weakly bound
 fragments.
 
 We present \NEO\ (Nonredundant Equivariant Orthogonalizer), the coordinate
-engine of \MATRIX, as a general construction of non-redundant,
+engine of \MATRIX\ (Molecular Analysis Toolkit for Reusable Integrated
+eXperiments), as a general construction of non-redundant,
 symmetry-adapted generalized internal coordinates.  \NEO\ starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
 point-group operations, fragments and optional interaction centers.  It then
@@ -60,16 +66,21 @@ rings and fragments, reduces the coordinate space using analytic Wilson
 \(\Bmat\)-row rank tests, and applies symmetry only inside homogeneous
 coordinate blocks.  The result is a deterministic constructive protocol and a
 frozen coordinate contract, rather than an arbitrary non-redundant basis.  The
-same frozen definition supplies Gaussian-readable coordinates, analytic
+same frozen definition is designed to supply Gaussian-readable coordinates, analytic
 \(\Bmat\) rows, symmetry labels and total-symmetric subsets for geometry
-optimization, Wilson GF analysis, vibrational scaling, force-field
-construction, DVR puckering grids, PES fitting and semi-experimental
+optimization, Wilson GF/potential-energy-distribution analysis, vibrational
+scaling, force-field construction, discrete-variable-representation puckering
+grids, potential-energy-surface fitting and semi-experimental
 least-squares refinement.  A separate functional layer can then evaluate inverse or
 exponential distance variables, trigonometric bend and torsional functions and
 Cremer--Pople-like ring descriptors from the same base coordinates.  The method
 therefore provides a constructive counterpart to natural internal coordinates:
 it preserves their locality and interpretability while extending them to the
 topological and symmetry cases that usually require manual intervention.
+The numerical evidence reported here validates the construction invariants,
+sparse derivative machinery and Gaussian export path; production GF/PED, DVR
+and semi-experimental refinement benchmarks are downstream applications rather
+than claims of the present validation set.
 \end{abstract}
 
 \section{Introduction}
@@ -90,25 +101,40 @@ semi-experimental structural refinement, ring puckering, weak complexes and
 metal or high-coordination environments.
 
 \NEO\ is designed to make this choice explicit and reproducible.  In the
-\MATRIX\ workflow, \NEO\ is the coordinate-generation engine, while MORPHEUS is
+\MATRIX\ workflow, \NEO\ is the coordinate-generation engine, while \MORPHEUS\ is
 the downstream framework that constructs and validates semi-experimental
 refinement models from those coordinates.  Thus \NEO\ defines the non-redundant
 generalized internal-coordinate basis, the analytic Wilson matrix and the
-symmetry labels; MORPHEUS decides which symmetry-allowed variables, predicates
+symmetry labels; \MORPHEUS\ decides which symmetry-allowed variables, predicates
 or priors enter a particular fit.  Separating these layers is essential: the
 coordinate space must be chemically meaningful before any refinement model can
 be judged.
 
+The acronyms used below denote roles in this workflow.  \MATRIX\ is the
+Molecular Analysis Toolkit for Reusable Integrated eXperiments, the shared
+molecular-state and package framework.  \ORACLE\ is the Operator for Routing,
+Analysis, Control, Launch and Exploration; in this manuscript the relevant
+\ORACLE/\MATRIX\ object is the validated molecular state, including continuous
+atom perception and synthon descriptors used by \NEO\ for deterministic local
+choices.  \SYCART\ denotes the symmetry-adapted Cartesian active-space model
+used as a Cartesian comparison basis.  \MORPHEUS\ is used as a tool name for
+SEFit, the semi-experimental fit module; \TRINITY\ is the planned external-gradient
+optimization branch, and \SMITH\ (Surface Modeling with Internal-coordinate
+Terms and Hamiltonians) is the planned multidimensional PES/property-surface
+fitting layer, with PES denoting potential-energy surface.  GF/PED denotes
+Wilson GF analysis and potential-energy distribution, and DVR denotes discrete
+variable representation.
+
 The same separation makes \NEO\ a coordinate service rather than a single
-application module.  GF/PED already uses the generated coordinates for Wilson
-analysis, vibrational scaling, local force-field analysis and force-constant
-models.  The DVR layer uses the same coordinate state to choose large-amplitude
-coordinates, build ring-puckering grids and associate grid points with molecular
-geometries.  TRINITY is the future external-gradient optimization consumer of
-the same GIC/SYCART state.  SMITH (Surface Modeling with Internal-coordinate
-Terms and Hamiltonians) is the planned consumer for multidimensional
-potential-energy and property-surface fitting, while MORPHEUS uses the frozen
-basis for one- and multidimensional semi-experimental fits.  In all cases the
+application module.  GF/PED is the immediate spectroscopic consumer of the
+generated coordinates for Wilson analysis, vibrational scaling, local
+force-field analysis and force-constant models.  The DVR layer uses the same
+coordinate state to choose large-amplitude coordinates, build ring-puckering
+grids and associate grid points with molecular geometries.  \TRINITY\ is the
+future external-gradient optimization consumer of the same \GIC/\SYCART\ state.
+\SMITH\ is the planned consumer for multidimensional potential-energy and
+property-surface fitting, while \MORPHEUS\ uses the frozen basis for one- and
+multidimensional semi-experimental fits.  In all cases the
 scientific object is the same: a rank-complete coordinate basis with a known
 Wilson matrix, symmetry labels and provenance.
 
@@ -228,7 +254,7 @@ centers, bond centers or protected semantic coordinates.
 \section{Molecular State and Atom Equivalence}
 
 \NEO\ does not rediscover the molecule at every downstream step.  Its input is a
-validated ORACLE/\MATRIX\ molecular state containing Cartesian geometry,
+validated \ORACLE/\MATRIX\ molecular state containing Cartesian geometry,
 covalent bonds, rings, point-group operations, optional fragments, optional
 interaction centers and the continuous chemical perception produced upstream.
 The output is a frozen \(\#\)GIC definition: primitive coordinate records,
@@ -237,9 +263,10 @@ representations, total-symmetric subsets and the metadata required to
 reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
 they do not rebuild topology, ring sets or coordinate rows.
 
-Initial local equivalence is not based only on element symbols.  ORACLE supplies
-continuous atom perception and synthon descriptors, and \NEO\ uses them to make
-deterministic local choices.  The present construction uses effective atomic numbers
+Initial local equivalence is not based only on element symbols.  The
+\ORACLE/\MATRIX\ molecular-state layer supplies continuous atom perception and
+synthon descriptors, and \NEO\ uses them to make deterministic local choices.
+The present construction uses effective atomic numbers
 that combine nuclear charge with local coordination, distance-derived
 bond-order information, angular rigidity and delocalization-like terms.  These
 continuous descriptors order atoms and ligands in cases where a pure graph
@@ -249,6 +276,11 @@ nuclear charge--which provide a natural route to more refined equivalence
 classes.  In the present contract, this continuous perception enters ring
 orientation, ligand grouping, local stretch equivalence, high-coordination
 templates and the one-dihedral exocyclic torsion rule.
+The determinism statements below are conditional on these descriptors being
+part of the frozen input state.  In other words, \NEO\ does not assume an
+unstated human perception step: the descriptor values, perception version,
+topology and symmetry operations are stored as contract provenance, and a
+change in any of them is a different molecular-state stratum.
 
 \section{Coordinate Functions and Downstream Models}
 
@@ -292,7 +324,8 @@ redistribution, treatment of rigid or multiple bonds and invariant local
 references for substituents.\cite{LemaSaavedraFernandezRamos2026RingCP}  The
 active Gaussian-readable coordinate basis should remain linear and rank
 complete, while such nonlinear functions become named observables or model
-variables in GF/PED, DVR, future TRINITY and SMITH workflows, or MORPHEUS.
+variables in GF/PED, DVR, future \TRINITY\ and \SMITH\ workflows, or
+\MORPHEUS.
 
 Conformational reconstruction from puckering variables is therefore not external
 to this workflow.  In the DVR layer, a one- or multidimensional grid in
@@ -347,7 +380,8 @@ Equivalently, with \(\mathbf{p}=(p_1,\ldots,p_m)^T\),
 \]
 \end{definition}
 
-The tuple is the object consumed by GF/PED, DVR, TRINITY, SMITH and MORPHEUS.
+The tuple is the object consumed by GF/PED, DVR, \TRINITY, \SMITH\ and
+\MORPHEUS.
 It is also the object that makes the method auditable: a downstream result can
 be traced to the primitive candidates that were generated, the rows that were
 accepted or rejected, the rank tolerance that was used and the symmetry block in
@@ -492,6 +526,14 @@ ordering.  If several pairs belong to the same local equivalence orbit, the
 coordinate is the normalized average of the corresponding primitive dihedrals.
 This gives one chemically stable torsional coordinate for each eligible
 exocyclic bond while still respecting local degeneracy.
+Here ``average'' means a stored linear combination of primitive torsional
+Wilson rows, together with a scalar value on the branch fixed by the reference
+geometry; it is not an arithmetic mean of periodic angles across a
+\(360^\circ\) wrap.  When a finite torsional value is needed for reporting or
+for a nonlinear model coordinate, \NEO\ uses the local reference branch, or an
+explicit circular representation through \(\sin\phi\) and \(\cos\phi\).  Thus
+symmetry averaging never identifies \(179^\circ\) and \(-179^\circ\) with an
+unphysical zero-degree torsion.
 
 \subsection{Rings, Puckering and Butterfly Coordinates}
 
@@ -523,8 +565,8 @@ analytic \(\Bmat\) row is expanded back to the real atoms by the chain rule,
 with the bond-center derivative distributed over \(i\) and \(j\).  This
 contraction is attractive for genuine double bonds, conjugated fragments and
 locally stiff fused-ring units, but it must be applied to complete symmetry
-orbits and only when ORACLE's continuous bond-order and synthon perception marks
-a hard local constraint.  The present bond-order flexibility factors are
+orbits and only when the \ORACLE/\MATRIX\ continuous bond-order and synthon
+descriptors mark a hard local constraint.  The present bond-order flexibility factors are
 therefore the conservative default; rigid-source contraction is the planned
 extension for cases where the chemically intended model removes, rather than
 merely down-weights, a non-puckering motion from the active source space.  In
@@ -559,14 +601,14 @@ The family set \(\mathfrak{F}\) carries a priority preorder
 interaction-center distances, ring-puckering sources and related special
 objects--are minimal elements in this preorder; ordinary stretches, bends and
 torsions fill the rank only after protected rows have been tested.  Ties inside
-a family are resolved by deterministic topology, ORACLE equivalence and
+a family are resolved by deterministic topology, \ORACLE/\MATRIX\ equivalence and
 CIP-like priority keys stored in \(\mathcal{M}\).  Thus the construction works on a
 fixed total order that extends a chemically motivated partial order.
 
 \begin{theorem}[Relabelling covariance]
 \label{thm:relabel}
 Let two frozen molecular states be related by an atom relabelling \(\pi\) that
-preserves element identities, geometry, topology, ORACLE descriptors, fragments,
+preserves element identities, geometry, topology, \ORACLE/\MATRIX\ descriptors, fragments,
 interaction centers, point-group operations, priority keys and tolerances.  Let
 \(Q_\pi\) be the induced orthogonal permutation of Cartesian displacement
 coordinates and \(U_\pi\) the induced permutation/sign map on primitive
@@ -604,7 +646,7 @@ constructing the contract first and then transporting it by the relabelling.
 
 \begin{proposition}[Deterministic coordinate contract]
 \label{prop:determinism}
-For a fixed molecular state--geometry, topology, ORACLE descriptors, point-group
+For a fixed molecular state--geometry, topology, \ORACLE/\MATRIX\ descriptors, point-group
 operations and fragment data--and for fixed primitive generators, family
 priority order, tie-breaking keys, row-normalization rule and numerical
 tolerances, \NEO\ returns a unique frozen coordinate contract, or a unique
@@ -615,7 +657,7 @@ history or manual choice is part of the contract definition.
 \begin{proof}
 Each stage of the construction is a deterministic map of the frozen input data.
 Primitive generation is determined by the stored topology, fragments,
-interaction centers and ORACLE equivalence descriptors.  Candidate ordering is
+interaction centers and \ORACLE/\MATRIX\ equivalence descriptors.  Candidate ordering is
 the fixed total order extending the family preorder and local tie-breaking keys.
 Rank decisions are Boolean tests of normalized analytic Wilson-row residuals
 against stored tolerances.  Symmetry adaptation is performed block by block from
@@ -728,7 +770,7 @@ can change.
 \begin{theorem}[Local stability]
 \label{thm:local-stability}
 Let \(S_0\) be a nonsingular frozen molecular state.  Assume that, in a
-neighbourhood of \(S_0\), topology, fragment decomposition, ORACLE equivalence
+neighbourhood of \(S_0\), topology, fragment decomposition, \ORACLE/\MATRIX\ equivalence
 classes, point-group representation, protected prefix, homogeneous block
 membership and priority order remain fixed in a ball of radius
 \(\delta_{\mathrm{str}}\) around \(S_0\).  Let
@@ -838,6 +880,14 @@ then
 \[
   \Bmat_{\alpha H}=C_{\alpha H}\Bmat_H .
 \]
+If an irreducible representation occurs with multiplicity greater than one in
+the same homogeneous block, the projector defines a subspace, not a unique
+printed basis.  \NEO\ fixes the stored basis by applying modified
+Gram--Schmidt to projected source vectors in the canonical block order, by
+discarding vectors below the saved norm tolerance, and by choosing the sign from
+the largest-magnitude coefficient pivot.  The subspace is the representation
+theoretic object; the ordered, sign-gauged coefficient matrix is the
+deterministic serialization stored in the contract.
 
 The homogeneous-block rule is the key safeguard.  A stretch and a torsion may
 belong to the same irreducible representation, but they are not the same kind
@@ -941,8 +991,8 @@ families and constants exist, but the present contract rejects pseudo-bond
 fragment mode and directs weak complexes to \texttt{SPECIAL\_COORDINATES}. \\
 Point-group projector & Active & Applied to homogeneous blocks after
 non-redundant reduction; local SALC fallback is recorded explicitly. \\
-SYCART comparison basis & Active in \MATRIX & Symmetry-adapted Cartesian
-nullspace coordinates provide an independent reference active space for
+\SYCART\ comparison basis & Active in \MATRIX & Symmetry-adapted Cartesian
+nullspace coordinates provide a Cartesian reference active space for
 downstream validation, without changing the \GIC\ construction. \\
 Sparse Wilson-\(\Bmat\) representation & Validated baseline & Sparse derivative
 rows are part of the frozen contract.  Dense matrices remain available only as
@@ -962,15 +1012,22 @@ from the frozen base \(\Bmat\) rows. \\
 \section{Validation Strategy}
 
 The validation target is not merely that a coordinate list can be printed.  A
-\NEO\ coordinate definition must pass four independent checks.
+\NEO\ coordinate definition must first pass construction-level checks.  The
+final coordinate count and analytic \(\Bmat\) rank must match the vibrational
+rank.  The current Python construction and the archived Merlino/Fortran
+construction path must agree on coordinate families, final rank and
+Wilson-\(\Bmat\) row space for the golden corpus.  Symmetry-adapted blocks must
+close under the stored point-group operations, and the saved SALC coefficient
+vectors must remain normalized.  These are internal implementation-level
+checks, not a comparison with an external published coordinate generator.
 
-First, the final coordinate count and analytic \(\Bmat\) rank must match the
-vibrational rank.  Second, independent construction paths must agree on
-coordinate families, final rank and Wilson-\(\Bmat\) row space for the golden
-corpus.  Third, symmetry-adapted blocks must close under the stored point-group
-operations, and the saved SALC coefficient vectors must remain normalized.
-Fourth, downstream GF/PED or refinement calculations must not find cross-irrep
-couplings that contradict the saved symmetry labels.
+The broader scientific motivation includes GF/PED analysis, DVR grids and
+\MORPHEUS\ refinement, but those are downstream application validations.  The
+present paper validates the frozen coordinate contract itself and then tests
+whether external Gaussian calculations can consume NEO-generated coordinates.
+It therefore shows that the geometric and algebraic object is well defined; it
+does not claim a production benchmark of GF/PED scaling, DVR dynamics or
+semi-experimental refinement.
 
 The regression corpus contains acyclic and cyclic molecules, fused and
 non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
@@ -984,12 +1041,14 @@ translation and orientation coordinates.
 
 Table~\ref{tab:validation} gives the self-consistency slice used for
 this draft.  The first eight rows compare the present construction with the
-vendored Merlino construction path; the reported residual is the
-Wilson-row-space residual between the two non-redundant bases.  The narrow range of
+archived Merlino construction path; the reported residual is the
+Wilson-row-space residual between two internally maintained non-redundant bases
+that share the same scientific lineage but not the same implementation path.
+The narrow range of
 \(\Delta_\mathrm{PF}\) values is expected: these residuals are dominated by the
 fixed row-space audit tolerance and floating-point floor of the comparison, not
-by a molecule-specific physical error.  Their role is to show that independent
-construction paths saturate the same numerical equivalence criterion across
+by a molecule-specific physical error.  Their role is to show that the two
+implementation paths saturate the same numerical equivalence criterion across
 systems of different size and symmetry.  The formic-acid--water row uses the release-grade
 \texttt{SPECIAL\_COORDINATES} fragment path, for which the covalent Merlino
 reference is not the relevant comparison; there the table reports direct
@@ -1083,7 +1142,8 @@ preserves its symmetry labels.  The compact application probes ask a different
 question: whether the same frozen coordinate object gives a physically useful
 representation for force constants and ring deformation.  They are deliberately
 small Gaussian DV calculations, because their role is to test the coordinate
-representation, not to benchmark an electronic-structure method.
+representation, not to benchmark an electronic-structure method or to replace
+full GF/PED, DVR and \MORPHEUS\ validation studies.
 
 \subsection{Gaussian ReadAllGIC Optimization}
 
@@ -1153,9 +1213,10 @@ coupled, with a mean off-diagonal value of 0.151 and a 95th percentile of
 the symmetry-adapted contract they fall further to 0.013 and 0.056.  The point
 is not that \NEO\ constructs normal modes, nor that one small molecule proves a
 general vibrational benchmark.  The figure shows the diagnostic that will be
-applied across a broader corpus: a chemically labelled basis can make the
-Hessian visibly more block structured before any empirical scaling or
-normal-mode diagonalization is applied.
+applied across a broader corpus.  It is therefore an illustrative locality
+check: in this case, a chemically labelled basis makes the Hessian visibly more
+block structured before any empirical scaling or normal-mode diagonalization is
+applied.
 
 \begin{figure}[htbp]
 \centering
@@ -1181,7 +1242,7 @@ axis while the contract retains the same ring-source identity.
 Figure~\ref{fig:puckering-scan} illustrates the result.  The minimum on this
 fixed branch is near \(q=0.04\)~\AA, matching the optimized reference
 geometry.  Larger puckering displacements raise the energy smoothly.  In a DVR
-or SMITH application, the same base coordinate could be replaced by a
+or \SMITH\ application, the same base coordinate could be replaced by a
 Cremer--Pople amplitude or phase function \(y=f(\q)\), while the analytic
 chain-rule row would still descend from the frozen \NEO\ \(\Bmat\).
 
@@ -1263,14 +1324,16 @@ The output of \NEO\ is not an undocumented list of optimizer variables.  It is a
 frozen coordinate contract with primitive definitions, coefficients, family
 labels, irreducible representations, rank diagnostics and analytic derivative
 rows.  Moreover, downstream calculations can compare the \GIC\ active space
-with an independently generated symmetry-adapted Cartesian nullspace.  Agreement
-between the two active spaces shows that the chemical conclusion does not
-depend on a hidden choice inside the coordinate generator, but on the shared
-topology, symmetry and rank of the molecular problem.
+with a symmetry-adapted Cartesian nullspace that is not built from GIC
+primitives.  Agreement between the two active spaces shows that the chemical
+conclusion does not depend on a hidden choice inside the coordinate generator,
+but on the shared topology, symmetry and rank of the molecular problem.
 
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
-symmetry-projector normalization and independent row-space equivalence for
-representative cases.  Table~\ref{tab:frisch-si} adds the more external-facing
+symmetry-projector normalization and Python--Fortran/Merlino row-space
+equivalence for representative cases.  This is an implementation-level
+cross-check inside the \MATRIX\ lineage, not a claim of agreement with an
+external natural-coordinate program.  Table~\ref{tab:frisch-si} adds the more external-facing
 question raised by the Gaussian GIC Supporting Information: can the same kinds
 of chemically specialized variables be obtained without hand-writing the GIC
 expressions?  The answer is positive for the tested motifs.  Gaussian supplies
@@ -1279,7 +1342,10 @@ construction, semantic interning of generated coordinates, sparse derivative
 propagation and frozen provenance.  A direct numerical run in Gaussian using
 explicitly written GIC input remains useful before submission, but it is now a
 cross-method reproducibility check rather than the first evidence that the
-\NEO\ model can generate these variables.
+\NEO\ model can generate these variables.  By contrast, production GF/PED,
+DVR and \MORPHEUS\ examples remain outside the validation set of this paper:
+the present figures show coordinate locality, large-amplitude export and
+Gaussian consumption, not a completed spectroscopy or refinement benchmark.
 
 The main limitation is currently intermolecular pseudo-cycle construction.
 Protected fragment and special-center coordinates are already suitable for weak
@@ -1299,11 +1365,11 @@ generalized internal coordinates for \MATRIX.  Its main contribution is a
 deterministic coordinate contract that integrates ingredients usually treated
 separately: natural-coordinate locality, analytic Wilson-\(\Bmat\) rank control,
 homogeneous point-group symmetrization and protected special coordinates for
-rings, fragments and interaction centers.  This makes the same coordinate
-definition reusable across
+rings, fragments and interaction centers.  This is the coordinate object
+intended for reuse across
 Gaussian input generation, GF/PED vibrational scaling and force-field analysis,
-large-amplitude DVR grids, future TRINITY optimization, future SMITH PES
-fitting, MORPHEUS semi-experimental refinement and workflow diagnostics.
+large-amplitude DVR grids, future \TRINITY\ optimization, future \SMITH\ PES
+fitting, \MORPHEUS\ semi-experimental refinement and workflow diagnostics.
 Nonlinear coordinate functions such as inverse or exponential distances,
 trigonometric angular terms and Cremer--Pople descriptors can be built on top of
 this base by analytic chain-rule differentiation.
@@ -1316,12 +1382,13 @@ pseudo-cycle coordinates for intermolecular systems, with validation against the
 same rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of
 \NEO.
 The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
-contract is already usable as an external solver coordinate set, while the
-Hessian, puckering and portable chair-to-boat export probes illustrate the
-force-field and large-amplitude directions that will close the application
-section.  The cyclohexane export check further shows that a NEO-generated
-puckering path can be represented either as ordinary Cartesians or as Gaussian
-\texttt{ReadAllGIC} input with numerically identical energies.
+contract is already usable as an external solver coordinate set.  The Hessian,
+puckering and portable chair-to-boat export probes illustrate why the same
+contract is relevant to force-field and large-amplitude work, but they remain
+coordinate diagnostics.  Full GF/PED, DVR and \MORPHEUS\ application benchmarks
+are the next validation layer.  The cyclohexane export check further shows that
+a NEO-generated puckering path can be represented either as ordinary Cartesians
+or as Gaussian \texttt{ReadAllGIC} input with numerically identical energies.
 
 \bibliographystyle{unsrtnat}
 \bibliography{references}
