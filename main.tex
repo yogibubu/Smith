@@ -14,6 +14,7 @@
 \newcommand{\GIC}{GIC}
 \newcommand{\Bmat}{\mathbf{B}}
 \newcommand{\bmat}{\mathbf{b}}
+\newcommand{\Cmat}{\mathbf{C}}
 \newcommand{\Gmat}{\mathbf{G}}
 \newcommand{\x}{\mathbf{x}}
 \newcommand{\q}{\mathbf{q}}
@@ -22,6 +23,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
 \theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
 
 \title{\NEO\ (Nonredundant Equivariant Orthogonalizer): Block-Local, Symmetry-Consistent Generalized Internal Coordinates for Molecular and Intermolecular Coordinate Spaces}
@@ -108,8 +110,10 @@ basis for one- and multidimensional semi-experimental fits.  In all cases the
 scientific object is the same: a rank-complete coordinate basis with a known
 Wilson matrix, symmetry labels and provenance.
 
-The central claim of this paper is not that a new Wilson matrix is needed.  It
-is that a production coordinate generator must provide a deterministic
+The novelty is not a new coordinate formula, but a deterministic constructive
+protocol producing a frozen coordinate contract.  The central claim of this
+paper is not that a new Wilson matrix is needed.  It is that a production
+coordinate generator must provide a deterministic
 constructive protocol for choosing a non-redundant basis while satisfying four
 requirements simultaneously.  First, the final variables must span the correct
 vibrational rank, \(3N-6\) for nonlinear systems and \(3N-5\) for linear
@@ -296,13 +300,22 @@ A frozen coordinate contract is the tuple
   \mathcal{C} = (\mathcal{P},\mathcal{G},\Bmat,\Sigma,\mathcal{M}).
 \]
 Here \(\mathcal{P}=(p_1,\ldots,p_m)\) is the ordered set of typed primitive
-candidates; \(\mathcal{G}=(g_1,\ldots,g_r)\) is the accepted non-redundant
-generalized-coordinate basis; \(\Bmat\) contains the analytic Wilson rows
-\(\partial g_a/\partial \x\); \(\Sigma\) contains point-group transformation
-matrices, irreducible-representation labels and SALC coefficients; and
-\(\mathcal{M}\) contains the frozen molecular state, source-family labels,
-protection flags, family priority order, numerical tolerances, diagnostics and
-provenance.
+candidates; \(\mathcal{G}=(\mathbf{g},\Cmat_{\mathcal{G}})\) is the accepted
+non-redundant generalized-coordinate basis together with its coefficient
+matrix; \(\Bmat\) contains the analytic Wilson rows of the accepted basis;
+\(\Sigma\) contains point-group transformation matrices,
+irreducible-representation labels and SALC coefficients; and \(\mathcal{M}\)
+contains the frozen molecular state, source-family labels, protection flags,
+family priority order, numerical tolerances, diagnostics and provenance.
+Equivalently, with \(\mathbf{p}=(p_1,\ldots,p_m)^T\),
+\[
+  \mathbf{g}=\Cmat_{\mathcal{G}}\mathbf{p},
+  \qquad
+  g_a=\sum_{j=1}^{m} c_{aj}p_j,
+  \qquad
+  \Bmat=\frac{\partial\mathbf{g}}{\partial\x}
+       =\Cmat_{\mathcal{G}}\Bmat(\mathcal{P}).
+\]
 \end{definition}
 
 The tuple is the object consumed by GF/PED, DVR, TRINITY, SMITH and MORPHEUS.
@@ -521,6 +534,51 @@ a family are resolved by deterministic topology, ORACLE equivalence and
 CIP-like priority keys stored in \(\mathcal{M}\).  Thus the algorithm works on a
 fixed total order that extends a chemically motivated partial order.
 
+\begin{theorem}[Deterministic coordinate contract]
+\label{thm:determinism}
+For a fixed molecular state--geometry, topology, ORACLE descriptors, point-group
+operations and fragment data--and for fixed primitive generators, family
+priority order, tie-breaking keys, row-normalization rule and numerical
+tolerances, \NEO\ returns a unique frozen coordinate contract, or a unique
+failure diagnostic.  In particular, no stochastic search, optimizer history or
+manual branch choice is part of the contract definition.
+\end{theorem}
+
+\begin{proof}
+Each stage of the construction is a deterministic map of the frozen input data.
+Primitive generation is determined by the stored topology, fragments,
+interaction centers and ORACLE equivalence descriptors.  Candidate ordering is
+the fixed total order extending the family preorder and local tie-breaking keys.
+Rank decisions are Boolean tests of normalized analytic Wilson-row residuals
+against stored tolerances.  Symmetry adaptation is performed block by block from
+the stored permutation representation and a fixed normalization/sign convention
+for the projected coefficient vectors.  Composing these maps gives either one
+contract or one recorded failure state.
+\end{proof}
+
+\begin{theorem}[Semantic preservation of protected coordinates]
+\label{thm:protected}
+Let \(\mathcal{P}_{\mathrm{prot}}\) be the protected prefix of the ordered
+candidate set.  Every protected candidate whose Wilson row is nonsingular and
+independent, within the stored tolerance, of the previously accepted protected
+rows is retained in any returned final contract.  No ordinary stretch, bend or
+torsion can displace an accepted protected coordinate.  If the independent
+protected prefix already exceeds the target vibrational rank, \NEO\ reports an
+invalid contract rather than removing protected coordinates by exchange.
+\end{theorem}
+
+\begin{proof}
+Protected candidates are tested before ordinary rank-completion candidates.
+During this prefix, a protected row is rejected only by the singular-row test or
+by dependence on rows already accepted from the protected prefix.  Once accepted,
+rows are never replaced by a later exchange step; subsequent ordinary candidates
+can only add missing independent directions until the target rank is reached.
+Therefore ordinary coordinates cannot remove a protected coordinate that has
+passed the protected-prefix rank test.  If the protected prefix alone contains
+more independent rows than the target rank, the algorithm has no
+rank-compatible protected basis and records that failure explicitly.
+\end{proof}
+
 \begin{proposition}[Rank-preserving ordered selection]
 \label{prop:rank-selection}
 Assume exact arithmetic and let
@@ -630,7 +688,10 @@ source state.  Each operation \(h\in G_{\mathrm{pt}}\) is represented by a
 Cartesian rotation matrix, an atom permutation and the signs required for
 oriented coordinates such as torsions, out-of-plane bends and axial fragment
 rotations.  For a homogeneous accepted coordinate block \(H\), with coefficient
-space \(V_H\), these operations define a finite-dimensional representation
+space \(V_H\), the stored operations map the block into itself.  Since each
+homogeneous block admitted to the projector is invariant under this permutation
+and sign representation, its coefficient space carries a finite-dimensional
+representation of the point group,
 \[
   \Gamma_H:G_{\mathrm{pt}}\rightarrow GL(V_H).
 \]
@@ -834,6 +895,10 @@ high-coordination angular blocks, fragment translations, fragment orientations
 and center-based distances.  The method is deliberately not a single global
 orthogonalization.  It is a sequence of local and block-local decisions followed
 by a rank audit in the physical Wilson \(\Bmat\)-row space.
+Theorems~\ref{thm:determinism} and~\ref{thm:protected} make the two distinctive
+claims precise: the same frozen molecular state defines one coordinate contract,
+and protected semantic coordinates are retained whenever rank compatibility
+allows them.
 
 The method should therefore be read as a documented coordinate-selection
 protocol, not as a proof that only one internal-coordinate basis is possible.
