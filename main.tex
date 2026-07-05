@@ -1079,12 +1079,11 @@ sparse \(\Bmat\) density \(0.095\)--\(0.101\). \\
 \section{Application Probes}
 
 The preceding tests establish that the contract closes the correct rank and
-preserves its symmetry labels.  Two compact application probes ask a different
+preserves its symmetry labels.  The compact application probes ask a different
 question: whether the same frozen coordinate object gives a physically useful
 representation for force constants and ring deformation.  They are deliberately
-small HF/STO-3G calculations carried out with Gaussian DV, because their role is
-to test the coordinate representation, not to benchmark an electronic-structure
-method.
+small Gaussian DV calculations, because their role is to test the coordinate
+representation, not to benchmark an electronic-structure method.
 
 \subsection{Gaussian ReadAllGIC Optimization}
 
@@ -1171,7 +1170,7 @@ coordinate coupling is visible.}
 
 \subsection{Ring Puckering Branch}
 
-The second probe uses the same cyclobutane contract to define a one-dimensional
+This probe uses the same cyclobutane contract to define a one-dimensional
 ring-puckering branch.  The coordinate is the alternating carbon-ring puckering
 amplitude associated with the \(D_{2d}\) ring source block.  Single-point
 Gaussian DV HF/STO-3G energies were evaluated along a fixed substituent-frame
@@ -1194,6 +1193,39 @@ chain-rule row would still descend from the frozen \NEO\ \(\Bmat\).
 energies.  The branch is a coordinate diagnostic, not a relaxed conformational
 energy profile.}
 \label{fig:puckering-scan}
+\end{figure}
+
+\subsection{Portable Chair-to-Boat Puckering Export}
+
+The final probe tests a stricter export question.  \NEO\ was used to construct a
+fixed-frame cyclohexane puckering path from the chair \(q_3\) component to the
+boat \(q_2\) component.  For each point it generated two independent external
+representations of the same geometry: a portable Cartesian input, usable by any
+electronic-structure program, and a Gaussian \texttt{ReadAllGIC} input containing
+the automatically generated coordinate contract.  Gaussian DV B3LYP/6-31+G*
+single-point energies were then evaluated from both inputs.
+
+All five contracts have rank \(48/48\) and contain no out-of-plane GIC terms, so
+the comparison uses only syntax supported by standard Gaussian
+\texttt{ReadAllGIC}.  Figure~\ref{fig:cyclohexane-puckering-equivalence} shows
+that the two energy traces are numerically identical: the largest
+Cartesian--\texttt{ReadAllGIC} difference is \(3.0\times10^{-3}\,\mu E_h\),
+about \(8\times10^{-6}\)~kJ~mol\(^{-1}\).  The large rise along the path is not
+a chair--boat barrier; it is the expected cost of an unrelaxed fixed-frame
+puckering deformation.  The result instead shows that the same NEO-generated
+large-amplitude coordinate path can be exported either as ordinary Cartesians or
+as an automatically generated Gaussian GIC model without changing the electronic
+energy surface being sampled.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.78\linewidth]{figures/cyclohexane_puckering_equivalence.png}
+\caption{Cyclohexane fixed-frame chair-to-boat puckering export test
+(Gaussian DV B3LYP/6-31+G*).  The upper panel compares the same five geometries
+evaluated from portable Cartesian inputs and from \NEO-generated
+\texttt{ReadAllGIC} inputs.  The lower panel gives the energy difference in
+microhartree.}
+\label{fig:cyclohexane-puckering-equivalence}
 \end{figure}
 
 \section{Discussion}
@@ -1285,8 +1317,11 @@ same rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of
 \NEO.
 The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
 contract is already usable as an external solver coordinate set, while the
-Hessian and puckering probes illustrate the force-field and large-amplitude
-directions that will close the application section.
+Hessian, puckering and portable chair-to-boat export probes illustrate the
+force-field and large-amplitude directions that will close the application
+section.  The cyclohexane export check further shows that a NEO-generated
+puckering path can be represented either as ordinary Cartesians or as Gaussian
+\texttt{ReadAllGIC} input with numerically identical energies.
 
 \bibliographystyle{unsrtnat}
 \bibliography{references}

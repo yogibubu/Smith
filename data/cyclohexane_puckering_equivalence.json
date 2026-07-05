@@ -1,0 +1,74 @@
+{
+  "method": "B3LYP/6-31+G*",
+  "route_cartesian": "#p b3lyp/6-31+g* nosymm",
+  "route_readallgic": "#p b3lyp/6-31+g* nosymm geom=readallgic output=pickett",
+  "path": "fixed-frame q3(chair) to q2(boat) cyclohexane puckering interpolation",
+  "points": [
+    {
+      "lambda": 0.0,
+      "q3_chair_to_q2_boat": 0.0,
+      "point_group": "D3d",
+      "rank": 48,
+      "target_rank": 48,
+      "gic_count": 48,
+      "cartesian_energy_hartree": -235.885365415,
+      "readallgic_energy_hartree": -235.885365415,
+      "delta_microhartree": 0.0,
+      "relative_cartesian_kj_mol": 0.0,
+      "relative_readallgic_kj_mol": 0.0
+    },
+    {
+      "lambda": 0.25,
+      "q3_chair_to_q2_boat": 0.25,
+      "point_group": "C1",
+      "rank": 48,
+      "target_rank": 48,
+      "gic_count": 48,
+      "cartesian_energy_hartree": -235.856446668,
+      "readallgic_energy_hartree": -235.856446667,
+      "delta_microhartree": 0.0009999894245993346,
+      "relative_cartesian_kj_mol": 75.92615977992894,
+      "relative_readallgic_kj_mol": 75.92616240540082
+    },
+    {
+      "lambda": 0.5,
+      "q3_chair_to_q2_boat": 0.5,
+      "point_group": "C1",
+      "rank": 48,
+      "target_rank": 48,
+      "gic_count": 48,
+      "cartesian_energy_hartree": -235.778542564,
+      "readallgic_energy_hartree": -235.778542564,
+      "delta_microhartree": 0.0,
+      "relative_cartesian_kj_mol": 280.4633566306384,
+      "relative_readallgic_kj_mol": 280.4633566306384
+    },
+    {
+      "lambda": 0.75,
+      "q3_chair_to_q2_boat": 0.75,
+      "point_group": "C1",
+      "rank": 48,
+      "target_rank": 48,
+      "gic_count": 48,
+      "cartesian_energy_hartree": -235.666615984,
+      "readallgic_energy_hartree": -235.666615981,
+      "delta_microhartree": 0.002999996695507434,
+      "relative_cartesian_kj_mol": 574.326551903185,
+      "relative_readallgic_kj_mol": 574.3265597796751
+    },
+    {
+      "lambda": 1.0,
+      "q3_chair_to_q2_boat": 1.0,
+      "point_group": "C1",
+      "rank": 48,
+      "target_rank": 48,
+      "gic_count": 48,
+      "cartesian_energy_hartree": -235.550463307,
+      "readallgic_energy_hartree": -235.550463309,
+      "delta_microhartree": -0.0020000072709080996,
+      "relative_cartesian_kj_mol": 879.2853633194219,
+      "relative_readallgic_kj_mol": 879.2853580684035
+    }
+  ],
+  "max_abs_delta_microhartree": 0.002999996695507434
+}
