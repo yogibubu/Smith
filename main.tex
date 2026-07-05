@@ -574,15 +574,15 @@ relabellings: relabelling the molecular state and then constructing the
 contract gives the same object, up to the canonical contract isomorphism, as
 constructing the contract first and then transporting it by the relabelling.
 
-\begin{theorem}[Deterministic coordinate contract]
-\label{thm:determinism}
+\begin{proposition}[Deterministic coordinate contract]
+\label{prop:determinism}
 For a fixed molecular state--geometry, topology, ORACLE descriptors, point-group
 operations and fragment data--and for fixed primitive generators, family
 priority order, tie-breaking keys, row-normalization rule and numerical
 tolerances, \NEO\ returns a unique frozen coordinate contract, or a unique
 incompatibility certificate.  In particular, no stochastic search, optimizer
 history or manual choice is part of the contract definition.
-\end{theorem}
+\end{proposition}
 
 \begin{proof}
 Each stage of the construction is a deterministic map of the frozen input data.
@@ -596,8 +596,8 @@ for the projected coefficient vectors.  Composing these maps gives either one
 contract or one recorded incompatibility certificate.
 \end{proof}
 
-\begin{theorem}[Semantic preservation of protected coordinates]
-\label{thm:protected}
+\begin{proposition}[Semantic preservation of protected coordinates]
+\label{prop:protected}
 Let \(\mathcal{P}_{\mathrm{prot}}\) be the protected prefix of the ordered
 candidate set.  Every protected candidate whose Wilson row is nonsingular and
 independent, within the stored tolerance, of the previously accepted protected
@@ -605,7 +605,7 @@ rows is retained in any returned final contract.  No ordinary stretch, bend or
 torsion can displace an accepted protected coordinate.  If the independent
 protected prefix already exceeds the target vibrational rank, \NEO\ reports an
 invalid contract rather than removing protected coordinates by exchange.
-\end{theorem}
+\end{proposition}
 
 \begin{proof}
 Protected candidates are tested before ordinary rank-completion candidates.
@@ -917,10 +917,18 @@ Table~\ref{tab:validation} gives the self-consistency slice used for
 this draft.  The first eight rows were generated with
 \texttt{matrix gicforge fortran-audit} against the vendored Merlino backend; the
 reported residual is the Wilson-row-space residual between the Python and
-Fortran non-redundant bases.  The formic-acid--water row uses the release-grade
+Fortran non-redundant bases.  The narrow range of
+\(\Delta_\mathrm{PF}\) values is expected: these residuals are dominated by the
+fixed row-space audit tolerance and floating-point floor of the comparison, not
+by a molecule-specific physical error.  Their role is to show that independent
+backends saturate the same numerical equivalence criterion across systems of
+different size and symmetry.  The formic-acid--water row uses the release-grade
 \texttt{SPECIAL\_COORDINATES} fragment path, for which the legacy Fortran
 comparison is not the relevant reference; there the table reports direct
 analytic \(\Bmat\)-rank closure and the number of protected special coordinates.
+Because this weak-complex probe is \(C_1\), \(\epsilon_\mathrm{SALC}=0\) is
+trivial by construction and should be read only as the absence of nontrivial
+SALC blocks, not as a symmetry-adaptation test.
 
 \begin{table}[htbp]
 \centering
@@ -962,12 +970,14 @@ high-coordination angular blocks, fragment translations, fragment orientations
 and center-based distances.  The method is deliberately not a single global
 orthogonalization.  It is a sequence of local and block-local decisions followed
 by a rank audit in the physical Wilson \(\Bmat\)-row space.
-Theorems~\ref{thm:relabel}--\ref{thm:local-stability} make the main structural
-claims precise: \NEO\ is natural with respect to symmetry-preserving
-relabellings, the contract is deterministic on a frozen state, protected
-semantic coordinates are retained whenever rank compatibility allows them,
-block-local reduction is insensitive to homogeneous scaling, and the discrete
-contract is locally stable inside a fixed molecular-state stratum.
+Theorem~\ref{thm:relabel}, Propositions~\ref{prop:determinism}
+and~\ref{prop:protected}, and Theorems~\ref{thm:block-scaling}
+and~\ref{thm:local-stability} make the main structural claims precise: \NEO\ is
+natural with respect to symmetry-preserving relabellings, the contract is
+deterministic on a frozen state, protected semantic coordinates are retained
+whenever rank compatibility allows them, block-local reduction is insensitive
+to homogeneous scaling, and the discrete contract is locally stable inside a
+fixed molecular-state stratum.
 
 The method should therefore be read as a documented coordinate-selection
 protocol, not as a proof that only one internal-coordinate basis is possible.
@@ -993,9 +1003,11 @@ representative cases.  A direct numerical comparison with hand-written Gaussian
 GIC definitions is a useful external-facing test, especially for simple
 molecules where equivalent coordinate spaces can be built manually.  It is not a
 substitute for the \NEO\ contract, because Gaussian GIC syntax does not supply an
-automatic general generator, but it should be included in a final validation set
-to show that the generated space agrees with an independent GIC construction
-when both are available.
+automatic general generator, but it should be included before submission in a
+final validation set to show that the generated space agrees with an independent
+GIC construction when both are available.  Until that comparison is added, the
+validation claim is limited to internal rank closure, symmetry consistency,
+SYCART active-space agreement and Python/Fortran row-space equivalence.
 
 The main limitation is currently intermolecular pseudo-cycle construction.
 Protected fragment and special-center coordinates are already suitable for weak
