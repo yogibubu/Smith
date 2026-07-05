@@ -52,8 +52,9 @@ rings and fragments, reduces the coordinate space using analytic Wilson
 coordinate blocks.  The same frozen definition supplies Gaussian-readable
 coordinates, analytic \(\Bmat\) rows, symmetry labels and total-symmetric
 subsets for geometry optimization, Wilson GF analysis, vibrational scaling,
-force-field construction, PES fitting and semi-experimental least-squares
-refinement.  A separate functional layer can then evaluate inverse or
+force-field construction, DVR puckering grids, PES fitting and
+semi-experimental least-squares refinement.  A separate functional layer can
+then evaluate inverse or
 exponential distance variables, trigonometric bend and torsional functions and
 Cremer--Pople-like ring descriptors from the same base coordinates.  The method
 therefore provides a constructive counterpart to natural internal coordinates:
@@ -91,13 +92,15 @@ be judged.
 The same separation makes \NEO\ a coordinate service rather than a single
 application module.  GF/PED already uses the generated coordinates for Wilson
 analysis, vibrational scaling, local force-field analysis and force-constant
-models.  TRINITY is the future external-gradient optimization consumer of the
-same GIC/SYCART state.  SMITH (Surface Modeling with Internal-coordinate Terms
-and Hamiltonians) is the planned consumer for multidimensional potential-energy
-and property-surface fitting, while MORPHEUS uses the frozen basis for one- and
-multidimensional semi-experimental fits.  In all cases the scientific object is
-the same: a rank-complete coordinate basis with a known Wilson matrix, symmetry
-labels and provenance.
+models.  The DVR branch uses the same coordinate state to choose large-amplitude
+coordinates, build ring-puckering grids and associate grid points with molecular
+geometries.  TRINITY is the future external-gradient optimization consumer of
+the same GIC/SYCART state.  SMITH (Surface Modeling with Internal-coordinate
+Terms and Hamiltonians) is the planned consumer for multidimensional
+potential-energy and property-surface fitting, while MORPHEUS uses the frozen
+basis for one- and multidimensional semi-experimental fits.  In all cases the
+scientific object is the same: a rank-complete coordinate basis with a known
+Wilson matrix, symmetry labels and provenance.
 
 The central claim of this paper is not that a new Wilson matrix is needed.  It
 is that a production coordinate generator must satisfy four requirements
@@ -237,7 +240,20 @@ redistribution, treatment of rigid or multiple bonds and invariant local
 references for substituents.\cite{LemaSaavedraFernandezRamos2026RingCP}  The
 active Gaussian-readable coordinate basis should remain linear and rank
 complete, while such nonlinear functions become named observables or model
-variables in GF/PED, future TRINITY and SMITH workflows, or MORPHEUS.
+variables in GF/PED, DVR, future TRINITY and SMITH workflows, or MORPHEUS.
+
+Conformational reconstruction from puckering variables is therefore not external
+to this workflow.  In the DVR branch, a one- or multidimensional grid in
+\(RPck\)-, \(Q\)- or \(\phi\)-like variables must be associated with physically
+closed ring geometries before electronic-structure points, metric terms or
+wavefunctions can be interpreted.  The reconstruction layer of
+Ref.~\citenum{LemaSaavedraFernandezRamos2026RingCP} provides precisely this
+coordinate-to-geometry step: closure constraints, angular redistribution,
+rigid-bond treatment and substituent reference frames belong above the frozen
+\NEO\ basis, but they are natural consumers of it.  A production DVR can then
+recompute the Wilson metric on the reconstructed structures, or use an explicitly
+validated reduced metric, without introducing a second private ring-coordinate
+definition.
 
 This distinction also prevents a common ambiguity in the word ``GIC.''  A
 general GIC expression can be an optimizer coordinate.  A \NEO\ coordinate
@@ -357,12 +373,25 @@ presence of rigid or multiple bonds and then recovers the full ring geometry by
 distributing the remaining distortions under constraints.\cite{LemaSaavedraFernandezRamos2026RingCP}
 The current \NEO\ implementation already introduces bond-order-dependent
 flexibility factors in \(RPck\) source vectors, so dihedrals centered on more
-rigid bonds contribute less to the puckering row.  A natural next step is to
-promote this weighting into a formal rigid-subspace reduction when ORACLE
-perception identifies double bonds, conjugated fragments or other locally stiff
-ring units.  This would keep the active GIC basis linear while exposing
-Cremer--Pople amplitudes and phases as derived functions for sampling, PES
-fitting and conformer classification.
+rigid bonds contribute less to the puckering row.  The rigid-bond treatment of
+Ref.~\citenum{LemaSaavedraFernandezRamos2026RingCP} is therefore most naturally
+viewed in \NEO\ as a stronger, optional source-space contraction rather than as
+a rewrite of the covalent graph.  A rigid bond \(i-j\) can be replaced, inside
+that ring source polygon only, by the virtual source point
+\(\mathbf{c}_{ij}=(\mathbf{r}_i+\mathbf{r}_j)/2\); the effective polygon then
+has one fewer source point and one fewer puckering degree of freedom.  The
+analytic \(\Bmat\) row is expanded back to the real atoms by the chain rule,
+with the bond-center derivative distributed over \(i\) and \(j\).  This
+contraction is attractive for genuine double bonds, conjugated fragments and
+locally stiff fused-ring units, but it must be applied to complete symmetry
+orbits and only when ORACLE's continuous bond-order and synthon perception marks
+a hard local constraint.  The present bond-order flexibility factors are
+therefore the conservative default; rigid-source contraction is the planned
+extension for cases where the chemically intended model removes, rather than
+merely down-weights, a non-puckering motion from the active source space.  In
+both cases, the active GIC basis remains linear while Cremer--Pople amplitudes
+and phases are exposed as derived functions for sampling, PES fitting and
+conformer classification.
 
 Fused, spiro and bridged systems are handled as connected ring-source spaces
 rather than as ordinary acyclic torsions.  When two rings share a bond, \NEO\
@@ -508,7 +537,7 @@ intramolecular path uses \texttt{ONEDIH} by default; a legacy alternative is
 kept for diagnostics. \\
 Ring deformation and puckering & Active & Endocyclic angle and torsional source
 spaces generate \(RDef\) and \(RPck\) components; \(Q/\phi\)-like descriptors
-are post-processing quantities. \\
+are post-processing and DVR variables. \\
 Butterfly and condensed rings & Active & Fused-ring butterfly and condensed
 torsion families are kept as separate homogeneous source blocks. \\
 Out-of-plane/improper coordinates & Active & \(U\) out-of-plane coordinates are
@@ -600,11 +629,11 @@ locality, analytic Wilson-\(\Bmat\) rank control, homogeneous point-group
 symmetrization and protected special coordinates for rings, fragments and
 interaction centers.  This makes the same coordinate definition reusable across
 Gaussian input generation, GF/PED vibrational scaling and force-field analysis,
-future TRINITY optimization, future SMITH PES fitting, MORPHEUS
-semi-experimental refinement and workflow diagnostics.  Nonlinear coordinate
-functions such as inverse or exponential distances, trigonometric angular terms
-and Cremer--Pople descriptors can be built on top of this base by analytic
-chain-rule differentiation.
+large-amplitude DVR grids, future TRINITY optimization, future SMITH PES
+fitting, MORPHEUS semi-experimental refinement and workflow diagnostics.
+Nonlinear coordinate functions such as inverse or exponential distances,
+trigonometric angular terms and Cremer--Pople descriptors can be built on top of
+this base by analytic chain-rule differentiation.
 
 The current implementation supports the intramolecular machinery needed for
 acyclic, cyclic, fused, bridged, spiro and high-symmetry molecules, together
