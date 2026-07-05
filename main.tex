@@ -447,16 +447,16 @@ When a center has equivalent ligands or high coordination, the candidate angles
 are grouped by local equivalence or by recognized idealized coordination
 templates before block-local reduction.
 \item Exocyclic torsions are generated only for non-ring central bonds with
-non-terminal substituents.  The default Merlino-compatible path keeps one
-representative torsional coordinate per exocyclic bond, selected by a
-CIP-like priority based on the continuous effective atomic numbers and local
+non-terminal substituents.  The default intramolecular path keeps one
+representative torsional coordinate per exocyclic bond, selected by a CIP-like
+priority based on the continuous effective atomic numbers and local
 connectivity.  Symmetry-equivalent alternatives are averaged when they belong
 to the same local orbit.
 \item Endocyclic valence-angle and torsional source spaces are generated ring
 by ring.  Their active combinations are not arbitrary lists of primitive
 angles or dihedrals; they are block-local deformation and puckering components.
 For an \(n\)-membered ring, the default active puckering source dimension is
-\(n-3\), with Fourier/Merlino-style component vectors and optional
+\(n-3\), with Fourier-style component vectors and optional
 bond-order-based flexibility factors.
 \item Fused and condensed rings introduce additional torsional sources,
 including butterfly coordinates around bonds shared by two rings.  These rows
@@ -970,9 +970,8 @@ combinations exist for common three- and four-coordinate motifs. \\
 High coordination & Active/refactor boundary & Coordination numbers 5--9 use
 template recognition where possible, otherwise ligand-equivalence blocks and
 local SVD. Metal-specific extensions remain under development. \\
-One-dihedral exocyclic torsions & Active default & The Merlino-compatible
-intramolecular path uses \texttt{ONEDIH} by default; a legacy alternative is
-kept for diagnostics. \\
+One-dihedral exocyclic torsions & Active default & The intramolecular path uses
+\texttt{ONEDIH} by default; a legacy alternative is kept for diagnostics. \\
 Ring deformation and puckering & Active & Endocyclic angle and torsional source
 spaces generate \(RDef\) and \(RPck\) components; \(Q/\phi\)-like descriptors
 are post-processing and DVR variables. \\
@@ -1014,8 +1013,8 @@ from the frozen base \(\Bmat\) rows. \\
 The validation target is not merely that a coordinate list can be printed.  A
 \NEO\ coordinate definition must first pass construction-level checks.  The
 final coordinate count and analytic \(\Bmat\) rank must match the vibrational
-rank.  The current Python construction and the archived Merlino/Fortran
-construction path must agree on coordinate families, final rank and
+rank.  The current Python construction and a separate Fortran control
+implementation must agree on coordinate families, final rank and
 Wilson-\(\Bmat\) row space for the golden corpus.  Symmetry-adapted blocks must
 close under the stored point-group operations, and the saved SALC coefficient
 vectors must remain normalized.  These are internal implementation-level
@@ -1040,18 +1039,19 @@ fragment-coordinate policy and the analytic \(\Bmat\) rows of interfragment
 translation and orientation coordinates.
 
 Table~\ref{tab:validation} gives the self-consistency slice used for
-this draft.  The first eight rows compare the present construction with the
-archived Merlino construction path; the reported residual is the
+this draft.  The first eight rows compare the present construction with a
+separate Fortran control implementation; the reported residual is the
 Wilson-row-space residual between two internally maintained non-redundant bases
-that share the same scientific lineage but not the same implementation path.
+that share the same scientific specification but not the same implementation
+path.
 The narrow range of
 \(\Delta_\mathrm{PF}\) values is expected: these residuals are dominated by the
 fixed row-space audit tolerance and floating-point floor of the comparison, not
 by a molecule-specific physical error.  Their role is to show that the two
 implementation paths saturate the same numerical equivalence criterion across
 systems of different size and symmetry.  The formic-acid--water row uses the release-grade
-\texttt{SPECIAL\_COORDINATES} fragment path, for which the covalent Merlino
-reference is not the relevant comparison; there the table reports direct
+\texttt{SPECIAL\_COORDINATES} fragment path, for which the covalent Fortran
+control reference is not the relevant comparison; there the table reports direct
 analytic \(\Bmat\)-rank closure and the number of protected special coordinates.
 Because this weak-complex probe is \(C_1\), \(\epsilon_\mathrm{SALC}=0\) is
 trivial by construction and should be read only as the absence of nontrivial
@@ -1063,7 +1063,7 @@ SALC blocks, not as a symmetry-adaptation test.
 \setlength{\tabcolsep}{3pt}
 \caption{Representative internal validation of the present \NEO\ construction.
 Ranks are final/target ranks.  \(\Delta_\mathrm{PF}\) is the Python--Fortran
-Wilson-row-space residual where the Merlino comparison is applicable.
+Wilson-row-space residual where the Fortran control comparison is applicable.
 \(\epsilon_\mathrm{SALC}\) is the maximum norm error of nontrivial saved SALC
 coefficient vectors.}
 \label{tab:validation}
@@ -1330,8 +1330,8 @@ conclusion does not depend on a hidden choice inside the coordinate generator,
 but on the shared topology, symmetry and rank of the molecular problem.
 
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
-symmetry-projector normalization and Python--Fortran/Merlino row-space
-equivalence for representative cases.  This is an implementation-level
+symmetry-projector normalization and Python--Fortran row-space equivalence for
+representative cases.  This is an implementation-level
 cross-check inside the \MATRIX\ lineage, not a claim of agreement with an
 external natural-coordinate program.  Table~\ref{tab:frisch-si} adds the more external-facing
 question raised by the Gaussian GIC Supporting Information: can the same kinds
