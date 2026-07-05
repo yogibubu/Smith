@@ -172,14 +172,17 @@ TRIC/geomeTRIC coordinates & Fragment translations and rotations give excellent
 optimization variables for weakly connected systems.\cite{WangSong2016GeomeTRIC}
 & Optimization coordinates are not by themselves a frozen, symmetry-labelled
 internal-coordinate model for GF analysis or semi-experimental refinement. \\
-Gaussian GIC syntax & Very general coordinate expressions, including
-nontraditional geometric parameters, can be evaluated by an external optimizer;
-the recent Gaussian implementation is the most direct general-purpose
-comparison.\cite{Marenich2025GIC} & The most general coordinates still have to
-be specified or selected through input/connectivity rules, and the syntax does
-not define a complete natural-coordinate generator with protected rank
-reduction, homogeneous point-group projectors and reusable symmetry-labelled
-blocks for refinement or force-field analysis. \\
+Gaussian GIC syntax & Very general symbolic coordinate expressions, including
+nontraditional geometric parameters, sparse derivative rows and automatic
+symbolic differentiation, can be evaluated by an external optimizer; the recent
+Gaussian implementation is the most direct general-purpose
+comparison.\cite{Marenich2025GIC} & Standard internals can be generated from
+connectivity and user-defined GIC expressions can be parsed and differentiated,
+but the chemically specialized examples remain coordinates that are explicitly
+specified in input or activated through dedicated options.  The syntax does not
+define a complete natural-coordinate generator with protected rank reduction,
+homogeneous point-group projectors and reusable symmetry-labelled blocks for
+refinement or force-field analysis. \\
 \NEO & Builds a rank-complete, type-labelled, symmetry-adapted coordinate basis
 from a validated molecular state. & The remaining development frontier is the
 fully general pseudo-bond/pseudo-cycle model for weak complexes; the
@@ -205,6 +208,20 @@ optimization.\cite{SwartBickelhaupt2006StrongWeak}  \NEO\ turns this lineage
 into a frozen construction for spectroscopy and refinement by combining
 chemically typed primitive generation, block-local rank reduction,
 special-coordinate protection and point-group projectors.
+
+The recent Gaussian GIC paper is therefore the closest comparison and also
+clarifies the remaining gap.  Its Supporting Information demonstrates the
+power of the GIC language with nonlinear water coordinates, formamide
+proton-transfer sum and difference variables, methane and ammonia
+\(XY_3\)-type symmetrized combinations, polar and elliptic Li\(_2\)--Ar scan
+variables, fragment rotor coordinates for benzene dimers and water clusters,
+and quaternion fragment coordinates for ferrocene.\cite{Marenich2025GIC}
+These examples clarify the distinction between an expressive coordinate
+language and an automatic generator.  Gaussian can evaluate and differentiate
+such expressions once they have been supplied or selected.  \NEO\ instead aims
+to make the corresponding objects part of the frozen contract whenever they
+follow from topology, local equivalence, point-group symmetry, fragments, ring
+centers, bond centers or protected semantic coordinates.
 
 \section{Molecular State and Atom Equivalence}
 
@@ -256,7 +273,16 @@ functions without changing topology, rank selection or symmetry labels.
 Examples include \(r^{-1}\), \(\exp(-\alpha r)\) and damped contact functions
 for distances; \(\sin\theta\), \(\cos\theta\), \(\sin n\phi\) and
 \(\cos n\phi\) for bends and torsions; and Cremer--Pople-like \(q\) and
-\(\phi\) descriptors derived from linear \(RPck\) components.  Recent work by
+\(\phi\) descriptors derived from linear \(RPck\) components.  The same layer
+also covers the practical variables used in the Gaussian GIC examples:
+bond-sum and bond-difference coordinates for proton transfer, symmetrized
+\(XY_n\) local combinations, polar or elliptic functions of intermolecular
+Cartesian components, and quaternion or exponential-map functions of fragment
+orientation.\cite{Marenich2025GIC}  In a GIC input language these are written
+as explicit expressions or requested through a specific option; in \NEO\ they
+are downstream functions of generated base coordinates or protected fragment
+coordinates, with the chain rule preserving the connection to the frozen
+Wilson rows.  Recent work by
 Lema-Saavedra and Fern{\'a}ndez-Ramos shows why this separation is useful for
 rings: Cremer--Pople amplitudes provide an efficient conformational search
 space, while chemically viable 3D geometries require ring closure, angular
@@ -914,6 +940,16 @@ non-redundant reduction; local SALC fallback is recorded explicitly. \\
 SYCART comparison basis & Active in \MATRIX & Symmetry-adapted Cartesian
 nullspace coordinates provide an independent reference active space for
 downstream validation, without changing the \GIC\ construction. \\
+Sparse Wilson-\(\Bmat\) storage & Planned optimization & The Gaussian GIC
+implementation stores derivative rows sparsely, which is the right
+representation for local primitive rows and fragment/function coordinates.
+\NEO\ should retain sparse row objects through contract evaluation and reserve
+dense matrices for compact rank and projector audits. \\
+Canonical primitive/function trees & Planned optimization & The Gaussian
+Supporting Information uses search trees to avoid duplicate primitive records
+in large GIC expressions.  A hash/tree or expression-DAG registry would give
+\NEO\ the same protection for automatically generated primitives and
+\(\y=f(\q)\) functions in large systems. \\
 \bottomrule
 \end{longtable}
 
@@ -1026,15 +1062,31 @@ topology, symmetry and rank of the molecular problem.
 
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
 symmetry-projector normalization and Python/Fortran row-space equivalence for
-representative cases.  A direct numerical comparison with hand-written Gaussian
-GIC definitions is a useful external-facing test, especially for simple
-molecules where equivalent coordinate spaces can be built manually.  It is not a
-substitute for the \NEO\ contract, because Gaussian GIC syntax does not supply an
-automatic general generator, but it should be included before submission in a
-final validation set to show that the generated space agrees with an independent
-GIC construction when both are available.  Until that comparison is added, the
+representative cases.  A direct numerical comparison with Gaussian GIC
+definitions should still be included before submission, but its purpose should
+be precise.  The useful examples are not generic bond lengths or angles; they
+are the Supporting-Information cases where chemical meaning enters through a
+written expression or a special option: the formamide \(\Sigma r/\Delta r\)
+transfer variables, \(XY_3\)-symmetrized local blocks, Li\(_2\)--Ar polar or
+elliptic scan functions, benzene-dimer/water-cluster rotor coordinates and
+ferrocene quaternion coordinates.\cite{Marenich2025GIC}  Showing that \NEO\
+can generate the corresponding base or protected coordinate objects, and that
+Gaussian can reproduce them when the GIC input is written explicitly, would
+make the complementarity visible: Gaussian supplies a powerful expression and
+derivative language, while \NEO\ supplies the automatic construction and frozen
+provenance of the coordinate contract.  Until that comparison is added, the
 validation claim is limited to internal rank closure, symmetry consistency,
 SYCART active-space agreement and Python/Fortran row-space equivalence.
+
+The same comparison also suggests two implementation improvements.  First,
+contract rows should be stored and propagated sparsely wherever possible,
+because distance, angle, torsion, center and fragment rows have small local
+support even when the final audit is performed in the full Cartesian space.
+Second, generated primitives and derived functions should be registered through
+a canonical hash/tree or expression-DAG structure, analogous in purpose to the
+primitive search trees described for Gaussian GICs.\cite{Marenich2025GIC}
+That would prevent duplicated primitive rows in large automatically generated
+contracts and would make the future \(\y=f(\q)\) layer scalable.
 
 The main limitation is currently intermolecular pseudo-cycle construction.
 Protected fragment and special-center coordinates are already suitable for weak
