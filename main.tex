@@ -34,7 +34,10 @@
 \newtheorem{proposition}{Proposition}
 
 \title{\NEO\ (Nonredundant Equivariant Orthogonalizer): Block-Local, Symmetry-Consistent Generalized Internal Coordinates for Molecular and Intermolecular Coordinate Spaces}
-\author{Author list to be completed}
+\author{Vincenzo Barone\\
+INSTM, National Interuniversity Consortium for Materials Science and Technology\\
+via G. Giusti 9, 50121 Firenze, Italy\\
+\href{mailto:vincebarone52@gmail.com}{vincebarone52@gmail.com}}
 \date{Working draft -- \today}
 
 \begin{document}
@@ -1346,6 +1349,43 @@ cross-method reproducibility check rather than the first evidence that the
 DVR and \MORPHEUS\ examples remain outside the validation set of this paper:
 the present figures show coordinate locality, large-amplitude export and
 Gaussian consumption, not a completed spectroscopy or refinement benchmark.
+
+\subsection{Computational Cost and Remaining Validation}
+
+The computational separation is the same as the conceptual separation.  The
+coordinate contract is constructed once for a frozen molecular state; only the
+analytic \(\Bmat\) rows and derived coordinate functions need to be evaluated
+again at later optimization, scan or refinement geometries.  If \(m\) is the
+number of primitive candidates, \(r\) the target rank and \(z\) the number of
+nonzero sparse derivative entries, the current dense rank audit scales as
+\(O(mr\,3N)\) for modified Gram--Schmidt after the local block reductions have
+been formed.  For ordinary molecular graphs \(m\) and \(r\) are both linear in
+\(N\), so this one-time audit has cubic worst-case dense scaling but remains a
+build-time cost.  The per-geometry derivative service is sparse and scales with
+\(z\), plus the sparse chain-rule cost for any derived functions.  Large fused
+ring systems, high-coordination templates and fragment special coordinates add
+block-local SVD or projector work, but these operations are confined to their
+homogeneous source blocks rather than to a global primitive matrix.  A timed
+scaling benchmark is not yet included and should be added before treating
+performance as a validated claim.
+
+Several validation items also remain intentionally open.  The local-stability
+theorem, Theorem~\ref{thm:local-stability}, gives an existence threshold
+\(\delta\) in terms of decision margins \(\mu_a\) and Lipschitz constants
+\(L_a\), but the present draft does not report a numerical \(\delta\), \(\mu_a\)
+or \(L_a\) for a real molecule.  A future validation table should instantiate
+these quantities for representative systems, at least at the level of finite
+difference lower bounds on decision margins and empirical Lipschitz estimates
+inside a fixed topology/symmetry stratum.  Likewise, the manuscript does not
+yet compare \NEO\ against an external published natural-coordinate generator;
+the Gaussian tests are export and solver-consumption tests, not an external
+coordinate-generator benchmark.  Finally, the protected-prefix rejection rule is
+specified and implemented as a fail-fast contract condition, but no numerical
+example is shown in which independent protected coordinates exceed the target
+rank.  Such a deliberately overconstrained toy state would be a useful
+diagnostic example because it would demonstrate that \NEO\ rejects an invalid
+semantic contract rather than repairing it by silently deleting protected
+coordinates.
 
 The main limitation is currently intermolecular pseudo-cycle construction.
 Protected fragment and special-center coordinates are already suitable for weak
