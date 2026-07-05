@@ -4,6 +4,7 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{array}
 \usepackage{booktabs}
+\usepackage{graphicx}
 \usepackage{longtable}
 \usepackage{microtype}
 \usepackage[numbers,sort&compress]{natbib}
@@ -15,6 +16,7 @@
 \newcommand{\Bmat}{\mathbf{B}}
 \newcommand{\bmat}{\mathbf{b}}
 \newcommand{\Cmat}{\mathbf{C}}
+\newcommand{\Fmat}{\mathbf{F}}
 \newcommand{\Gmat}{\mathbf{G}}
 \newcommand{\x}{\mathbf{x}}
 \newcommand{\q}{\mathbf{q}}
@@ -891,15 +893,17 @@ release-grade intermolecular method; pseudo-bond/pseudo-cycle coordinates are a
 promising extension that requires a stricter separation of covalent and
 non-covalent cycle semantics before public release.
 
-\section{Construction Status}
+\section{Validated Construction Scope}
 
 Table~\ref{tab:status} records the status of the present \MATRIX/\NEO\
-construction.  The table is included in the draft because it prevents a common
-manuscript error: describing intended extensions as if they were already part of
-the release-grade coordinate contract.
+construction.  The purpose is not to document a program interface, but to state
+which mathematical objects belong to the present coordinate contract and which
+objects remain methodological extensions.  This separation is important because
+downstream validation is meaningful only for coordinates that are part of the
+frozen contract.
 
 \begin{longtable}{p{0.27\linewidth}p{0.18\linewidth}p{0.45\linewidth}}
-\caption{Current status of the main \NEO\ coordinate features.}
+\caption{Validated scope of the main \NEO\ coordinate families.}
 \label{tab:status}\\
 \toprule
 Feature & Status & Notes \\
@@ -940,16 +944,15 @@ non-redundant reduction; local SALC fallback is recorded explicitly. \\
 SYCART comparison basis & Active in \MATRIX & Symmetry-adapted Cartesian
 nullspace coordinates provide an independent reference active space for
 downstream validation, without changing the \GIC\ construction. \\
-Sparse Wilson-\(\Bmat\) storage & Active runtime baseline & The Gaussian GIC
-implementation stores derivative rows sparsely, and \NEO\ now exposes sparse
-Wilson-row objects for iterative evaluation.  Dense matrices remain available
-for compact rank and projector audits. \\
-Canonical primitive/function registry & Active baseline & The Gaussian
+Sparse Wilson-\(\Bmat\) representation & Validated baseline & Sparse derivative
+rows are part of the frozen contract.  Dense matrices remain available only as
+compact representations for rank and projector audits. \\
+Canonical primitive/function registry & Validated baseline & The Gaussian
 Supporting Information uses search trees to avoid duplicate primitive records
 in large GIC expressions.  \NEO\ uses a deterministic semantic registry for
-generated primitives and \(\y=f(\q)\) functions, preserving the generator
+generated primitives and \(\y=f(\q)\) functions, preserving the coordinate
 contract while preventing duplicated coordinate objects. \\
-Coordinate-function layer & Active baseline & Inverse and exponential
+Coordinate-function layer & Validated baseline & Inverse and exponential
 distances, trigonometric functions, linear combinations, polar radii and
 elliptic quadratic functions are evaluated by sparse chain-rule propagation
 from the frozen base \(\Bmat\) rows. \\
@@ -962,12 +965,12 @@ The validation target is not merely that a coordinate list can be printed.  A
 \NEO\ coordinate definition must pass four independent checks.
 
 First, the final coordinate count and analytic \(\Bmat\) rank must match the
-vibrational rank.  Second, the Python and Fortran-compatible backends must
-agree on coordinate families, final rank and Wilson-\(\Bmat\) row space for the
-golden corpus.  Third, symmetry-adapted blocks must close under the stored
-point-group operations, and the saved SALC coefficient vectors must remain
-normalized.  Fourth, downstream GF/PED or refinement calculations must not find
-cross-irrep couplings that contradict the saved symmetry labels.
+vibrational rank.  Second, independent construction paths must agree on
+coordinate families, final rank and Wilson-\(\Bmat\) row space for the golden
+corpus.  Third, symmetry-adapted blocks must close under the stored point-group
+operations, and the saved SALC coefficient vectors must remain normalized.
+Fourth, downstream GF/PED or refinement calculations must not find cross-irrep
+couplings that contradict the saved symmetry labels.
 
 The regression corpus contains acyclic and cyclic molecules, fused and
 non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
@@ -980,17 +983,16 @@ fragment-coordinate policy and the analytic \(\Bmat\) rows of interfragment
 translation and orientation coordinates.
 
 Table~\ref{tab:validation} gives the self-consistency slice used for
-this draft.  The first eight rows were generated with
-\texttt{matrix gicforge fortran-audit} against the vendored Merlino backend; the
-reported residual is the Wilson-row-space residual between the Python and
-Fortran non-redundant bases.  The narrow range of
+this draft.  The first eight rows compare the present construction with the
+vendored Merlino construction path; the reported residual is the
+Wilson-row-space residual between the two non-redundant bases.  The narrow range of
 \(\Delta_\mathrm{PF}\) values is expected: these residuals are dominated by the
 fixed row-space audit tolerance and floating-point floor of the comparison, not
 by a molecule-specific physical error.  Their role is to show that independent
-backends saturate the same numerical equivalence criterion across systems of
-different size and symmetry.  The formic-acid--water row uses the release-grade
-\texttt{SPECIAL\_COORDINATES} fragment path, for which the legacy Fortran
-comparison is not the relevant reference; there the table reports direct
+construction paths saturate the same numerical equivalence criterion across
+systems of different size and symmetry.  The formic-acid--water row uses the release-grade
+\texttt{SPECIAL\_COORDINATES} fragment path, for which the covalent Merlino
+reference is not the relevant comparison; there the table reports direct
 analytic \(\Bmat\)-rank closure and the number of protected special coordinates.
 Because this weak-complex probe is \(C_1\), \(\epsilon_\mathrm{SALC}=0\) is
 trivial by construction and should be read only as the absence of nontrivial
@@ -1068,6 +1070,85 @@ sparse \(\Bmat\) density below 0.35. \\
 \end{tabular}
 \end{table}
 
+\section{Application Probes}
+
+The preceding tests establish that the contract closes the correct rank and
+preserves its symmetry labels.  Two compact application probes ask a different
+question: whether the same frozen coordinate object gives a physically useful
+representation for force constants and ring deformation.  They are deliberately
+small HF/STO-3G calculations carried out with Gaussian DV, because their role is
+to test the coordinate representation, not to benchmark an electronic-structure
+method.
+
+\subsection{Hessian Locality}
+
+Let \(\Fmat_x\) be a Cartesian Hessian at the reference geometry.  For a
+full-rank \NEO\ Wilson matrix \(\Bmat\), the minimum-norm Cartesian
+displacement associated with an internal displacement is
+\[
+  \Delta \x = \Bmat^T(\Bmat\Bmat^T)^{-1}\Delta\q ,
+\]
+and the corresponding first-order internal-coordinate Hessian is
+\[
+  \Fmat_q =
+  \left[\Bmat^T(\Bmat\Bmat^T)^{-1}\right]^T
+  \Fmat_x
+  \left[\Bmat^T(\Bmat\Bmat^T)^{-1}\right].
+\]
+This construction is not a new force-field definition; it is a coordinate-space
+diagnostic.  The dimensionless coupling
+\[
+  C_{ij}=\frac{|F_{ij}|}{\sqrt{|F_{ii}F_{jj}|}}
+\]
+then compares off-diagonal structure without mixing units.
+
+Figure~\ref{fig:hessian-heatmap} shows the result for cyclobutane.  In an
+orthonormal Cartesian vibrational basis the normalized Hessian is broadly
+coupled, with a mean off-diagonal value of 0.151 and a 95th percentile of
+0.394.  In the frozen \NEO\ contract these values fall to 0.028 and 0.085.  In
+the symmetry-adapted contract they fall further to 0.013 and 0.056.  The point
+is not that \NEO\ constructs normal modes.  It constructs a chemically labelled
+basis in which the Hessian already has a sparse, block-structured appearance
+before any empirical scaling or normal-mode diagonalization is applied.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/neo_hessian_heatmap.png}
+\caption{Normalized off-diagonal Hessian coupling for cyclobutane
+(Gaussian DV HF/STO-3G).  The same Cartesian Hessian is represented in an
+orthonormal Cartesian vibrational basis, in the frozen \NEO\ contract and in the
+symmetry-adapted \NEO\ contract.  The diagonal is suppressed so that residual
+coordinate coupling is visible.}
+\label{fig:hessian-heatmap}
+\end{figure}
+
+\subsection{Ring Puckering Branch}
+
+The second probe uses the same cyclobutane contract to define a one-dimensional
+ring-puckering branch.  The coordinate is the alternating carbon-ring puckering
+amplitude associated with the \(D_{2d}\) ring source block.  Single-point
+Gaussian DV HF/STO-3G energies were evaluated along a fixed substituent-frame
+branch.  This is intentionally not a relaxed conformational profile; it is a
+test that a named puckering coordinate can be used as a reproducible sampling
+axis while the contract retains the same ring-source identity.
+
+Figure~\ref{fig:puckering-scan} illustrates the result.  The minimum on this
+fixed branch is near \(q=0.04\)~\AA, matching the optimized reference
+geometry.  Larger puckering displacements raise the energy smoothly.  In a DVR
+or SMITH application, the same base coordinate could be replaced by a
+Cremer--Pople amplitude or phase function \(y=f(\q)\), while the analytic
+chain-rule row would still descend from the frozen \NEO\ \(\Bmat\).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.68\linewidth]{figures/neo_puckering_scan.png}
+\caption{Fixed-frame cyclobutane puckering branch generated from the frozen
+\NEO\ ring coordinate and evaluated with Gaussian DV HF/STO-3G single-point
+energies.  The branch is a coordinate diagnostic, not a relaxed conformational
+energy profile.}
+\label{fig:puckering-scan}
+\end{figure}
+
 \section{Discussion}
 
 \NEO\ can be viewed as a constructive generalization of natural internal
@@ -1109,7 +1190,7 @@ depend on a hidden choice inside the coordinate generator, but on the shared
 topology, symmetry and rank of the molecular problem.
 
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
-symmetry-projector normalization and Python/Fortran row-space equivalence for
+symmetry-projector normalization and independent row-space equivalence for
 representative cases.  Table~\ref{tab:frisch-si} adds the more external-facing
 question raised by the Gaussian GIC Supporting Information: can the same kinds
 of chemically specialized variables be obtained without hand-writing the GIC
@@ -1118,7 +1199,7 @@ a powerful expression and derivative language; \NEO\ supplies automatic
 construction, semantic interning of generated coordinates, sparse derivative
 propagation and frozen provenance.  A direct numerical run in Gaussian using
 explicitly written GIC input remains useful before submission, but it is now a
-cross-program reproducibility check rather than the first evidence that the
+cross-method reproducibility check rather than the first evidence that the
 \NEO\ model can generate these variables.
 
 The main limitation is currently intermolecular pseudo-cycle construction.
