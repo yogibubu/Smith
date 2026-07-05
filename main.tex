@@ -569,6 +569,11 @@ conjugate.  The complete contract is therefore transported to an isomorphic
 contract.
 \end{proof}
 
+Equivalently, \NEO\ is natural with respect to symmetry-preserving atom
+relabellings: relabelling the molecular state and then constructing the
+contract gives the same object, up to the canonical contract isomorphism, as
+constructing the contract first and then transporting it by the relabelling.
+
 \begin{theorem}[Deterministic coordinate contract]
 \label{thm:determinism}
 For a fixed molecular state--geometry, topology, ORACLE descriptors, point-group
@@ -958,11 +963,11 @@ and center-based distances.  The method is deliberately not a single global
 orthogonalization.  It is a sequence of local and block-local decisions followed
 by a rank audit in the physical Wilson \(\Bmat\)-row space.
 Theorems~\ref{thm:relabel}--\ref{thm:local-stability} make the main structural
-claims precise: equivalent molecular states generate isomorphic contracts, the
-contract is deterministic on a frozen state, protected semantic coordinates are
-retained whenever rank compatibility allows them, block-local reduction is
-insensitive to homogeneous scaling, and the discrete contract is locally stable
-inside a fixed molecular-state stratum.
+claims precise: \NEO\ is natural with respect to symmetry-preserving
+relabellings, the contract is deterministic on a frozen state, protected
+semantic coordinates are retained whenever rank compatibility allows them,
+block-local reduction is insensitive to homogeneous scaling, and the discrete
+contract is locally stable inside a fixed molecular-state stratum.
 
 The method should therefore be read as a documented coordinate-selection
 protocol, not as a proof that only one internal-coordinate basis is possible.
