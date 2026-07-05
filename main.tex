@@ -13,11 +13,11 @@
 \newcommand{\MATRIX}{MATRIX}
 \newcommand{\GIC}{GIC}
 \newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\bmat}{\mathbf{b}}
 \newcommand{\Gmat}{\mathbf{G}}
 \newcommand{\x}{\mathbf{x}}
 \newcommand{\q}{\mathbf{q}}
 \newcommand{\y}{\mathbf{y}}
-\newcommand{\TODO}[1]{\par\noindent\textbf{TODO:} #1\par}
 
 \title{\NEO\ (Nonredundant Equivariant Orthogonalizer): Block-Local, Symmetry-Consistent Generalized Internal Coordinates for Molecular and Intermolecular Coordinate Spaces}
 \author{Author list to be completed}
@@ -112,6 +112,15 @@ applied without mixing unrelated coordinate types.  Fourth, non-standard but
 chemically important objects--ring puckering components, ring-center distances,
 fragment translations and fragment orientations--must be protected before
 ordinary valence coordinates fill the remaining rank.
+
+The name \NEO\ uses ``equivariant'' in this classical molecular-symmetry sense:
+coordinate rows are constructed so that point-group operations map them into the
+same coordinate space with the corresponding atom permutation and vector or
+pseudovector signs.  It does not denote a machine-learning equivariant model.
+Likewise, ``orthogonalizer'' refers to normalized Wilson-row rank selection and
+orthonormal SALC coefficient vectors within homogeneous source blocks.  It does
+not claim global orthogonality in the kinetic \(\Gmat\) metric; that metric is a
+downstream GF, DVR or refinement object.
 
 \section{Relationship to Existing Coordinate Models}
 
@@ -313,7 +322,10 @@ center distance have different natural units and different chemical roles.
 Changing their weights can change which delocalized coordinates are retained.
 \NEO\ instead uses rank-revealing linear algebra inside chemically homogeneous
 blocks and reserves the final cross-block competition for a deterministic
-analytic \(\Bmat\)-rank test.
+analytic \(\Bmat\)-rank test.  This does not make the construction unique in an
+abstract mathematical sense.  It replaces hidden numerical weighting choices by
+an explicit chemical priority order whose provenance is stored in the frozen
+definition.
 
 \section{Primitive Families}
 
@@ -413,7 +425,7 @@ non-planarity role and are treated as their own coordinate family.
 \section{Rank Reduction}
 
 Let \(\mathcal{P}\) be the ordered set of primitive candidates and
-\(\Bmat(p)\) the analytic Wilson row for primitive \(p\).  The target rank is
+\(\bmat(p)\) the analytic Wilson row for primitive \(p\).  The target rank is
 \[
   r =
   \begin{cases}
@@ -422,18 +434,37 @@ Let \(\mathcal{P}\) be the ordered set of primitive candidates and
   \end{cases}
 \]
 \NEO\ selects rows by incremental modified Gram--Schmidt rank testing with a
-single numerical tolerance.  Each accepted row increases the rank of the
-current \(\Bmat\)-row basis.  Singular rows and rows dependent on previously
-accepted rows are recorded in the frozen diagnostics.
+single numerical tolerance, but the comparison is performed on normalized Wilson
+rows,
+\begin{equation}
+  \hat{\bmat}(p) = \frac{\bmat(p)}{\|\bmat(p)\|_2}.
+\end{equation}
+The residual tested for candidate \(p\) is
+\begin{equation}
+  \rho(p) =
+  \left\|
+    \hat{\bmat}(p) -
+    \sum_{i \in \mathcal{A}}
+    \left[\hat{\bmat}(p)\cdot \hat{\bmat}_i\right]\hat{\bmat}_i
+  \right\|_2 ,
+\end{equation}
+where \(\mathcal{A}\) is the current accepted orthonormal row basis.  The
+absolute row norm is used only to reject singular coordinates; independence is
+decided by the direction of the analytic Wilson row.  This normalization avoids
+a direct comparison of raw angstrom and radian scales in the final rank test.
+It does not remove all modelling choices: the ordered candidate list remains a
+chemical convention, not a theorem of uniqueness.  Singular rows and rows
+dependent on previously accepted rows are recorded in the frozen diagnostics.
 
-The decisive policy is not the linear algebra routine; it is the order in which
-the rank test is allowed to compare rows.  Special protected coordinates are
-tested before ordinary primitives.  Ordinary stretches, bends and torsions then
-complete the rank.  A protected coordinate can be skipped only if it is singular
-or dependent on previously accepted protected rows.  It cannot be displaced
-merely because an ordinary valence coordinate spans a similar first-order
-motion.  If independent protected coordinates alone exceed the vibrational
-rank, the build stops rather than silently discarding a special coordinate.
+The decisive policy is therefore not only the linear algebra routine; it is the
+order in which the rank test is allowed to compare rows.  Special protected
+coordinates are tested before ordinary primitives.  Ordinary stretches, bends
+and torsions then complete the rank.  A protected coordinate can be skipped only
+if it is singular or dependent on previously accepted protected rows.  It cannot
+be displaced merely because an ordinary valence coordinate spans a similar
+first-order motion.  If independent protected coordinates alone exceed the
+vibrational rank, the build stops rather than silently discarding a special
+coordinate.
 
 This policy is what makes the coordinate set suitable for refinement.  A
 fragment-center distance or ring-center to atom distance might be expressible as
@@ -582,9 +613,41 @@ high-symmetry point-group projectors.  Weak-complex tests protect the
 fragment-coordinate policy and the analytic \(\Bmat\) rows of interfragment
 translation and orientation coordinates.
 
-\TODO{Replace this paragraph with a compact numerical table: molecule, point
-group, rank, protected families, projector method, Python/Fortran row-space
-residual, and maximum SALC normalization residual.}
+Table~\ref{tab:validation} gives the current self-consistency slice used for
+this draft.  The first eight rows were generated with
+\texttt{matrix gicforge fortran-audit} against the vendored Merlino backend; the
+reported residual is the Wilson-row-space residual between the Python and
+Fortran non-redundant bases.  The formic-acid--water row uses the production
+\texttt{SPECIAL\_COORDINATES} fragment path, for which the legacy Fortran
+comparison is not the relevant reference; there the table reports direct
+analytic \(\Bmat\)-rank closure and the number of protected special coordinates.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Representative internal validation of the current \NEO\ implementation.
+Ranks are final/target ranks.  \(\Delta_\mathrm{PF}\) is the Python--Fortran
+Wilson-row-space residual where the Merlino comparison is applicable.
+\(\epsilon_\mathrm{SALC}\) is the maximum norm error of nontrivial saved SALC
+coefficient vectors.}
+\label{tab:validation}
+\begin{tabular}{@{}p{0.17\linewidth}p{0.25\linewidth}p{0.07\linewidth}p{0.16\linewidth}p{0.27\linewidth}@{}}
+\toprule
+System & Stress test & PG & Rank/closure & Numerical check \\
+\midrule
+Benzene & Aromatic ring projector & \(D_{6h}\) & 30/30; 3 \(RPck\) & \(\Delta_\mathrm{PF}=6.67\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Pyrrole & Heteroaromatic ring projector & \(C_{2v}\) & 24/24; 2 \(RPck\) & \(\Delta_\mathrm{PF}=6.92\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Azulene & Non-benzenoid fused ring, butterfly & \(C_{2v}\) & 48/48; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.44\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Norbornane & Bridged saturated ring & \(C_{2v}\) & 51/51; 3 \(RPck\) & \(\Delta_\mathrm{PF}=6.22\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Cubane & High-symmetry cage & \(O_h\) & 42/42; cyclic bends & \(\Delta_\mathrm{PF}=6.41\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\mathrm{PF}=6.71\times10^{-9}\); \(\epsilon_\mathrm{SALC}=3.33\times10^{-16}\) \\
+Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Cyclottane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 11 protected & direct \(\Bmat\)-rank \(=18\); \(\epsilon_\mathrm{SALC}=0\) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Discussion}
 
@@ -599,7 +662,15 @@ not a single global orthogonalization.  It is a sequence of local and
 block-local decisions followed by a rank audit in the physical Wilson
 \(\Bmat\)-row space.
 
-This is also the correct way to answer the possible ``black box'' criticism.
+The method should therefore be read as a documented coordinate-selection
+protocol, not as a proof that only one internal-coordinate basis is possible.
+Normalized Wilson-row testing removes the most direct dependence on raw physical
+units in the final rank decision, but the protected-first family order remains a
+chemical modelling choice.  The point is that this choice is explicit,
+reproducible and reported, rather than hidden in primitive weights chosen before
+a global diagonalization.
+
+This is also the practical answer to the possible ``black box'' criticism.
 The output of \NEO\ is not an undocumented list of optimizer variables.  It is a
 frozen coordinate contract with primitive definitions, coefficients, family
 labels, irreducible representations, rank diagnostics and analytic derivative
@@ -608,6 +679,16 @@ with an independently generated symmetry-adapted Cartesian nullspace.  Agreement
 between the two active spaces shows that the chemical conclusion does not
 depend on a hidden choice inside the coordinate generator, but on the shared
 topology, symmetry and rank of the molecular problem.
+
+The internal validation in Table~\ref{tab:validation} establishes rank closure,
+symmetry-projector normalization and Python/Fortran row-space equivalence for
+representative cases.  A direct numerical comparison with hand-written Gaussian
+GIC definitions is a useful external-facing test, especially for simple
+molecules where equivalent coordinate spaces can be built manually.  It is not a
+substitute for the \NEO\ contract, because Gaussian GIC syntax does not supply an
+automatic general generator, but it should be included in a final validation set
+to show that the generated space agrees with an independent GIC construction
+when both are available.
 
 The main limitation is currently intermolecular pseudo-cycle construction.
 Protected fragment and special-center coordinates are already suitable for weak
