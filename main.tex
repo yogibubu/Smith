@@ -16,6 +16,7 @@
 \newcommand{\Gmat}{\mathbf{G}}
 \newcommand{\x}{\mathbf{x}}
 \newcommand{\q}{\mathbf{q}}
+\newcommand{\y}{\mathbf{y}}
 \newcommand{\TODO}[1]{\par\noindent\textbf{TODO:} #1\par}
 
 \title{\NEO\ (Nonredundant Equivariant Orthogonalizer): Block-Local, Symmetry-Consistent Generalized Internal Coordinates for Molecular and Intermolecular Coordinate Spaces}
@@ -50,11 +51,14 @@ rings and fragments, reduces the coordinate space using analytic Wilson
 \(\Bmat\)-row rank tests, and applies symmetry only inside homogeneous
 coordinate blocks.  The same frozen definition supplies Gaussian-readable
 coordinates, analytic \(\Bmat\) rows, symmetry labels and total-symmetric
-subsets for geometry optimization, Wilson GF analysis and semi-experimental
-least-squares refinement.  The method therefore provides a constructive
-counterpart to natural internal coordinates: it preserves their locality and
-interpretability while extending them to the topological and symmetry cases
-that usually require manual intervention.
+subsets for geometry optimization, Wilson GF analysis, vibrational scaling,
+force-field construction, PES fitting and semi-experimental least-squares
+refinement.  A separate functional layer can then evaluate inverse or
+exponential distance variables, trigonometric bend and torsional functions and
+Cremer--Pople-like ring descriptors from the same base coordinates.  The method
+therefore provides a constructive counterpart to natural internal coordinates:
+it preserves their locality and interpretability while extending them to the
+topological and symmetry cases that usually require manual intervention.
 \end{abstract}
 
 \section{Introduction}
@@ -83,6 +87,17 @@ symmetry labels; MORPHEUS decides which symmetry-allowed variables, predicates
 or priors enter a particular fit.  Separating these layers is essential: the
 coordinate space must be chemically meaningful before any refinement model can
 be judged.
+
+The same separation makes \NEO\ a coordinate service rather than a single
+application module.  GF/PED already uses the generated coordinates for Wilson
+analysis, vibrational scaling, local force-field analysis and force-constant
+models.  TRINITY is the future external-gradient optimization consumer of the
+same GIC/SYCART state.  SMITH (Surface Modeling with Internal-coordinate Terms
+and Hamiltonians) is the planned consumer for multidimensional potential-energy
+and property-surface fitting, while MORPHEUS uses the frozen basis for one- and
+multidimensional semi-experimental fits.  In all cases the scientific object is
+the same: a rank-complete coordinate basis with a known Wilson matrix, symmetry
+labels and provenance.
 
 The central claim of this paper is not that a new Wilson matrix is needed.  It
 is that a production coordinate generator must satisfy four requirements
@@ -124,17 +139,21 @@ obtained from global rank decompositions.\cite{Baker1996Delocalized} & The
 coordinates can mix stretches, bends, torsions and weak contacts; weights used
 to control this mixing are method choices rather than chemical observables. \\
 Natural internal coordinates & Highly interpretable symmetry and force-field
-variables for well understood local motifs. & General construction is difficult
-for fused or bridged rings, high coordination, fragments, interaction centers
-and arbitrary point groups. \\
+variables for well understood local motifs.\cite{Berces1997NaturalMetal,VonArnimAhlrichs1999GNIC,SwartBickelhaupt2006StrongWeak}
+& General construction is difficult for fused or bridged rings, high
+coordination, fragments, interaction centers and arbitrary point groups. \\
 TRIC/geomeTRIC coordinates & Fragment translations and rotations give excellent
 optimization variables for weakly connected systems.\cite{WangSong2016GeomeTRIC}
 & Optimization coordinates are not by themselves a frozen, symmetry-labelled
 internal-coordinate model for GF analysis or semi-experimental refinement. \\
-User-defined GIC syntax & Flexible coordinate expressions can be passed to
-external optimizers.\cite{Marenich2025GIC} & The syntax does not prescribe a
-general policy for topology perception, rank reduction, block symmetrization or
-intermolecular special coordinates. \\
+Gaussian GIC syntax & Very general coordinate expressions, including
+nontraditional geometric parameters, can be evaluated by an external optimizer;
+the recent Gaussian implementation is the most direct general-purpose
+comparison.\cite{Marenich2025GIC} & The most general coordinates still have to
+be specified or selected through input/connectivity rules, and the syntax does
+not define a complete natural-coordinate generator with protected rank
+reduction, homogeneous point-group projectors and reusable symmetry-labelled
+blocks for refinement or force-field analysis. \\
 \NEO & Builds a rank-complete, type-labelled, symmetry-adapted coordinate basis
 from a validated molecular state. & The remaining development frontier is the
 fully general pseudo-bond/pseudo-cycle model for weak complexes; the production
@@ -150,8 +169,14 @@ surface.  A semi-experimental fit or a Wilson GF analysis imposes stricter
 requirements: the fitted or analyzed variables must be identifiable, symmetry
 consistent and auditable as the same objects across independent programs.
 Natural internal coordinates meet these requirements when the local chemistry is
-known in advance.  \NEO\ turns that idea into an automatic construction by
-combining chemically typed primitive generation, block-local rank reduction,
+known in advance.  B{\'e}rces extended their use to transition-metal skeletal
+degrees of freedom,\cite{Berces1997NaturalMetal} von Arnim and Ahlrichs
+generalized the automatic construction while still identifying multiply fused
+ring systems as a hard case,\cite{VonArnimAhlrichs1999GNIC} and Swart and
+Bickelhaupt emphasized the need to distinguish strong and weak coordinates in
+optimization.\cite{SwartBickelhaupt2006StrongWeak}  \NEO\ turns this lineage
+into a frozen construction for spectroscopy and refinement by combining
+chemically typed primitive generation, block-local rank reduction,
 special-coordinate protection and point-group projectors.
 
 \section{Molecular State and Atom Equivalence}
@@ -176,6 +201,44 @@ route to more refined equivalence classes.  In the present implementation, this
 continuous perception enters ring orientation, ligand grouping, local stretch
 equivalence, high-coordination templates and the one-dihedral exocyclic torsion
 rule.
+
+\section{Coordinate Functions and Downstream Models}
+
+The frozen \NEO\ basis is the first-order coordinate frame.  Many downstream
+models, however, are better written in functions of those coordinates than in
+the raw coordinates themselves.  This is especially true for force fields and
+PES fitting, where the physically smooth variable may be an inverse distance,
+an exponential contact coordinate, a trigonometric torsional term or a
+ring-puckering descriptor.  We therefore distinguish base coordinates
+\(\q\), which define rank and symmetry, from model coordinates
+\(\y=f(\q)\), which are evaluated by downstream modules.
+
+For any differentiable coordinate function \(y_a=f_a(\q)\), the Wilson row used
+by a fit or force-field model follows from the chain rule,
+\begin{equation}
+  \frac{\partial y_a}{\partial \x}
+  =
+  \sum_i
+  \frac{\partial f_a}{\partial q_i}
+  \frac{\partial q_i}{\partial \x}.
+\end{equation}
+Thus the same frozen \(\Bmat\) service can support nonlinear coordinate
+functions without changing topology, rank selection or symmetry labels.
+Examples include \(r^{-1}\), \(\exp(-\alpha r)\) and damped contact functions
+for distances; \(\sin\theta\), \(\cos\theta\), \(\sin n\phi\) and
+\(\cos n\phi\) for bends and torsions; and Cremer--Pople-like \(q\) and
+\(\phi\) descriptors derived from linear \(RPck\) components.  The active
+Gaussian-readable coordinate basis should remain linear and rank complete,
+while such nonlinear functions become named observables or model variables in
+GF/PED, future TRINITY and SMITH workflows, or MORPHEUS.
+
+This distinction also prevents a common ambiguity in the word ``GIC.''  A
+general GIC expression can be an optimizer coordinate.  A \NEO\ coordinate
+definition is a reusable coordinate contract: it specifies the base coordinate
+space, the analytic derivatives and the symmetry transformation rules from
+which later functional variables can be built.  Implementing these coordinate
+functions systematically is part of the next development layer, but it does not
+require a different coordinate-generation theory.
 
 \section{Construction Principles}
 
@@ -515,8 +578,12 @@ integration of four ingredients that are usually separate: natural-coordinate
 locality, analytic Wilson-\(\Bmat\) rank control, homogeneous point-group
 symmetrization and protected special coordinates for rings, fragments and
 interaction centers.  This makes the same coordinate definition reusable across
-Gaussian input generation, GF analysis, semi-experimental refinement and
-workflow diagnostics.
+Gaussian input generation, GF/PED vibrational scaling and force-field analysis,
+future TRINITY optimization, future SMITH PES fitting, MORPHEUS
+semi-experimental refinement and workflow diagnostics.  Nonlinear coordinate
+functions such as inverse or exponential distances, trigonometric angular terms
+and Cremer--Pople descriptors can be built on top of this base by analytic
+chain-rule differentiation.
 
 The current implementation supports the intramolecular machinery needed for
 acyclic, cyclic, fused, bridged, spiro and high-symmetry molecules, together
