@@ -1034,7 +1034,13 @@ For the ferrocene row, the lower cyclopentadienyl ring is rotated through a
 five-point torsional scan from the eclipsed \(D_{5h}\) form to the staggered
 \(D_{5d}\) form.  The unprojected \NEO\ contract closes the full rank at every
 grid point, while the high-symmetry endpoints are covered separately by the
-projector tests in Table~\ref{tab:validation}.
+projector tests in Table~\ref{tab:validation}.  The sparse-\(\Bmat\) density
+reported there is the fraction
+\[
+  n_{\mathrm{nz}}/(n_{\mathrm{GIC}}\,3N)
+\]
+of nonzero derivative entries in the stored Wilson matrix; it is a compactness
+diagnostic for the sparse representation, not an additional rank criterion.
 
 \begin{table}[htbp]
 \centering
@@ -1065,7 +1071,7 @@ orientation derivatives. \\
 Ferrocene Cp torsion & Ring-center/Fe special coordinates retained through a
 \(0,9,18,27,36^\circ\) Cp rotation scan & Each grid point has rank
 \(57/57\), analytic \(\Bmat\) rank \(57\), stable ring-center identities and
-sparse \(\Bmat\) density below 0.35. \\
+sparse \(\Bmat\) density \(0.095\)--\(0.101\). \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1079,6 +1085,45 @@ representation for force constants and ring deformation.  They are deliberately
 small HF/STO-3G calculations carried out with Gaussian DV, because their role is
 to test the coordinate representation, not to benchmark an electronic-structure
 method.
+
+\subsection{Gaussian ReadAllGIC Optimization}
+
+The most direct external test is to let Gaussian use the \NEO\ contract as its
+optimization coordinate system.  In this probe \NEO\ generates the
+Gaussian-readable \texttt{ReadAllGIC} block, and Gaussian reads that block,
+evaluates the GIC derivatives with its own machinery and performs the
+optimization.  No hand-written surrogate coordinates are introduced.  The three
+systems in Table~\ref{tab:readallgic-opt} were chosen because their
+\NEO\ contracts contain only stretches, bends, dihedrals and linear
+combinations of those primitives, with no out-of-plane coordinates.  The same
+inputs are therefore compatible with standard Gaussian \texttt{ReadAllGIC}
+usage; the calculations reported here used Gaussian DV at HF/STO-3G.
+
+This is still a solver and coordinate-contract check, not an electronic
+structure benchmark.  The relevant observations are that Gaussian accepts the
+automatically generated coordinate block, reports \(NTRed=NRank\) equal to the
+\NEO\ rank at every optimization step, and reaches a stationary point in three
+to five steps for saturated ring and cage systems with different symmetry and
+rank.
+
+\begin{table}[htbp]
+\centering
+\caption{Gaussian \texttt{ReadAllGIC} optimizations using \NEO-generated
+coordinate contracts.  The route was HF/STO-3G
+\texttt{Opt=(ReadAllGIC,MaxCycle=80) NoSymm}.  The equality
+\(NTRed=NRank\) is the Gaussian-side rank reported for the GIC coordinate
+space.}
+\label{tab:readallgic-opt}
+\begin{tabular}{lccccc}
+\toprule
+System & PG & \NEO\ rank & Gaussian \(NTRed/NRank\) & Steps & \(E_\mathrm{final}\) / \(E_h\) \\
+\midrule
+Cyclohexane & \(D_{3d}\) & 48/48 & 48/48 & 4 & \(-231.482671557\) \\
+Norbornane & \(C_{2v}\) & 51/51 & 51/51 & 5 & \(-268.893823835\) \\
+Cubane & \(O_h\) & 42/42 & 42/42 & 3 & \(-303.781399977\) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Hessian Locality}
 
@@ -1102,14 +1147,16 @@ diagnostic.  The dimensionless coupling
 \]
 then compares off-diagonal structure without mixing units.
 
-Figure~\ref{fig:hessian-heatmap} shows the result for cyclobutane.  In an
+Figure~\ref{fig:hessian-heatmap} shows an illustrative result for cyclobutane.  In an
 orthonormal Cartesian vibrational basis the normalized Hessian is broadly
 coupled, with a mean off-diagonal value of 0.151 and a 95th percentile of
 0.394.  In the frozen \NEO\ contract these values fall to 0.028 and 0.085.  In
 the symmetry-adapted contract they fall further to 0.013 and 0.056.  The point
-is not that \NEO\ constructs normal modes.  It constructs a chemically labelled
-basis in which the Hessian already has a sparse, block-structured appearance
-before any empirical scaling or normal-mode diagonalization is applied.
+is not that \NEO\ constructs normal modes, nor that one small molecule proves a
+general vibrational benchmark.  The figure shows the diagnostic that will be
+applied across a broader corpus: a chemically labelled basis can make the
+Hessian visibly more block structured before any empirical scaling or
+normal-mode diagonalization is applied.
 
 \begin{figure}[htbp]
 \centering
@@ -1236,6 +1283,10 @@ methodological step is the rigorous public release of pseudo-bond and
 pseudo-cycle coordinates for intermolecular systems, with validation against the
 same rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of
 \NEO.
+The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
+contract is already usable as an external solver coordinate set, while the
+Hessian and puckering probes illustrate the force-field and large-amplitude
+directions that will close the application section.
 
 \bibliographystyle{unsrtnat}
 \bibliography{references}
