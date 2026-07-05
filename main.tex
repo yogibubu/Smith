@@ -702,30 +702,52 @@ can change.
 Let \(S_0\) be a nonsingular frozen molecular state.  Assume that, in a
 neighbourhood of \(S_0\), topology, fragment decomposition, ORACLE equivalence
 classes, point-group representation, protected prefix, homogeneous block
-membership and priority order remain fixed.  Assume also that every row norm,
-rank residual and projected-vector norm used by the construction has a nonzero
-margin from its stored acceptance threshold at \(S_0\).  Then there exists
-\(\delta>0\) such that every state \(S\) in this same discrete stratum with
-\(\|\x(S)-\x(S_0)\|<\delta\) generates an isomorphic coordinate contract: the
-primitive identities, accepted/rejected rank decisions, protected coordinates,
-family labels and symmetry labels are unchanged, while \(\Bmat\) rows and
-coefficient matrices vary continuously with the geometry.
+membership and priority order remain fixed in a ball of radius
+\(\delta_{\mathrm{str}}\) around \(S_0\).  Let
+\(\{f_a(\x)\}_{a=1}^{n_t}\) be the finite set of scalar decision functions used
+by the construction in this stratum: row norms, rank residuals, block singular
+or projected-vector norms and any sign-gauge pivot quantities used to store
+SALC coefficients.  Let \(\tau_a\) be the corresponding acceptance threshold and
+define the margin at \(S_0\)
+\[
+  \mu_a = |f_a(\x_0)-\tau_a| > 0 .
+\]
+If \(f_a\) is Lipschitz in the stratum ball with constant \(L_a\), then every
+\[
+  0 < \delta <
+  \min\left[
+    \delta_{\mathrm{str}},
+    \min_{a:L_a>0}\frac{\mu_a}{2L_a}
+  \right]
+\]
+preserves the discrete coordinate contract, with the usual convention that the
+inner minimum is \(+\infty\) if all \(L_a=0\).  Thus every state \(S\) in the
+same discrete stratum with \(\|\x(S)-\x(S_0)\|<\delta\) generates an isomorphic
+coordinate contract: the primitive identities, accepted/rejected rank decisions,
+protected coordinates, family labels and symmetry labels are unchanged, while
+\(\Bmat\) rows and coefficient matrices vary continuously with the geometry
+under the same normalization convention.
 \end{theorem}
 
 \begin{proof}
 Within the fixed discrete stratum, all primitive coordinate formulas and their
 analytic Wilson rows are smooth functions of the Cartesian geometry away from
-the singular configurations excluded by hypothesis.  The row norms,
-Gram--Schmidt residuals, block-local Gram matrices and projected-vector norms
-are therefore continuous functions of \(\x\).  Since only finitely many such
-tests are performed and each has a positive margin from its threshold at
-\(S_0\), continuity gives a common neighbourhood in which every inequality used
-by the construction has the same truth value.  The deterministic ordering then
-forces the same accepted and rejected primitive identities.  Fixed point-group
-representations give the same projectors, and the nonzero projected vectors
-remain nonzero with the same normalization convention.  Hence the discrete
-contract is unchanged up to isomorphism, and the analytic rows and coefficients
-vary continuously.
+the singular configurations excluded by hypothesis.  The decision functions
+\(f_a\) are therefore continuous and locally Lipschitz on a sufficiently small
+closed ball inside the stratum.  If
+\(\|\x-\x_0\|<\mu_a/(2L_a)\) for \(L_a>0\), then
+\[
+  |f_a(\x)-f_a(\x_0)| \le L_a\|\x-\x_0\| < \mu_a/2 ,
+\]
+so \(f_a(\x)\) remains on the same side of \(\tau_a\) as \(f_a(\x_0)\).  Tests
+with \(L_a=0\) are constant in the neighbourhood and require no additional
+restriction.  Taking the minimum over the finite decision set and the stratum
+radius preserves every Boolean decision made by the construction.  The
+deterministic ordering then forces the same accepted and rejected primitive
+identities.  Fixed point-group representations give the same projectors, and
+the projected vectors remain nonzero with the same normalization convention.
+Hence the discrete contract is unchanged up to isomorphism, and the analytic
+rows and coefficients vary continuously.
 \end{proof}
 
 This is the technical reason for block-local reduction.  \NEO\ does not claim
