@@ -1,0 +1,532 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=2.6cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{microtype}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
+
+\newcommand{\NEO}{NEO}
+\newcommand{\MATRIX}{MATRIX}
+\newcommand{\GIC}{GIC}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Gmat}{\mathbf{G}}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\q}{\mathbf{q}}
+\newcommand{\TODO}[1]{\par\noindent\textbf{TODO:} #1\par}
+
+\title{\NEO\ (Nonredundant Equivariant Orthogonalizer): Block-Local, Symmetry-Consistent Generalized Internal Coordinates for Molecular and Intermolecular Coordinate Spaces}
+\author{Author list to be completed}
+\date{Working draft -- \today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Internal coordinates are the natural language of molecular structure, yet their
+automatic construction remains uneven across the use cases required by modern
+spectroscopy and structure refinement.  Primitive redundant internals are robust
+for geometry optimization but do not define a unique active space.  Global
+non-redundant coordinates obtained from the singular-value or eigenvalue
+decomposition of a full primitive Wilson matrix remove the redundancy, but the
+resulting variables are often delocalized and sensitive to arbitrary weights
+assigned to stretches, bends, torsions and non-covalent contacts.  Natural
+internal coordinates provide the best chemical interpretation, especially for
+force-field and vibrational work, but existing constructions are usually tied to
+particular bonding patterns and do not provide a general, reproducible treatment
+of fused rings, high coordination, point-group symmetry and weakly bound
+fragments.
+
+We present \NEO\ (Nonredundant Equivariant Orthogonalizer), the coordinate
+engine of \MATRIX, as a general construction of non-redundant,
+symmetry-adapted generalized internal coordinates.  \NEO\ starts
+from a frozen molecular state containing geometry, topology, atom equivalence,
+point-group operations, fragments and optional interaction centers.  It then
+builds chemically typed primitive families, protects special coordinates for
+rings and fragments, reduces the coordinate space using analytic Wilson
+\(\Bmat\)-row rank tests, and applies symmetry only inside homogeneous
+coordinate blocks.  The same frozen definition supplies Gaussian-readable
+coordinates, analytic \(\Bmat\) rows, symmetry labels and total-symmetric
+subsets for geometry optimization, Wilson GF analysis and semi-experimental
+least-squares refinement.  The method therefore provides a constructive
+counterpart to natural internal coordinates: it preserves their locality and
+interpretability while extending them to the topological and symmetry cases
+that usually require manual intervention.
+\end{abstract}
+
+\section{Introduction}
+
+The Wilson internal-coordinate formalism gives a compact relation between
+Cartesian displacements \(\Delta \x\) and internal-coordinate displacements
+\(\Delta \q\),
+\begin{equation}
+  \Delta \q = \Bmat \Delta \x ,
+\end{equation}
+and remains the standard framework for vibrational analysis, potential-energy
+distributions and internal-coordinate force constants.\cite{Wilson1955}  The
+formalism itself does not solve the constructive problem: one must still choose
+which coordinates define the molecular model.  That choice is benign in small
+hand-built Z matrices, but it becomes a central scientific issue when the same
+coordinate model is expected to support symmetry-constrained optimization,
+semi-experimental structural refinement, ring puckering, weak complexes and
+metal or high-coordination environments.
+
+\NEO\ is designed to make this choice explicit and reproducible.  In the
+\MATRIX\ workflow, \NEO\ is the coordinate-generation engine, while MORPHEUS is
+the downstream framework that constructs and validates semi-experimental
+refinement models from those coordinates.  Thus \NEO\ defines the non-redundant
+generalized internal-coordinate basis, the analytic Wilson matrix and the
+symmetry labels; MORPHEUS decides which symmetry-allowed variables, predicates
+or priors enter a particular fit.  Separating these layers is essential: the
+coordinate space must be chemically meaningful before any refinement model can
+be judged.
+
+The central claim of this paper is not that a new Wilson matrix is needed.  It
+is that a production coordinate generator must satisfy four requirements
+simultaneously.  First, the final variables must span the correct vibrational
+rank, \(3N-6\) for nonlinear systems and \(3N-5\) for linear systems.  Second,
+they must remain local enough to support chemical interpretation, parameter
+constraints and force-constant analysis.  Third, point-group symmetry must be
+applied without mixing unrelated coordinate types.  Fourth, non-standard but
+chemically important objects--ring puckering components, ring-center distances,
+fragment translations and fragment orientations--must be protected before
+ordinary valence coordinates fill the remaining rank.
+
+\section{Relationship to Existing Coordinate Models}
+
+Table~\ref{tab:context} summarizes the position of \NEO\ relative to the main
+coordinate strategies used in quantum chemistry and molecular spectroscopy.
+The comparison is deliberately constructive.  \NEO\ is not a replacement for
+the Wilson formalism, natural internal coordinates or translation-rotation
+coordinates; it is a general layer that decides how such ingredients are
+assembled into one frozen, reusable coordinate object.
+
+\begin{table}[htbp]
+\centering
+\caption{How \NEO\ is positioned relative to established coordinate strategies.}
+\label{tab:context}
+\begin{tabular}{p{0.20\linewidth}p{0.32\linewidth}p{0.37\linewidth}}
+\toprule
+Strategy & Strength & Limitation addressed by \NEO \\
+\midrule
+Z matrices & Compact, local and interpretable for small molecules. & Tree
+dependence, singularities, and manual choices make them fragile for rings,
+symmetry and automated workflows.\cite{BakerHehre1991ZMatrix} \\
+Redundant internal coordinates & Robust for optimization and easy to generate
+from a graph.\cite{PulayFogarasi1992,Peng1996Redundant,BakkenHelgaker2002} &
+They do not define a unique active basis for vibrational analysis, symmetry
+projection or least-squares refinement. \\
+Delocalized internal coordinates & Automatic non-redundant bases can be
+obtained from global rank decompositions.\cite{Baker1996Delocalized} & The
+coordinates can mix stretches, bends, torsions and weak contacts; weights used
+to control this mixing are method choices rather than chemical observables. \\
+Natural internal coordinates & Highly interpretable symmetry and force-field
+variables for well understood local motifs. & General construction is difficult
+for fused or bridged rings, high coordination, fragments, interaction centers
+and arbitrary point groups. \\
+TRIC/geomeTRIC coordinates & Fragment translations and rotations give excellent
+optimization variables for weakly connected systems.\cite{WangSong2016GeomeTRIC}
+& Optimization coordinates are not by themselves a frozen, symmetry-labelled
+internal-coordinate model for GF analysis or semi-experimental refinement. \\
+User-defined GIC syntax & Flexible coordinate expressions can be passed to
+external optimizers.\cite{Marenich2025GIC} & The syntax does not prescribe a
+general policy for topology perception, rank reduction, block symmetrization or
+intermolecular special coordinates. \\
+\NEO & Builds a rank-complete, type-labelled, symmetry-adapted coordinate basis
+from a validated molecular state. & The remaining development frontier is the
+fully general pseudo-bond/pseudo-cycle model for weak complexes; the production
+intermolecular path currently uses protected fragment and center coordinates. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This positioning is important for the narrative of the method.  Primitive
+redundant internals and delocalized internals are excellent tools for geometry
+optimization, where the main criterion is stable movement on a potential-energy
+surface.  A semi-experimental fit or a Wilson GF analysis imposes stricter
+requirements: the fitted or analyzed variables must be identifiable, symmetry
+consistent and auditable as the same objects across independent programs.
+Natural internal coordinates meet these requirements when the local chemistry is
+known in advance.  \NEO\ turns that idea into an automatic construction by
+combining chemically typed primitive generation, block-local rank reduction,
+special-coordinate protection and point-group projectors.
+
+\section{Molecular State and Atom Equivalence}
+
+\NEO\ does not rediscover the molecule at every downstream step.  Its input is a
+validated \MATRIX\ molecular state containing Cartesian geometry, covalent
+bonds, rings, point-group operations, optional fragments and optional
+interaction centers.  The output is a frozen \(\#\)GIC definition: primitive
+coordinate records, final generalized coordinates, coefficients, family labels,
+irreducible representations, total-symmetric subsets and the metadata required
+to reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
+they do not rebuild topology, ring sets or coordinate rows.
+
+Initial local equivalence is not based only on element symbols.  The current
+runtime uses effective atomic numbers that combine nuclear charge with local
+coordination, distance-derived bond-order information, angular rigidity and
+delocalization-like terms.  These continuous descriptors order atoms and
+ligands in cases where a pure graph label would be ambiguous.  The broader
+\MATRIX\ topology layer also exposes synthon descriptors--charge, covalency,
+delocalization, strain and effective nuclear charge--which provide a natural
+route to more refined equivalence classes.  In the present implementation, this
+continuous perception enters ring orientation, ligand grouping, local stretch
+equivalence, high-coordination templates and the one-dihedral exocyclic torsion
+rule.
+
+\section{Construction Principles}
+
+The construction is easiest to state as a sequence of constraints on the
+candidate space.
+
+\begin{enumerate}
+\item All covalent bonds in the validated topology generate stretch candidates.
+Stretches establish the bonded frame and are not allowed to be displaced by
+later valence or torsional candidates.
+\item Valence-angle candidates are generated locally around each bonded center.
+When a center has equivalent ligands or high coordination, the candidate angles
+are grouped by local equivalence or by recognized idealized coordination
+templates before block-local reduction.
+\item Exocyclic torsions are generated only for non-ring central bonds with
+non-terminal substituents.  The default Merlino-compatible path keeps one
+representative torsional coordinate per exocyclic bond, selected by a
+CIP-like priority based on the continuous effective atomic numbers and local
+connectivity.  Symmetry-equivalent alternatives are averaged when they belong
+to the same local orbit.
+\item Endocyclic valence-angle and torsional source spaces are generated ring
+by ring.  Their active combinations are not arbitrary lists of primitive
+angles or dihedrals; they are block-local deformation and puckering components.
+For an \(n\)-membered ring, the default active puckering source dimension is
+\(n-3\), with Fourier/Merlino-style component vectors and optional
+bond-order-based flexibility factors.
+\item Fused and condensed rings introduce additional torsional sources,
+including butterfly coordinates around bonds shared by two rings.  These rows
+remain in ring/torsional source blocks during reduction and symmetry
+adaptation; they are not relabelled as generic torsions.
+\item Special coordinates--fragment-center distances, center-atom distances,
+fragment translations, fragment orientations and interaction-center distances--
+are generated before ordinary candidates fill the remaining rank.  Their rows
+are protected because they describe objects that ordinary valence coordinates
+can span algebraically but not semantically.
+\item The final non-redundant basis is selected by analytic \(\Bmat\)-row rank,
+using a fixed family order and a protected-first policy.  Symmetry is applied
+after a valid non-redundant basis exists, and only inside homogeneous source
+blocks.
+\end{enumerate}
+
+This ordering differs from a global diagonalization of the full primitive
+metric, whether expressed as \( \Bmat \Bmat^T \), as a row-space projector such
+as \( \Bmat \Bmat^+ \), or as a single SVD of every redundant primitive at
+once.  Such decompositions are mathematically useful, but their eigenvectors
+depend on how the primitive rows have been scaled.  A stretch measured in
+angstrom, a bend measured in radians, a torsion, a fragment translation and a
+center distance have different natural units and different chemical roles.
+Changing their weights can change which delocalized coordinates are retained.
+\NEO\ instead uses rank-revealing linear algebra inside chemically homogeneous
+blocks and reserves the final cross-block competition for a deterministic
+analytic \(\Bmat\)-rank test.
+
+\section{Primitive Families}
+
+The primitive layer is intentionally redundant.  Redundancy is useful at this
+stage because it allows chemical rules to create all plausible local
+deformations before the rank selector removes dependent rows.  The important
+restriction is that primitives are born with family labels that survive
+reduction, symmetry adaptation and output.
+
+\subsection{Bonded Coordinates}
+
+Every covalent edge generates a stretch.  Equivalent stretches can be converted
+to local sums and differences using a block-local SVD of their analytic
+\(\Bmat\) rows, but the source block remains a stretch block.  Ordinary bends
+are generated from pairs of neighbors around each center.  Nearly linear
+centers produce two linear-bend components, because one ordinary angular
+derivative becomes singular at linearity.
+
+For three- and four-coordinate centers, \NEO\ uses local equivalence classes to
+construct chemically recognizable bend combinations: symmetric deformations,
+rocking coordinates and tetrahedral or \(WXY_3/W_2XY_2\)-like patterns.  For
+coordination numbers between five and nine, the code first attempts to match an
+idealized local template; if no template closes reliably, ligand-equivalence
+classes define the block that is reduced by SVD.  This is the practical
+realization of the ``\(XY_n\) local symmetry'' idea: the algebra is local, the
+grouping is chemically typed, and the result does not mix angle rows with
+stretches or torsions.
+
+\subsection{Exocyclic Torsions}
+
+For an acyclic bond \(j-k\), all substituent pairs \(i-j-k-l\) are possible
+primitive torsions.  Keeping every such torsion is usually unnecessary and can
+create symmetry noise.  The default intramolecular path therefore uses the
+one-dihedral rule: among non-linear substituent pairs, the selected pair is the
+highest-priority pair under effective-atomic-number and local-connectivity
+ordering.  If several pairs belong to the same local equivalence orbit, the
+coordinate is the normalized average of the corresponding primitive dihedrals.
+This gives one chemically stable torsional coordinate for each eligible
+exocyclic bond while still respecting local degeneracy.
+
+\subsection{Rings, Puckering and Butterfly Coordinates}
+
+Ring coordinates are the main place where primitive internal coordinates must
+be replaced by natural combinations.  An \(n\)-membered ring has redundant
+endocyclic angle and dihedral lists.  \NEO\ constructs ring deformation
+coordinates and \(RPck\) puckering components as linear combinations of those
+source rows, keeping \(n-3\) independent puckering components for rings larger
+than three atoms.  The polar Cremer--Pople-like descriptors \(Q\) and \(\phi\)
+are useful for interpretation, but the active coordinate basis stores linear
+\(RPck\) rows because their \(\Bmat\) rows are analytic linear combinations of
+dihedral derivatives.\cite{CremerPople1975}
+
+Fused, spiro and bridged systems are handled as connected ring-source spaces
+rather than as ordinary acyclic torsions.  When two rings share a bond, \NEO\
+adds butterfly coordinates around that shared bond.  Condensed-ring torsions
+and ring puckering components remain separate homogeneous blocks in the
+symmetry projector.  This is essential for high-symmetry systems such as cubane
+and for fused aromatic systems where a global torsion list would obscure the
+local ring role.
+
+\subsection{Out-of-Plane and Improper Coordinates}
+
+Three-coordinate centers generate out-of-plane coordinates unless all four
+atoms involved are cyclic.  Gaussian-compatible improper dihedrals can be
+emitted in a compatibility mode, but the default analytic coordinate is the
+out-of-plane \(U\) coordinate.  This distinction is an output convention, not a
+change in the reduction policy: both forms occupy the same local
+non-planarity role and are treated as their own coordinate family.
+
+\section{Rank Reduction}
+
+Let \(\mathcal{P}\) be the ordered set of primitive candidates and
+\(\Bmat(p)\) the analytic Wilson row for primitive \(p\).  The target rank is
+\[
+  r =
+  \begin{cases}
+    3N-6, & \text{nonlinear molecule},\\
+    3N-5, & \text{linear molecule}.
+  \end{cases}
+\]
+\NEO\ selects rows by incremental modified Gram--Schmidt rank testing with a
+single numerical tolerance.  Each accepted row increases the rank of the
+current \(\Bmat\)-row basis.  Singular rows and rows dependent on previously
+accepted rows are recorded in the frozen diagnostics.
+
+The decisive policy is not the linear algebra routine; it is the order in which
+the rank test is allowed to compare rows.  Special protected coordinates are
+tested before ordinary primitives.  Ordinary stretches, bends and torsions then
+complete the rank.  A protected coordinate can be skipped only if it is singular
+or dependent on previously accepted protected rows.  It cannot be displaced
+merely because an ordinary valence coordinate spans a similar first-order
+motion.  If independent protected coordinates alone exceed the vibrational
+rank, the build stops rather than silently discarding a special coordinate.
+
+This policy is what makes the coordinate set suitable for refinement.  A
+fragment-center distance or ring-center to atom distance might be expressible as
+a linear combination of many ordinary internal derivatives near a reference
+geometry.  That algebraic fact does not make the ordinary combination a useful
+fit variable.  The protected-first rule preserves the variables that define the
+model, then uses ordinary coordinates for completeness.
+
+\section{Symmetry Adaptation}
+
+Symmetry is applied only after a non-redundant coordinate basis has been
+selected.  The source molecular state contains point-group operations as
+rotation matrices and atom permutations.  For each homogeneous coordinate
+block--for example stretches, ordinary bends, ring puckering components,
+fragment translations or fragment orientations--\NEO\ builds the representation
+of the operations on that block, applies character projectors, orthonormalizes
+the projected vectors and writes the resulting symmetry-adapted linear
+combinations to the frozen GIC definition.
+
+The homogeneous-block rule is the key safeguard.  A stretch and a torsion may
+belong to the same irreducible representation, but they are not the same kind
+of coordinate.  Mixing them during symmetry adaptation would produce a valid
+vector in a mathematical representation and an opaque variable in a chemical
+model.  \NEO\ therefore projects only within coordinate families and source
+blocks.  If a block is not closed under the stored operations, the program uses
+an explicit local SALC fallback only where the contract allows it, and records
+that fallback in the symmetry diagnostics.
+
+Fragment translations transform as polar vectors; fragment orientations
+transform as axial vectors.  Torsions and out-of-plane coordinates carry the
+appropriate sign changes under atom permutation and inversion.  Ring puckering
+coordinates are projected through the underlying dihedral source vectors so
+that the symmetry labels refer to the same analytic \(\Bmat\) rows used later
+by GF, fitting and optimization.
+
+\section{Intermolecular and Special Coordinates}
+
+Weak complexes are a stress test for any internal-coordinate generator.  A
+covalent graph alone is disconnected, but adding arbitrary weak contacts as
+ordinary bonds can create artificial rings and mix covalent and non-covalent
+motions.  \NEO\ therefore separates the production fragment-coordinate model
+from the pseudo-bond model under development.
+
+In the production \texttt{SPECIAL\_COORDINATES} mode, each fragment keeps its
+intramolecular coordinate basis.  Interfragment motion is represented by
+protected special coordinates: fragment-center distances, fragment-center to
+atom distances, Cartesian components of relative fragment translation and
+relative fragment orientations expressed as exponential-map rotation
+coordinates.  This follows the physical insight of translation-rotation
+coordinates used in geomeTRIC-like optimization methods,\cite{WangSong2016GeomeTRIC}
+but stores the result as a frozen, symmetry-labelled \(\GIC\) definition with
+analytic \(\Bmat\) rows.
+
+Interaction centers extend the same idea to non-atomic reference objects.  A
+center may be a ring centroid, a bond midpoint or a contact center.  Distances
+from atoms or fragments to such centers are special protected coordinates and
+are evaluated analytically by distributing the center derivative over the atoms
+that define it.  This gives a practical route to coordination complexes,
+metallocenes and eta-like interactions without pretending that a metal-ring
+centroid is a covalent atom in the molecular graph.
+
+The code base also contains a pseudo-bond and pseudo-cycle infrastructure.  In
+that model, selected non-covalent contacts can be inserted into the construction
+graph, and the resulting pseudo-cycles can generate \(N-3\) angular and
+torsional components analogous to covalent ring coordinates.  The current public
+contract disables this mode for production builds: pseudo-bond constants,
+families and candidate generators are present, but the accepted fragment modes
+are \texttt{NONE} and \texttt{SPECIAL\_COORDINATES}.  This distinction should be
+kept in the final manuscript.  The special-coordinate fragment model is the
+release-grade intermolecular method; pseudo-bond/pseudo-cycle coordinates are a
+promising extension that requires a stricter separation of covalent and
+non-covalent cycle semantics before public release.
+
+\section{Implementation Status}
+
+Table~\ref{tab:status} records the status checked against the current
+\MATRIX/\NEO\ source tree.  The table is included in the draft because it
+prevents a common manuscript error: describing the intended coordinate theory
+as if every branch were already the default production path.
+
+\begin{longtable}{p{0.27\linewidth}p{0.18\linewidth}p{0.45\linewidth}}
+\caption{Current implementation status of the main \NEO\ coordinate features.}
+\label{tab:status}\\
+\toprule
+Feature & Status & Notes \\
+\midrule
+\endfirsthead
+\toprule
+Feature & Status & Notes \\
+\midrule
+\endhead
+Covalent stretches & Active & Generated for all topology bonds; local
+equivalence grouping is available. \\
+Exocyclic bends & Active & Generated around bonded centers; local symmetric
+combinations exist for common three- and four-coordinate motifs. \\
+High coordination & Active/refactor boundary & Coordination numbers 5--9 use
+template recognition where possible, otherwise ligand-equivalence blocks and
+local SVD. Metal-specific extensions remain under development. \\
+One-dihedral exocyclic torsions & Active default & The Merlino-compatible
+intramolecular path uses \texttt{ONEDIH} by default; a legacy alternative is
+kept for diagnostics. \\
+Ring deformation and puckering & Active & Endocyclic angle and torsional source
+spaces generate \(RDef\) and \(RPck\) components; \(Q/\phi\)-like descriptors
+are post-processing quantities. \\
+Butterfly and condensed rings & Active & Fused-ring butterfly and condensed
+torsion families are kept as separate homogeneous source blocks. \\
+Out-of-plane/improper coordinates & Active & \(U\) out-of-plane coordinates are
+default; Gaussian-style improper dihedrals are available as a compatibility
+mode. \\
+Special fragment coordinates & Active & Fragment-center distances,
+center-atom distances, translations and orientations are protected before
+ordinary rank completion. \\
+Interaction centers & Active baseline & Ring centers, bond centers and related
+virtual centers can enter protected center-atom coordinates. \\
+Pseudo-bond/pseudo-cycle fragment mode & Disabled for production & Candidate
+families and constants exist, but the current contract rejects pseudo-bond
+fragment mode and directs weak complexes to \texttt{SPECIAL\_COORDINATES}. \\
+Point-group projector & Active & Applied to homogeneous blocks after
+non-redundant reduction; local SALC fallback is recorded explicitly. \\
+SYCART comparison basis & Active in \MATRIX & Symmetry-adapted Cartesian
+nullspace coordinates provide an independent reference active space for
+downstream validation, without changing the \GIC\ construction. \\
+\bottomrule
+\end{longtable}
+
+\section{Validation Strategy}
+
+The validation target is not merely that a coordinate list can be printed.  A
+\NEO\ coordinate definition must pass four independent checks.
+
+First, the final coordinate count and analytic \(\Bmat\) rank must match the
+vibrational rank.  Second, the Python and Fortran-compatible backends must
+agree on coordinate families, final rank and Wilson-\(\Bmat\) row space for the
+golden corpus.  Third, symmetry-adapted blocks must close under the stored
+point-group operations, and the saved SALC coefficient vectors must remain
+normalized.  Fourth, downstream GF/PED or refinement calculations must not find
+cross-irrep couplings that contradict the saved symmetry labels.
+
+The current regression corpus contains acyclic and cyclic molecules, fused and
+non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
+molecules, ferrocene in \(D_{5h}\) and \(D_{5d}\) forms, and a formic-acid--water
+weak-complex probe.  The ring subset protects the \(RDef/RPck\) source spaces,
+butterfly coordinates and the use of linear \(RPck\) rows rather than polar
+active coordinates.  Ferrocene protects center-based special coordinates and
+high-symmetry point-group projectors.  Weak-complex tests protect the
+fragment-coordinate policy and the analytic \(\Bmat\) rows of interfragment
+translation and orientation coordinates.
+
+\TODO{Replace this paragraph with a compact numerical table: molecule, point
+group, rank, protected families, projector method, Python/Fortran row-space
+residual, and maximum SALC normalization residual.}
+
+\section{Discussion}
+
+\NEO\ can be viewed as a constructive generalization of natural internal
+coordinates.  It preserves the natural-coordinate preference for local,
+chemically interpretable combinations, but it makes the construction explicit
+for cases that are traditionally handled by expert intervention.  The same
+generator handles ordinary valence coordinates, ring puckering components,
+butterfly torsions, high-coordination angular blocks, fragment translations,
+fragment orientations and center-based distances.  The method is deliberately
+not a single global orthogonalization.  It is a sequence of local and
+block-local decisions followed by a rank audit in the physical Wilson
+\(\Bmat\)-row space.
+
+This is also the correct way to answer the possible ``black box'' criticism.
+The output of \NEO\ is not an undocumented list of optimizer variables.  It is a
+frozen coordinate contract with primitive definitions, coefficients, family
+labels, irreducible representations, rank diagnostics and analytic derivative
+rows.  Moreover, downstream calculations can compare the \GIC\ active space
+with an independently generated symmetry-adapted Cartesian nullspace.  Agreement
+between the two active spaces shows that the chemical conclusion does not
+depend on a hidden choice inside the coordinate generator, but on the shared
+topology, symmetry and rank of the molecular problem.
+
+The main limitation is currently intermolecular pseudo-cycle construction.
+Protected fragment and special-center coordinates are already suitable for weak
+complexes and coordination motifs.  What is not yet release-grade is the more
+ambitious model in which weak contacts are inserted as pseudo-bonds and then
+used to construct ring-like angular and torsional components.  That model is
+scientifically attractive because it would give a unified internal-coordinate
+description of hydrogen-bonded cycles, but it must avoid contaminating the
+covalent topology and must remain stable under symmetry.  Until that contract
+is closed, the manuscript should present pseudo-bonds as a development target,
+not as the production intermolecular method.
+
+\section{Conclusions}
+
+\NEO\ provides a general, frozen and symmetry-aware construction of
+generalized internal coordinates for \MATRIX.  Its main contribution is the
+integration of four ingredients that are usually separate: natural-coordinate
+locality, analytic Wilson-\(\Bmat\) rank control, homogeneous point-group
+symmetrization and protected special coordinates for rings, fragments and
+interaction centers.  This makes the same coordinate definition reusable across
+Gaussian input generation, GF analysis, semi-experimental refinement and
+workflow diagnostics.
+
+The current implementation supports the intramolecular machinery needed for
+acyclic, cyclic, fused, bridged, spiro and high-symmetry molecules, together
+with a production special-coordinate model for weak complexes.  The next
+methodological step is the rigorous public release of pseudo-bond and
+pseudo-cycle coordinates for intermolecular systems, with validation against the
+same rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of
+\NEO.
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}
