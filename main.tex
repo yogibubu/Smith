@@ -940,16 +940,19 @@ non-redundant reduction; local SALC fallback is recorded explicitly. \\
 SYCART comparison basis & Active in \MATRIX & Symmetry-adapted Cartesian
 nullspace coordinates provide an independent reference active space for
 downstream validation, without changing the \GIC\ construction. \\
-Sparse Wilson-\(\Bmat\) storage & Planned optimization & The Gaussian GIC
-implementation stores derivative rows sparsely, which is the right
-representation for local primitive rows and fragment/function coordinates.
-\NEO\ should retain sparse row objects through contract evaluation and reserve
-dense matrices for compact rank and projector audits. \\
-Canonical primitive/function trees & Planned optimization & The Gaussian
+Sparse Wilson-\(\Bmat\) storage & Active runtime baseline & The Gaussian GIC
+implementation stores derivative rows sparsely, and \NEO\ now exposes sparse
+Wilson-row objects for iterative evaluation.  Dense matrices remain available
+for compact rank and projector audits. \\
+Canonical primitive/function registry & Active baseline & The Gaussian
 Supporting Information uses search trees to avoid duplicate primitive records
-in large GIC expressions.  A hash/tree or expression-DAG registry would give
-\NEO\ the same protection for automatically generated primitives and
-\(\y=f(\q)\) functions in large systems. \\
+in large GIC expressions.  \NEO\ uses a deterministic semantic registry for
+generated primitives and \(\y=f(\q)\) functions, preserving the generator
+contract while preventing duplicated coordinate objects. \\
+Coordinate-function layer & Active baseline & Inverse and exponential
+distances, trigonometric functions, linear combinations, polar radii and
+elliptic quadratic functions are evaluated by sparse chain-rule propagation
+from the frozen base \(\Bmat\) rows. \\
 \bottomrule
 \end{longtable}
 
@@ -1020,6 +1023,51 @@ Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 11 protected
 \end{tabular}
 \end{table}
 
+Table~\ref{tab:frisch-si} gives the first validation slice aimed directly at
+the recent Gaussian GIC examples.  These are not comparisons of optimizer
+performance; they test whether the chemically meaningful variables illustrated
+in the Supporting Information can be produced as \NEO\ contract objects or
+coordinate functions without hand-writing a molecule-specific GIC input block.
+For the ferrocene row, the lower cyclopentadienyl ring is rotated through a
+five-point torsional scan from the eclipsed \(D_{5h}\) form to the staggered
+\(D_{5d}\) form.  The unprojected \NEO\ contract closes the full rank at every
+grid point, while the high-symmetry endpoints are covered separately by the
+projector tests in Table~\ref{tab:validation}.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Targeted tests inspired by the Gaussian GIC Supporting Information.
+The purpose is to test automatic \NEO\ construction of the same kind of
+coordinate object that Gaussian can evaluate when supplied as a GIC expression
+or through a dedicated option.}
+\label{tab:frisch-si}
+\begin{tabular}{@{}p{0.20\linewidth}p{0.31\linewidth}p{0.41\linewidth}@{}}
+\toprule
+SI motif & \NEO\ object & Check \\
+\midrule
+Formamide proton transfer & Generated \(R_{\mathrm{NH}}\), \(R_{\mathrm{OH}}\)
+primitive signatures plus \(\Sigma r\) and \(\Delta r\) functions & Function
+values and sparse chain-rule rows reproduce the sum and difference derivatives. \\
+Li\(_2\)--Ar scan variables & Protected interfragment translation axes plus
+polar radius and elliptic quadratic functions & \(R=\sqrt{x^2+y^2}\) and the
+elliptic constraint propagate sparse derivatives from generated axes. \\
+\(XY_3\) local block & Homogeneous \(C_{3v}\) bend block projected by the stored
+point-group representation & The block gives one \(A_1\) and one degenerate
+\(E\) pair without mixing with other coordinate families. \\
+Weak-complex rotor variables & Protected fragment translations, fragment
+orientations and fragment-center distances & The weak-complex contract contains
+automatic \(FTRANS\), \(FROT\) and \(FC\_DIST\) rows with nonzero sparse
+orientation derivatives. \\
+Ferrocene Cp torsion & Ring-center/Fe special coordinates retained through a
+\(0,9,18,27,36^\circ\) Cp rotation scan & Each grid point has rank
+\(57/57\), analytic \(\Bmat\) rank \(57\), stable ring-center identities and
+sparse \(\Bmat\) density below 0.35. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Discussion}
 
 \NEO\ can be viewed as a constructive generalization of natural internal
@@ -1062,31 +1110,16 @@ topology, symmetry and rank of the molecular problem.
 
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
 symmetry-projector normalization and Python/Fortran row-space equivalence for
-representative cases.  A direct numerical comparison with Gaussian GIC
-definitions should still be included before submission, but its purpose should
-be precise.  The useful examples are not generic bond lengths or angles; they
-are the Supporting-Information cases where chemical meaning enters through a
-written expression or a special option: the formamide \(\Sigma r/\Delta r\)
-transfer variables, \(XY_3\)-symmetrized local blocks, Li\(_2\)--Ar polar or
-elliptic scan functions, benzene-dimer/water-cluster rotor coordinates and
-ferrocene quaternion coordinates.\cite{Marenich2025GIC}  Showing that \NEO\
-can generate the corresponding base or protected coordinate objects, and that
-Gaussian can reproduce them when the GIC input is written explicitly, would
-make the complementarity visible: Gaussian supplies a powerful expression and
-derivative language, while \NEO\ supplies the automatic construction and frozen
-provenance of the coordinate contract.  Until that comparison is added, the
-validation claim is limited to internal rank closure, symmetry consistency,
-SYCART active-space agreement and Python/Fortran row-space equivalence.
-
-The same comparison also suggests two implementation improvements.  First,
-contract rows should be stored and propagated sparsely wherever possible,
-because distance, angle, torsion, center and fragment rows have small local
-support even when the final audit is performed in the full Cartesian space.
-Second, generated primitives and derived functions should be registered through
-a canonical hash/tree or expression-DAG structure, analogous in purpose to the
-primitive search trees described for Gaussian GICs.\cite{Marenich2025GIC}
-That would prevent duplicated primitive rows in large automatically generated
-contracts and would make the future \(\y=f(\q)\) layer scalable.
+representative cases.  Table~\ref{tab:frisch-si} adds the more external-facing
+question raised by the Gaussian GIC Supporting Information: can the same kinds
+of chemically specialized variables be obtained without hand-writing the GIC
+expressions?  The answer is positive for the tested motifs.  Gaussian supplies
+a powerful expression and derivative language; \NEO\ supplies automatic
+construction, semantic interning of generated coordinates, sparse derivative
+propagation and frozen provenance.  A direct numerical run in Gaussian using
+explicitly written GIC input remains useful before submission, but it is now a
+cross-program reproducibility check rather than the first evidence that the
+\NEO\ model can generate these variables.
 
 The main limitation is currently intermolecular pseudo-cycle construction.
 Protected fragment and special-center coordinates are already suitable for weak
