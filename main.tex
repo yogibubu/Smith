@@ -879,9 +879,10 @@ by GF, fitting and optimization.
 Weak complexes are a stress test for any internal-coordinate generator.  A
 covalent graph alone is disconnected, but adding arbitrary weak contacts as
 ordinary bonds can create artificial rings and mix covalent and non-covalent
-motions.  \NEO\ therefore keeps two explicit intermolecular constructions: a
-protected fragment-coordinate model and a pseudo-bond/pseudo-cycle model for
-selected hydrogen-bonded or contact-closed graphs.
+motions.  Within its current validated scope, \NEO\ therefore keeps two
+explicit intermolecular constructions: a protected fragment-coordinate model
+and a pseudo-bond/pseudo-cycle model for selected hydrogen-bonded or
+contact-closed graphs.
 
 In the release-grade \texttt{SPECIAL\_COORDINATES} mode, each fragment keeps its
 intramolecular coordinate basis.  Interfragment motion is represented by
@@ -901,16 +902,16 @@ that define it.  This gives a practical route to coordination complexes,
 metallocenes and eta-like interactions without pretending that a metal-ring
 centroid is a covalent atom in the molecular graph.
 
-In the \texttt{PSEUDO\_BONDS} mode, selected non-covalent contacts are inserted
-into the construction graph as typed pseudo-edges, and the resulting
-pseudo-cycles generate angular and torsional source components analogous to
-covalent ring coordinates.  These rows are still labelled separately from
-covalent stretches, bends and torsions, so downstream users can decide whether
-they are model coordinates, constraints or diagnostics.  The present validation
-uses formic-acid--water, formamide--water and the glycine I/II hydrogen-bond
-fixtures as regression probes: a single intramolecular bridge and a bifurcated
-bridge both close the expected rank without converting the underlying covalent
-topology into a different molecule.
+In the current validated \texttt{PSEUDO\_BONDS} baseline, selected
+non-covalent contacts are inserted into the construction graph as typed
+pseudo-edges, and the resulting pseudo-cycles generate angular and torsional
+source components analogous to covalent ring coordinates.  These rows are still
+labelled separately from covalent stretches, bends and torsions, so downstream
+users can decide whether they are model coordinates, constraints or
+diagnostics.  The present validation uses formic-acid--water, formamide--water
+and the glycine I/II hydrogen-bond fixtures as regression probes: a single
+intramolecular bridge and a bifurcated bridge both close the expected rank
+without converting the underlying covalent topology into a different molecule.
 
 \section{Validated Construction Scope}
 
@@ -958,10 +959,11 @@ Semantic \texttt{PROTECT}/\texttt{OBSERVABLE} layer & Active baseline &
 Protected user rows are deduplicated, substituted when row-equivalent to an
 automatic primitive and rejected when they exceed the target rank; observables
 use sparse chain-rule propagation. \\
-Pseudo-bond/pseudo-cycle mode & Active baseline & Typed weak contacts can be
-inserted as pseudo-edges; pseudo-cycle bend and torsion families remain
-separate from covalent coordinates and are regression-tested on hydrogen-bonded
-weak complexes and glycine I/II contact fixtures. \\
+Pseudo-bond/pseudo-cycle mode & Validated baseline & Within the current
+validated scope, typed weak contacts can be inserted as pseudo-edges;
+pseudo-cycle bend and torsion families remain separate from covalent
+coordinates and are regression-tested on hydrogen-bonded weak complexes and
+glycine I/II contact fixtures. \\
 Point-group projector & Active & Applied to homogeneous blocks after
 non-redundant reduction; local SALC fallback is recorded explicitly. \\
 NEO symmetry-adapted Cartesian reference basis & Active in \NEO & Symmetry-adapted Cartesian
@@ -1324,7 +1326,8 @@ but the relative fixed-frame puckering profile is the same at the level needed
 for this export test (Table~\ref{tab:external-codes}).  This verifies the
 intended division of labor: \NEO\ constructs the model and coordinates, while
 external electronic-structure programs consume the resulting Cartesian
-geometries or GIC serializations.
+geometries or GIC serializations.  It confirms that the coordinate contract is
+independent of the electronic-structure implementation.
 
 \begin{table}[htbp]
 \centering
@@ -1442,9 +1445,9 @@ in the semantic coordinate layer unit probes in Table~\ref{tab:validation}; a ch
 realistic overconstrained example remains a useful future diagnostic.
 
 The main limitation is no longer the absence of pseudo-bonds in the code path,
-but the small size of the validation set for pseudo-cycles.  Protected fragment
+but the current validated scope of the pseudo-cycle tests.  Protected fragment
 and special-center coordinates are already suitable for weak complexes and
-coordination motifs, while the pseudo-bond layer now covers typed hydrogen-bond
+coordination motifs, while the pseudo-bond baseline covers typed hydrogen-bond
 closures and bifurcated contacts.  What remains to be expanded is the corpus of
 symmetry-rich intermolecular cycles and the numerical stress testing of those
 pseudo-cycle rows under geometry changes.
@@ -1506,10 +1509,10 @@ this base by analytic chain-rule differentiation.
 
 The present construction supports the intramolecular machinery needed for
 acyclic, cyclic, fused, bridged, spiro and high-symmetry molecules, together
-with special-coordinate and pseudo-bond models for weak complexes.  The next
-methodological step is to enlarge the pseudo-cycle validation corpus for
-intermolecular systems, using the same rank, symmetry and analytic-\(\Bmat\)
-invariants used by the rest of \NEO.
+with special-coordinate and pseudo-bond models for weak complexes within the
+validated baseline described above.  The next methodological step is to enlarge
+the pseudo-cycle validation corpus for intermolecular systems, using the same
+rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of \NEO.
 The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
 contract is already usable as an external solver coordinate set.  The Hessian,
 puckering, GF/PED scaling and portable chair-to-boat export probes illustrate
