@@ -1212,37 +1212,46 @@ modes.\cite{RauhutPulay1995,BakerJarzeckiPulay1998,BaroneBiczyskoBloino2014}
 That operation is only transparent when the coordinate blocks keep stretches,
 bends, torsions and ring-puckering coordinates separated.
 
-The add-on test prepared for the next numerical pass is a substituted
-cyclohexane GF/PED calculation at B3LYP/6-31G* with standard Gaussian 16
-frequencies and no out-of-plane GIC terms.  \NEO\ supplies the frozen
-coordinate contract and sparse \(\Bmat\) rows; the GF layer then applies
+The add-on test uses cyclohexanol at GDV B3LYP/6-31G(d), with standard
+\texttt{Opt Freq NoSymm} and no out-of-plane GIC terms.  \NEO\ supplies the
+frozen coordinate contract and sparse \(\Bmat\) rows; the GF layer then applies
 family-level Pulay-style scale factors to the internal force field and reports
-PED percentages by source family.  Table~\ref{tab:gf-ped-scaling} gives the
-reporting format and the scale classes used by the regression input.  The
-hydroxyl stretch is deliberately assigned a force-constant factor larger than
-one, corresponding to an approximately \(+100\)~cm\(^{-1}\) shift, because
-localized OH stretches are a known sensitive region for modest harmonic DFT
-levels and are usually treated by class-specific calibration rather than by a
-single global frequency scale factor.
+PED percentages by source family.  The contract has rank \(51/51\).  The
+unscaled GF frequencies reproduce the Gaussian/FCHK harmonic frequencies with
+an RMS difference of \(2.6\times10^{-6}\)~cm\(^{-1}\), and the aligned
+optimized geometry agrees to \(4.7\times10^{-7}\)~\AA.  The hydroxyl stretch is
+deliberately assigned a force-constant factor larger than one, corresponding to
+an approximately \(+100\)~cm\(^{-1}\) shift, because localized OH stretches are
+a known sensitive region for modest harmonic DFT levels and are usually treated
+by class-specific calibration rather than by a single global frequency scale
+factor.
 
 \begin{table}[htbp]
 \centering
-\caption{GF/PED scaling probe prepared for the substituted-cyclohexane
-validation.  The table is intentionally restricted to representative modes; a
-full spectrum would obscure the point that \NEO\ family labels give a readable
-PED without manual coordinate relabelling.}
+\caption{Representative GDV B3LYP/6-31G(d) GF/PED scaling probe for
+cyclohexanol.  Frequencies are in cm\(^{-1}\).  PED entries are summed over
+\NEO\ coordinate families and rounded to one decimal percent.}
 \label{tab:gf-ped-scaling}
-\begin{tabular}{@{}p{0.19\linewidth}p{0.16\linewidth}p{0.14\linewidth}p{0.43\linewidth}@{}}
+\begin{tabular}{@{}p{0.24\linewidth}ccp{0.42\linewidth}@{}}
 \toprule
-Mode class & Force-field scale & Expected shift & PED readout required from \NEO \\
+Representative mode & Unscaled & Scaled & Dominant PED families \\
 \midrule
-OH stretch & 1.055 & \(+100\) cm\(^{-1}\) & Dominant OH stretch contribution with only minor CO and bend leakage. \\
-CH stretches & 0.965 & red shift & Local CH stretch families remain separated from ring puckering rows. \\
-Heavy-atom stretch/bend & 0.98--1.00 & small & CO/CC stretches and CCO/CCC bends appear as mixed valence families, not as arbitrary normal-mode labels. \\
-Ring torsion/puckering & 0.95--1.00 & small & \(RPck\), torsional and bend contributions identify chair-deformation modes and connect to \(q,\phi\)-type observables. \\
+Low-frequency ring deformation & 269.158 & 266.496 & Heavy stretch 49.8; ring puckering 25.0; bend/rock 21.9. \\
+Ring bend/deformation & 475.915 & 472.567 & Heavy stretch 58.1; ring bend 27.3; bend/rock 13.7. \\
+Heavy-atom stretch/bend & 1106.899 & 1104.650 & Heavy stretch 89.2; bend/rock 10.5. \\
+CH stretch & 3088.189 & 3033.689 & CH stretch 100.0. \\
+OH stretch & 3748.716 & 3850.456 & OH stretch 99.9. \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The large-amplitude block analysis is consistent with the same family
+separation: the torsion block gives 270.542~cm\(^{-1}\), while the three
+ring-puckering rows give 224.217, 417.617 and 473.078~cm\(^{-1}\).  The active
+DVR candidate is the \(RPck0003\) row at 225.084~cm\(^{-1}\).  This is the
+spectroscopic counterpart of the construction principle: scaling classes are
+assigned to \NEO\ family labels such as \texttt{Stre0012}, \texttt{RPck0002}
+or \texttt{RDef0026}, not to handwritten normal-mode descriptions.
 
 \subsection{Ring Puckering Branch}
 

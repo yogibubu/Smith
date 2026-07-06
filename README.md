@@ -14,8 +14,6 @@ production special-coordinate fragment model and the disabled pseudo-bond /
 pseudo-cycle branch.
 
 The GF/PED scaling add-on is tracked in
-`data/gf_ped_scaling_probe.json`.  It records the substituted-cyclohexane G16
-B3LYP/6-31G* validation target and the SQM-style family scale classes.  The
-local editing environment used for this draft did not expose a G16 executable,
-so the manuscript table is kept as a validation target rather than a completed
-frequency/PED result.
+`data/gf_ped_scaling_probe.json`.  It records the cyclohexanol GDV
+B3LYP/6-31G(d) Opt/Freq probe, the SQM-style family scale classes, and the
+representative PED rows reported in the manuscript.
