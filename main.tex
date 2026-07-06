@@ -1180,6 +1180,11 @@ Ferrocene Cp torsion & Ring-center/Fe special coordinates retained through a
 \(0,9,18,27,36^\circ\) Cp rotation scan & Each grid point has rank
 \(57/57\), analytic \(\Bmat\) rank \(57\), stable ring-center identities and
 sparse \(\Bmat\) density \(0.095\)--\(0.101\). \\
+Cyclohexane ring flip coordinate & Automatically generated \(D_{3d}\)
+ring-puckering block \(\mathrm{A}_{1g}RPck001+\mathrm{E}_uRPck001/002\) &
+No hand-written \texttt{Gcyc}, \texttt{Ccyc} or \texttt{Scn0} input is supplied;
+the contract closes rank \(48/48\) and exports a Gaussian-readable puckering
+model. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1303,13 +1308,19 @@ energy profile.}
 
 \subsection{Portable Chair-to-Boat Puckering Export}
 
-The final probe tests a stricter export question.  \NEO\ was used to construct a
-fixed-frame cyclohexane puckering path from the chair \(q_3\) component to the
-boat \(q_2\) component.  For each point it generated two independent external
-representations of the same geometry: a portable Cartesian input, usable by any
-electronic-structure program, and a Gaussian \texttt{ReadAllGIC} input containing
-the automatically generated coordinate contract.  Gaussian DV B3LYP/6-31+G*
-single-point energies were then evaluated from both inputs.
+The final probe tests a stricter export question, using the same cyclohexane
+ring-flip motif discussed in the Gaussian GIC paper and its Supporting
+Information.  There, the puckering coordinate is encoded by an explicit
+molecule-specific input block containing variables such as \texttt{Gcyc},
+\texttt{Ccyc} and \texttt{Scn0}.  Here no such block is provided.  \NEO\ starts
+from the molecular graph and geometry, generates the ring-puckering contract,
+and then constructs a fixed-frame cyclohexane puckering path from the chair
+\(q_3\) component to the boat \(q_2\) component.  For each point it generated
+two independent external representations of the same geometry: a portable
+Cartesian input, usable by any electronic-structure program, and a Gaussian
+\texttt{ReadAllGIC} input containing the automatically generated coordinate
+contract.  Gaussian DV B3LYP/6-31+G* single-point energies were then evaluated
+from both inputs.
 
 All five contracts have rank \(48/48\) and contain no out-of-plane GIC terms, so
 the comparison uses only syntax supported by standard Gaussian
@@ -1385,9 +1396,10 @@ hand-writing molecule-specific GIC expressions?  Gaussian supplies a powerful
 expression and derivative language; \NEO\ supplies automatic construction,
 semantic interning of generated coordinates, sparse derivative propagation and
 frozen provenance.  In this sense, GIC syntax is a serialization and solver
-interface for \NEO, not a competing coordinate-generation theory.  A direct
-numerical comparison with explicitly written Gaussian GIC input would still be a
-useful cross-method reproducibility check.
+interface for \NEO, not a competing coordinate-generation theory.  The
+cyclohexane check makes this distinction concrete: the Gaussian-style puckering
+model is available to the external solver, but its coordinate definitions are
+not typed by hand.
 
 \subsection{Computational Cost and Remaining Validation}
 
