@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[10pt]{article}
 
 \usepackage[a4paper,margin=2.6cm]{geometry}
 \usepackage{amsmath,amssymb,amsthm}
@@ -102,48 +102,41 @@ coordinate model is expected to support symmetry-constrained optimization,
 semi-experimental structural refinement, ring puckering, weak complexes and
 metal or high-coordination environments.
 
-\NEO\ is designed to make this choice explicit and reproducible.  In the
-\MATRIX\ workflow, \NEO\ is the coordinate-generation engine, while \MORPHEUS\ is
-the downstream framework that constructs and validates semi-experimental
-refinement models from those coordinates.  Thus \NEO\ defines the non-redundant
-generalized internal-coordinate basis, the analytic Wilson matrix and the
-symmetry labels; \MORPHEUS\ decides which symmetry-allowed variables, predicates
-or priors enter a particular fit.  Separating these layers is essential: the
-coordinate space must be chemically meaningful before any refinement model can
-be judged.
+\NEO\ is designed to make this choice explicit and reproducible.  Table~\ref{tab:framework-roles}
+defines the workflow names used below.  The essential separation is that
+\NEO\ defines the non-redundant generalized internal-coordinate basis, analytic
+Wilson matrix and symmetry labels; downstream modules choose how those
+coordinates enter a fit, force field, scan or surface model.
 
-The acronyms used below denote roles in this workflow.  \MATRIX\ is the
-Molecular Analysis Toolkit for Reusable Integrated eXperiments, the shared
-molecular-state and package framework.  \ORACLE\ is the Operator for Routing,
-Analysis, Control, Launch and Exploration; in this manuscript the relevant
-\ORACLE/\MATRIX\ object is the validated molecular state, including continuous
-atom perception and synthon descriptors used by \NEO\ for deterministic local
-choices.  \SYCART\ denotes the symmetry-adapted Cartesian active-space model
-used as a Cartesian comparison basis.  \MORPHEUS\ is used as a tool name for
-SEFit, the semi-experimental fit module; \TRINITY\ is the planned external-gradient
-optimization branch, and \SMITH\ (Surface Modeling with Internal-coordinate
-Terms and Hamiltonians) is the planned multidimensional PES/property-surface
-fitting layer, with PES denoting potential-energy surface.  GF/PED denotes
-Wilson GF analysis and potential-energy distribution, and DVR denotes discrete
-variable representation.
-
-The same separation makes \NEO\ a coordinate service rather than a single
-application module.  GF/PED is the immediate spectroscopic consumer of the
-generated coordinates for Wilson analysis, vibrational scaling, local
-force-field analysis and force-constant models.  The DVR layer uses the same
-coordinate state to choose large-amplitude coordinates, build ring-puckering
-grids and associate grid points with molecular geometries.  \TRINITY\ is the
-future external-gradient optimization consumer of the same \GIC/\SYCART\ state.
-\SMITH\ is the planned consumer for multidimensional potential-energy and
-property-surface fitting, while \MORPHEUS\ uses the frozen basis for one- and
-multidimensional semi-experimental fits.  In all cases the
-scientific object is the same: a rank-complete coordinate basis with a known
-Wilson matrix, symmetry labels and provenance.
+\begin{table}[htbp]
+\centering
+\caption{Workflow components referred to in this manuscript.}
+\label{tab:framework-roles}
+\begin{tabular}{@{}p{0.18\linewidth}p{0.72\linewidth}@{}}
+\toprule
+Name & Role \\
+\midrule
+\MATRIX & Molecular Analysis Toolkit for Reusable Integrated eXperiments; the
+shared molecular-state and package framework. \\
+\ORACLE & Operator for Routing, Analysis, Control, Launch and Exploration; here,
+the validated state carrying continuous atom perception and synthon descriptors. \\
+\NEO & Coordinate-generation engine: \GIC/\SYCART\ construction, analytic
+\(\Bmat\) rows, symmetry labels and provenance. \\
+\SYCART & Symmetry-adapted Cartesian active-space model used as an independent
+Cartesian comparison basis. \\
+\MORPHEUS & SEFit semi-experimental refinement module using \NEO{} coordinates. \\
+\TRINITY & Planned external-gradient optimization branch. \\
+\SMITH & Planned Surface Modeling with Internal-coordinate Terms and Hamiltonians
+layer for multidimensional PES/property fitting. \\
+GF/PED, DVR & Wilson GF/potential-energy-distribution analysis and discrete
+variable representation. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The novelty is not a new coordinate formula, but a deterministic constructive
-protocol producing a frozen coordinate contract.  The central claim of this
-paper is not that a new Wilson matrix is needed.  It is that a general
-coordinate generator must provide a deterministic
+protocol.  The central claim is not that a new Wilson matrix is needed.  It is
+that a general coordinate generator must provide a deterministic
 constructive protocol for choosing a non-redundant basis while satisfying four
 requirements simultaneously.  First, the final variables must span the correct
 vibrational rank, \(3N-6\) for nonlinear systems and \(3N-5\) for linear
@@ -153,17 +146,16 @@ point-group symmetry must be applied without mixing unrelated coordinate types.
 Fourth, non-standard but chemically important objects--ring puckering
 components, ring-center distances, fragment translations and fragment
 orientations--must be protected before ordinary valence coordinates fill the
-remaining rank.  The result is not merely a coordinate list but a frozen
-coordinate contract: a persistent mathematical object that downstream modules
-can audit, reuse and compare against independent active-space constructions.
+remaining rank.  The result is not merely a coordinate list but a persistent
+object that downstream modules can audit, reuse and compare against independent
+active-space constructions.
 
 Equally important, \NEO\ is not a new coordinate language.  Modern GIC
 implementations already provide expressive syntax for nonlinear and mixed
 coordinate expressions.  The novelty here is the preceding step: a
 deterministic generator that converts a frozen molecular state into a
-rank-complete, symmetry-consistent and chemically semantic coordinate contract
-that can then be serialized as Gaussian-readable GICs or consumed directly by
-\MATRIX\ modules.
+rank-complete, symmetry-consistent coordinate basis that can be serialized as
+Gaussian-readable GICs or consumed directly by \MATRIX\ modules.
 
 The name \NEO\ uses ``equivariant'' in this classical molecular-symmetry sense:
 coordinate rows are constructed so that point-group operations map them into the
@@ -382,20 +374,16 @@ functions systematically is part of the next development layer, but it does not
 require a different coordinate-generation theory.
 
 \NEO\ therefore exposes a small semantic front-end rather than a second GIC
-language.  A user may request protected base objects, such as
-\texttt{DISTANCE}, \texttt{TORSION}, \texttt{RING\_PUCKERING},
-\texttt{BUTTERFLY}, fragment translations or center distances, and derived
-observables, such as inverse distances, exponentials, trigonometric functions,
-linear combinations, Cremer--Pople variables or proton-transfer coordinates.
-Protected semantic coordinates enter the same rank and symmetry contract as
-automatically generated protected coordinates whenever they are independent.
-Observable coordinates never compete in the rank selection; they are evaluated
-later as \(y=f(\q)\) from named base coordinates by the chain rule in
-Eq.~\eqref{eq:chain-rule}.  Duplicate user-protected rows are rejected, row-equivalent user
-coordinates substitute the automatic primitive with provenance recorded, and a
-partial user-specified symmetry orbit is diagnosed explicitly before local SALC
-fallback.  Thus the user expresses intent, while \NEO\ remains responsible for
-model construction, rank resolution and export.
+language.  \texttt{PROTECT} requests name base objects such as distances,
+torsions, ring puckering, butterfly coordinates, fragment translations or
+center distances.  Independent requests enter rank and symmetry selection with
+the same priority as automatically generated protected coordinates.
+\texttt{OBSERVABLE} requests define functions such as inverse distances,
+trigonometric terms, linear combinations, Cremer--Pople variables or
+proton-transfer coordinates; they are evaluated later as \(y=f(\q)\) by
+Eq.~\eqref{eq:chain-rule}.  Duplicate protected rows are rejected,
+row-equivalent user rows substitute the automatic primitive with provenance
+recorded, and partial symmetry orbits are diagnosed before local SALC fallback.
 
 \section{The Frozen Coordinate Contract}
 
@@ -739,10 +727,12 @@ more independent rows than the target rank, the construction has no
 rank-compatible protected basis and records that failure explicitly.
 \end{proof}
 
-\begin{proposition}[Rank-preserving ordered selection]
+\begin{proposition}[Rank-preserving selection]
 \label{prop:rank-selection}
-Assume exact arithmetic and let
-\(\mathcal{R}_k=\operatorname{span}\{\bmat(p_1),\ldots,\bmat(p_k)\}\).
+Assume exact arithmetic and define
+\[
+  \mathcal{R}_k=\operatorname{span}\{\bmat(p_1),\ldots,\bmat(p_k)\}.
+\]
 Incremental Gram--Schmidt selection accepts \(p_k\) exactly when
 \(\bmat(p_k)\notin\mathcal{R}_{k-1}\).  After all candidates have been tested,
 the accepted subset \(\mathcal{A}\) is an ordered basis of
@@ -1035,6 +1025,10 @@ center-atom distances, translations and orientations are protected before
 ordinary rank completion. \\
 Interaction centers & Active baseline & Ring centers, bond centers and related
 virtual centers can enter protected center-atom coordinates. \\
+Semantic \texttt{PROTECT}/\texttt{OBSERVABLE} front-end & Active baseline &
+Protected user rows are deduplicated, substituted when row-equivalent to an
+automatic primitive and rejected when they exceed the target rank; observables
+use sparse chain-rule propagation. \\
 Pseudo-bond/pseudo-cycle fragment mode & Excluded release-grade & Candidate
 families and constants exist, but the present contract rejects pseudo-bond
 fragment mode and directs weak complexes to \texttt{SPECIAL\_COORDINATES}. \\
@@ -1104,7 +1098,10 @@ control reference is not the relevant comparison; there the table reports direct
 analytic \(\Bmat\)-rank closure and the number of protected special coordinates.
 Because this weak-complex probe is \(C_1\), \(\epsilon_\mathrm{SALC}=0\) is
 trivial by construction and should be read only as the absence of nontrivial
-SALC blocks, not as a symmetry-adaptation test.
+SALC blocks, not as a symmetry-adaptation test.  The semantic-front-end row is
+a unit-level contract test of the \texttt{PROTECT}/\texttt{OBSERVABLE} layer
+introduced in Sec.~4; it exercises duplicate rejection, row-equivalent
+substitution and the fail-fast protected-prefix rule.
 
 \begin{table}[htbp]
 \centering
@@ -1129,6 +1126,7 @@ Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\ma
 Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 11 protected & direct \(\Bmat\)-rank \(=18\); \(\epsilon_\mathrm{SALC}=0\) \\
+Semantic front-end & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probes & duplicate protected row rejected; row-equivalent substitution recorded; protected rank excess fails fast \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1430,13 +1428,9 @@ difference lower bounds on decision margins and empirical Lipschitz estimates
 inside a fixed topology/symmetry stratum.  Likewise, the manuscript does not
 yet compare \NEO\ against an external published natural-coordinate generator;
 the Gaussian tests are export and solver-consumption tests, not an external
-coordinate-generator benchmark.  Finally, the protected-prefix rejection rule is
-specified and implemented as a fail-fast contract condition, but no numerical
-example is shown in which independent protected coordinates exceed the target
-rank.  Such a deliberately overconstrained toy state would be a useful
-diagnostic example because it would demonstrate that \NEO\ rejects an invalid
-semantic contract rather than repairing it by silently deleting protected
-coordinates.
+coordinate-generator benchmark.  The protected-prefix rejection rule is covered
+in the semantic front-end unit probes in Table~\ref{tab:validation}; a chemically
+realistic overconstrained example remains a useful future diagnostic.
 
 The main limitation is currently intermolecular pseudo-cycle construction.
 Protected fragment and special-center coordinates are already suitable for weak
@@ -1550,9 +1544,10 @@ validation targets.
 \section*{Acknowledgments}
 
 The author acknowledges the broader \MATRIX\ development environment used to
-test the coordinate contracts and the Gaussian GIC work that motivated the
-explicit distinction between coordinate-description languages and automatic
-coordinate generation.
+test the coordinate contracts, the Gaussian GIC work that motivated the
+distinction between coordinate-description languages and automatic generation,
+and the ring-reconstruction work of Lema-Saavedra and Fern{\'a}ndez-Ramos that
+clarified how puckering coordinates connect to closed molecular geometries.
 
 \bibliographystyle{unsrtnat}
 \bibliography{references}
