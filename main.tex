@@ -66,6 +66,8 @@ rings and fragments, reduces the coordinate space using analytic Wilson
 \(\Bmat\)-row rank tests, and applies symmetry only inside homogeneous
 coordinate blocks.  The result is a deterministic constructive protocol and a
 frozen coordinate contract, rather than an arbitrary non-redundant basis.  The
+contract can also incorporate optional user-defined protected semantic
+coordinates and derived observables.
 same frozen definition is designed to supply Gaussian-readable coordinates, analytic
 \(\Bmat\) rows, symmetry labels and total-symmetric subsets for geometry
 optimization, Wilson GF/potential-energy-distribution analysis, vibrational
@@ -265,10 +267,7 @@ GIC definitions to obtain chemically natural variables such as local
 translations or ring-puckering components.  When those variables are consequences
 of the frozen molecular state, \NEO\ can generate and protect them
 automatically; when they are requested explicitly, the request is recorded as a
-semantic coordinate rather than as an opaque handwritten expression.  To the
-author's knowledge, no publicly available coordinate generator currently
-combines automatic point-group treatment, rank-complete non-redundant selection
-and protected semantic coordinates in a single reusable contract.
+semantic coordinate rather than as an opaque handwritten expression.
 
 \section{Molecular State and Atom Equivalence}
 
@@ -367,7 +366,7 @@ which later functional variables can be built.  Implementing these coordinate
 functions systematically is part of the next development layer, but it does not
 require a different coordinate-generation theory.
 
-\NEO\ therefore exposes a small semantic front-end rather than a second GIC
+\NEO\ therefore exposes a small semantic coordinate layer rather than a second GIC
 language.  \texttt{PROTECT} requests name base objects such as distances,
 torsions, ring puckering, butterfly coordinates, fragment translations or
 center distances.  Independent requests enter rank and symmetry selection with
@@ -1397,7 +1396,7 @@ inside a fixed topology/symmetry stratum.  Likewise, the manuscript does not
 yet compare \NEO\ against an external published natural-coordinate generator;
 the Gaussian tests are export and solver-consumption tests, not an external
 coordinate-generator benchmark.  The protected-prefix rejection rule is covered
-in the semantic front-end unit probes in Table~\ref{tab:validation}; a chemically
+in the semantic coordinate layer unit probes in Table~\ref{tab:validation}; a chemically
 realistic overconstrained example remains a useful future diagnostic.
 
 The main limitation is currently intermolecular pseudo-cycle construction.
