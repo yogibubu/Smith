@@ -873,6 +873,14 @@ discarding vectors below the saved norm tolerance, and by choosing the sign from
 the largest-magnitude coefficient pivot.  The subspace is the representation
 theoretic object; the ordered, sign-gauged coefficient matrix is the
 deterministic serialization stored in the contract.
+Along scans or optimizations, a change in the identity of the largest pivot can
+flip the printed gauge even when the invariant subspace, rank and symmetry
+labels are unchanged.  \NEO\ therefore treats pivot changes as path diagnostics:
+the stored overlap between consecutive SALC coefficient matrices is monitored,
+and a continuity-preserving Procrustes alignment can be applied by downstream
+GF/PED or DVR layers when a path-continuous basis is required.  None of the
+reported chair-to-boat, ferrocene or GF/PED probes showed a pivot switch in the
+active blocks used for the tabulated quantities.
 
 The homogeneous-block rule is the key safeguard.  A stretch and a torsion may
 belong to the same irreducible representation, but they are not the same kind
@@ -1455,12 +1463,19 @@ Several validation items also remain intentionally open.  The local-stability st
 or \(L_a\) for a real molecule.  A future validation table should instantiate
 these quantities for representative systems, at least at the level of finite
 difference lower bounds on decision margins and empirical Lipschitz estimates
-inside a fixed topology/symmetry stratum.  Likewise, the manuscript does not
-yet compare \NEO\ against an external published natural-coordinate generator;
-the Gaussian tests are export and solver-consumption tests, not an external
-coordinate-generator benchmark.  The protected-prefix rejection rule is covered
-in the semantic coordinate layer unit probes in Table~\ref{tab:validation}; a chemically
-realistic overconstrained example remains a useful future diagnostic.
+inside a fixed topology/symmetry stratum.  The same caveat applies to
+point-group perception near borderline geometries: determinism is guaranteed
+for the frozen \ORACLE\ state, but an unconstrained optimization that moves
+back and forth across a symmetry tolerance can legitimately produce different
+frozen strata.  The practical response is to record the perception margins and
+to flag near-threshold symmetry changes; quantitative tolerance-sensitivity
+tables are part of the roadmap rather than a claim made by the present
+validation.  Likewise, the manuscript does not yet compare \NEO\ against an
+external published natural-coordinate generator; the Gaussian tests are export
+and solver-consumption tests, not an external coordinate-generator benchmark.
+The protected-prefix rejection rule is covered in the semantic coordinate layer
+unit probes in Table~\ref{tab:validation}; a chemically realistic
+overconstrained example remains a useful future diagnostic.
 
 The main limitation is no longer the absence of pseudo-bonds in the code path,
 but the current validated scope of the pseudo-cycle tests.  Protected fragment
