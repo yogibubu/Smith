@@ -9,9 +9,8 @@ latexmk -pdf main.tex
 ```
 
 The draft is intentionally source-close: the implementation-status table tracks
-the current MATRIX/NEO code paths, including the distinction between the
-production special-coordinate fragment model and the disabled pseudo-bond /
-pseudo-cycle branch.
+the current NEO code paths, including the special-coordinate fragment model and
+the active pseudo-bond / pseudo-cycle branch.
 
 The GF/PED scaling add-on is tracked in
 `data/gf_ped_scaling_probe.json`.  It records the cyclohexanol GDV

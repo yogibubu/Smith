@@ -1,0 +1,26 @@
+{
+  "method": "PBE0/def2-SVP single-point energies on NEO-generated fixed-frame cyclohexane puckering Cartesian geometries",
+  "records": [
+    {
+      "point": "p00",
+      "orca_pbe0_def2svp_hartree": -235.422463981888,
+      "molpro_pbe0_def2svp_hartree": -235.42214227451,
+      "orca_relative_kjmol": 0.0,
+      "molpro_relative_kjmol": 0.0
+    },
+    {
+      "point": "p02",
+      "orca_pbe0_def2svp_hartree": -235.321345943342,
+      "molpro_pbe0_def2svp_hartree": -235.321038852734,
+      "orca_relative_kjmol": 265.48537359776907,
+      "molpro_relative_kjmol": 265.4469972734565
+    },
+    {
+      "point": "p04",
+      "orca_pbe0_def2svp_hartree": -235.103704313906,
+      "molpro_pbe0_def2svp_hartree": -235.103335256265,
+      "orca_relative_kjmol": 836.9033928957235,
+      "molpro_relative_kjmol": 837.027710994097
+    }
+  ]
+}

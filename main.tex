@@ -11,9 +11,7 @@
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 
 \newcommand{\NEO}{NEO}
-\newcommand{\MATRIX}{MATRIX}
 \newcommand{\ORACLE}{ORACLE}
-\newcommand{\SYCART}{SYCART}
 \newcommand{\GIC}{GIC}
 \newcommand{\Bmat}{\mathbf{B}}
 \newcommand{\bmat}{\mathbf{b}}
@@ -26,9 +24,6 @@
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
-\theoremstyle{plain}
-\newtheorem{theorem}{Theorem}
-\newtheorem{proposition}{Proposition}
 
 \title{\NEO\ (Nonredundant Equivariant Orthogonalizer): Block-Local, Symmetry-Consistent Generalized Internal Coordinates for Molecular and Intermolecular Coordinate Spaces}
 \author{Vincenzo Barone\\
@@ -55,10 +50,9 @@ particular bonding patterns and do not provide a general, reproducible treatment
 of fused rings, high coordination, point-group symmetry and weakly bound
 fragments.
 
-We present \NEO\ (Nonredundant Equivariant Orthogonalizer), the coordinate
-engine of \MATRIX\ (Molecular Analysis Toolkit for Reusable Integrated
-eXperiments), as a general construction of non-redundant,
-symmetry-adapted generalized internal coordinates.  \NEO\ starts
+We present \NEO\ (Nonredundant Equivariant Orthogonalizer) as a general
+construction of non-redundant, symmetry-adapted generalized internal
+coordinates.  \NEO\ starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
 point-group operations, fragments and optional interaction centers.  It then
 builds chemically typed primitive families, protects special coordinates for
@@ -67,8 +61,8 @@ rings and fragments, reduces the coordinate space using analytic Wilson
 coordinate blocks.  The result is a deterministic constructive protocol and a
 frozen coordinate contract, rather than an arbitrary non-redundant basis.  The
 contract can also incorporate optional user-defined protected semantic
-coordinates and derived observables.
-same frozen definition is designed to supply Gaussian-readable coordinates, analytic
+coordinates and derived observables.  The same frozen definition is designed to
+supply Gaussian-readable coordinates, analytic
 \(\Bmat\) rows, symmetry labels and total-symmetric subsets for geometry
 optimization, Wilson GF/potential-energy-distribution analysis, vibrational
 scaling, force-field construction, discrete-variable-representation puckering
@@ -115,14 +109,11 @@ coordinates enter a fit, force field, scan or surface model.
 \toprule
 Name & Role \\
 \midrule
-\MATRIX & Molecular Analysis Toolkit for Reusable Integrated eXperiments; the
-shared molecular-state and package framework. \\
 \ORACLE & Operator for Routing, Analysis, Control, Launch and Exploration; here,
 the validated state carrying continuous atom perception and synthon descriptors. \\
-\NEO & Coordinate-generation engine: \GIC/\SYCART\ construction, analytic
-\(\Bmat\) rows, symmetry labels and provenance. \\
-\SYCART & Symmetry-adapted Cartesian active-space model used as an independent
-Cartesian comparison basis. \\
+\NEO & Coordinate-generation engine: \GIC\ construction, symmetry-adapted
+Cartesian reference spaces, analytic \(\Bmat\) rows, symmetry labels and
+provenance. \\
 GF/PED, DVR & Wilson GF/potential-energy-distribution analysis and discrete
 variable representation. \\
 MORPHEUS & Separate semi-experimental refinement workflow that motivates
@@ -152,7 +143,7 @@ implementations already provide expressive syntax for nonlinear and mixed
 coordinate expressions.  The novelty here is the preceding step: a
 deterministic generator that converts a frozen molecular state into a
 rank-complete, symmetry-consistent coordinate basis that can be serialized as
-Gaussian-readable GICs or consumed directly by \MATRIX\ modules.
+Gaussian-readable GICs or consumed directly by downstream modules.
 
 The name \NEO\ uses ``equivariant'' in this classical molecular-symmetry sense:
 coordinate rows are constructed so that point-group operations map them into the
@@ -213,10 +204,10 @@ define a complete natural-coordinate generator with protected rank reduction,
 homogeneous point-group projectors and reusable symmetry-labelled blocks for
 refinement or force-field analysis. \\
 \NEO & Builds a rank-complete, type-labelled, symmetry-adapted coordinate basis
-from a validated molecular state. & The remaining development frontier is the
-fully general pseudo-bond/pseudo-cycle model for weak complexes; the
-release-grade intermolecular contract uses protected fragment and center
-coordinates. \\
+from a validated molecular state. & Weak complexes can be represented either
+by protected fragment/center coordinates or by typed pseudo-bonds and
+pseudo-cycles; the remaining development frontier is the breadth of the
+pseudo-cycle validation corpus. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -272,7 +263,7 @@ semantic coordinate rather than as an opaque handwritten expression.
 \section{Molecular State and Atom Equivalence}
 
 \NEO\ does not rediscover the molecule at every downstream step.  Its input is a
-validated \ORACLE/\MATRIX\ molecular state containing Cartesian geometry,
+validated \ORACLE\ molecular state containing Cartesian geometry,
 covalent bonds, rings, point-group operations, optional fragments, optional
 interaction centers and the continuous chemical perception produced upstream.
 The output is a frozen \(\#\)GIC definition: primitive coordinate records,
@@ -282,13 +273,13 @@ reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
 they do not rebuild topology, ring sets or coordinate rows.
 
 Initial local equivalence is not based only on element symbols.  The
-\ORACLE/\MATRIX\ molecular-state layer supplies continuous atom perception and
+\ORACLE\ molecular-state layer supplies continuous atom perception and
 synthon descriptors, and \NEO\ uses them to make deterministic local choices.
 The present construction uses effective atomic numbers
 that combine nuclear charge with local coordination, distance-derived
 bond-order information, angular rigidity and delocalization-like terms.  These
 continuous descriptors order atoms and ligands in cases where a pure graph
-label would be ambiguous.  The broader \MATRIX\ topology layer also exposes
+label would be ambiguous.  The broader \ORACLE\ topology layer also exposes
 synthon descriptors--charge, covalency, delocalization, strain and effective
 nuclear charge--which provide a natural route to more refined equivalence
 classes.  In the present contract, this continuous perception enters ring
@@ -573,10 +564,28 @@ be replaced by natural combinations.  An \(n\)-membered ring has redundant
 endocyclic angle and dihedral lists.  \NEO\ constructs ring deformation
 coordinates and \(RPck\) puckering components as linear combinations of those
 source rows, keeping \(n-3\) independent puckering components for rings larger
-than three atoms.  The polar Cremer--Pople-like descriptors \(Q\) and \(\phi\)
-are useful for interpretation, but the active coordinate basis stores linear
-\(RPck\) rows because their \(\Bmat\) rows are analytic linear combinations of
-dihedral derivatives.\cite{CremerPople1975}
+than three atoms.  The endocyclic valence-angle combinations are the CyGNA
+source family and are stored as \(RDef\) rows; the corresponding endocyclic
+torsional combinations are stored as \(RPck\) rows.  The polar
+Cremer--Pople-like descriptors \(Q\) and \(\phi\) are useful for
+interpretation, but the active coordinate basis stores linear \(RPck\) rows
+because their \(\Bmat\) rows are analytic linear combinations of dihedral
+derivatives.\cite{CremerPople1975}
+
+For a six-membered ring segment \(1\cdots6\), a typical generated angle row has
+the explicit form
+\[
+\begin{aligned}
+RDef &=
+ 0.57735\,A(6,1,2)-0.28868\,A(1,2,3)-0.28868\,A(2,3,4) \\
+&\quad +0.57735\,A(3,4,5)-0.28868\,A(4,5,6)-0.28868\,A(5,6,1),
+\end{aligned}
+\]
+and the analogous puckering row is built from the corresponding cyclic
+dihedrals with the same normalized coefficient pattern.  In the frozen
+contract these rows carry family labels, source primitive identifiers and
+symmetry labels; \(Q\) and \(\phi\) are then functions of the \(RPck\) rows, not
+replacement active coordinates.
 
 Unsaturated rings and locally rigid ring fragments require more than a generic
 \(n-3\) puckering count.  The reconstruction method of Lema-Saavedra and
@@ -596,7 +605,7 @@ analytic \(\Bmat\) row is expanded back to the real atoms by the chain rule,
 with the bond-center derivative distributed over \(i\) and \(j\).  This
 contraction is attractive for genuine double bonds, conjugated fragments and
 locally stiff fused-ring units, but it must be applied to complete symmetry
-orbits and only when the \ORACLE/\MATRIX\ continuous bond-order and synthon
+orbits and only when the \ORACLE\ continuous bond-order and synthon
 descriptors mark a hard local constraint.  The present bond-order flexibility factors are
 therefore the conservative default; rigid-source contraction is the planned
 extension for cases where the chemically intended model removes, rather than
@@ -632,14 +641,14 @@ The family set \(\mathfrak{F}\) carries a priority preorder
 interaction-center distances, ring-puckering sources and related special
 objects--are minimal elements in this preorder; ordinary stretches, bends and
 torsions fill the rank only after protected rows have been tested.  Ties inside
-a family are resolved by deterministic topology, \ORACLE/\MATRIX\ equivalence and
+a family are resolved by deterministic topology, \ORACLE\ equivalence and
 CIP-like priority keys stored in \(\mathcal{M}\).  Thus the construction works on a
 fixed total order that extends a chemically motivated partial order.
 
-\begin{theorem}[Relabelling covariance]
+\paragraph{Relabelling covariance.}
 \label{thm:relabel}
 Let two frozen molecular states be related by an atom relabelling \(\pi\) that
-preserves element identities, geometry, topology, \ORACLE/\MATRIX\ descriptors, fragments,
+preserves element identities, geometry, topology, \ORACLE\ descriptors, fragments,
 interaction centers, point-group operations, priority keys and tolerances.  Let
 \(Q_\pi\) be the induced orthogonal permutation of Cartesian displacement
 coordinates and \(U_\pi\) the induced permutation/sign map on primitive
@@ -654,28 +663,24 @@ second state.  In particular,
 and the accepted coordinate spaces, family labels and symmetry-adapted blocks
 are carried into each other by the induced row and coefficient-space
 isomorphisms.
-\end{theorem}
 
-The proof is given in Appendix~\ref{app:proofs}.
 
 Equivalently, \NEO\ is natural with respect to symmetry-preserving atom
 relabellings: relabelling the molecular state and then constructing the
 contract gives the same object, up to the canonical contract isomorphism, as
 constructing the contract first and then transporting it by the relabelling.
 
-\begin{proposition}[Deterministic coordinate contract]
+\paragraph{Deterministic coordinate contract.}
 \label{prop:determinism}
-For a fixed molecular state--geometry, topology, \ORACLE/\MATRIX\ descriptors, point-group
+For a fixed molecular state--geometry, topology, \ORACLE\ descriptors, point-group
 operations and fragment data--and for fixed primitive generators, family
 priority order, tie-breaking keys, row-normalization rule and numerical
 tolerances, \NEO\ returns a unique frozen coordinate contract, or a unique
 incompatibility certificate.  In particular, no stochastic search, optimizer
 history or manual choice is part of the contract definition.
-\end{proposition}
 
-The proof is given in Appendix~\ref{app:proofs}.
 
-\begin{proposition}[Semantic preservation of protected coordinates]
+\paragraph{Semantic preservation of protected coordinates.}
 \label{prop:protected}
 Let \(\mathcal{P}_{\mathrm{prot}}\) be the protected prefix of the ordered
 candidate set.  Every protected candidate whose Wilson row is nonsingular and
@@ -684,11 +689,9 @@ rows is retained in any returned final contract.  No ordinary stretch, bend or
 torsion can displace an accepted protected coordinate.  If the independent
 protected prefix already exceeds the target vibrational rank, \NEO\ reports an
 invalid contract rather than removing protected coordinates by exchange.
-\end{proposition}
 
-The proof is given in Appendix~\ref{app:proofs}.
 
-\begin{proposition}[Rank-preserving selection]
+\paragraph{Rank-preserving selection.}
 \label{prop:rank-selection}
 Assume exact arithmetic and define
 \[
@@ -701,9 +704,7 @@ the accepted subset \(\mathcal{A}\) is an ordered basis of
 \(\operatorname{rank}\Bmat(\mathcal{P})=r\), then
 \(|\mathcal{A}|=r\) and
 \(\operatorname{span}\Bmat(\mathcal{A})=\operatorname{span}\Bmat(\mathcal{P})\).
-\end{proposition}
 
-The proof is given in Appendix~\ref{app:proofs}.
 
 The numerical construction is the finite-precision version of this statement.  \NEO\
 selects rows by incremental modified Gram--Schmidt rank testing with a fixed
@@ -738,7 +739,7 @@ first-order motion.  If independent protected coordinates alone exceed the
 vibrational rank, the construction is rejected rather than silently discarding a
 special coordinate.
 
-\begin{theorem}[Block-local scaling invariance]
+\paragraph{Block-local scaling invariance.}
 \label{thm:block-scaling}
 Let \(H\subset\mathcal{P}\) be a homogeneous coordinate block.  Uniformly
 rescaling all Wilson rows in that block by a nonzero scalar does not change the
@@ -746,14 +747,12 @@ normalized-row rank decisions inside \(H\), nor the singular-vector or projector
 subspaces obtained from \(\Bmat_H\Bmat_H^T\).  By contrast, a global
 decomposition of several heterogeneous blocks is generally not invariant to
 independent rescalings of those blocks.
-\end{theorem}
 
-The proof is given in Appendix~\ref{app:proofs}.
 
-\begin{theorem}[Local stability]
+\paragraph{Local stability.}
 \label{thm:local-stability}
 Let \(S_0\) be a nonsingular frozen molecular state.  Assume that, in a
-neighbourhood of \(S_0\), topology, fragment decomposition, \ORACLE/\MATRIX\ equivalence
+neighbourhood of \(S_0\), topology, fragment decomposition, \ORACLE\ equivalence
 classes, point-group representation, protected prefix, homogeneous block
 membership and priority order remain fixed in a ball of radius
 \(\delta_{\mathrm{str}}\) around \(S_0\).  Let
@@ -785,9 +784,7 @@ coordinate contract: the primitive identities, accepted/rejected rank decisions,
 protected coordinates, family labels and symmetry labels are unchanged, while
 \(\Bmat\) rows and coefficient matrices vary continuously with the geometry
 under the same normalization convention.
-\end{theorem}
 
-The proof is given in Appendix~\ref{app:proofs}.
 
 This is the technical reason for block-local reduction.  \NEO\ does not claim
 that weights disappear from all possible coordinate constructions.  It avoids
@@ -812,7 +809,15 @@ model, then uses ordinary coordinates for completeness.
 
 Symmetry is applied only after a non-redundant coordinate basis has been
 selected.  Let \(G_{\mathrm{pt}}\) be the molecular point group stored in the
-source state.  Each operation \(h\in G_{\mathrm{pt}}\) is represented by a
+source state.  The point group is not guessed from idealized element labels
+alone: \ORACLE\ first clusters atoms by continuous element, coordination,
+bond-order and synthon descriptors, then tests candidate rotations, reflections
+and inversion operations against the Cartesian geometry within the stored
+tolerances.  An operation is accepted only when it maps each atom onto an atom
+of the same continuous equivalence class and preserves the stored topology and
+local descriptor signatures.  The accepted operations, atom permutation table,
+tolerances and perception version are frozen before \NEO\ constructs
+coordinates.  Each operation \(h\in G_{\mathrm{pt}}\) is represented by a
 Cartesian rotation matrix, an atom permutation and the signs required for
 oriented coordinates such as torsions, out-of-plane bends and axial fragment
 rotations.  For a homogeneous accepted coordinate block \(H\), with coefficient
@@ -874,8 +879,9 @@ by GF, fitting and optimization.
 Weak complexes are a stress test for any internal-coordinate generator.  A
 covalent graph alone is disconnected, but adding arbitrary weak contacts as
 ordinary bonds can create artificial rings and mix covalent and non-covalent
-motions.  \NEO\ therefore separates the release-grade fragment-coordinate model
-from the pseudo-bond model under development.
+motions.  \NEO\ therefore keeps two explicit intermolecular constructions: a
+protected fragment-coordinate model and a pseudo-bond/pseudo-cycle model for
+selected hydrogen-bonded or contact-closed graphs.
 
 In the release-grade \texttt{SPECIAL\_COORDINATES} mode, each fragment keeps its
 intramolecular coordinate basis.  Interfragment motion is represented by
@@ -895,21 +901,20 @@ that define it.  This gives a practical route to coordination complexes,
 metallocenes and eta-like interactions without pretending that a metal-ring
 centroid is a covalent atom in the molecular graph.
 
-The broader construction also contains a pseudo-bond and pseudo-cycle layer.  In
-that model, selected non-covalent contacts can be inserted into the construction
-graph, and the resulting pseudo-cycles can generate \(N-3\) angular and
-torsional components analogous to covalent ring coordinates.  The present
-contract excludes this mode from release-grade builds: pseudo-bond constants,
-families and candidate generators are present, but the accepted fragment modes
-are \texttt{NONE} and \texttt{SPECIAL\_COORDINATES}.  This distinction should be
-kept in the final manuscript.  The special-coordinate fragment model is the
-release-grade intermolecular method; pseudo-bond/pseudo-cycle coordinates are a
-promising extension that requires a stricter separation of covalent and
-non-covalent cycle semantics before public release.
+In the \texttt{PSEUDO\_BONDS} mode, selected non-covalent contacts are inserted
+into the construction graph as typed pseudo-edges, and the resulting
+pseudo-cycles generate angular and torsional source components analogous to
+covalent ring coordinates.  These rows are still labelled separately from
+covalent stretches, bends and torsions, so downstream users can decide whether
+they are model coordinates, constraints or diagnostics.  The present validation
+uses formic-acid--water, formamide--water and the glycine I/II hydrogen-bond
+fixtures as regression probes: a single intramolecular bridge and a bifurcated
+bridge both close the expected rank without converting the underlying covalent
+topology into a different molecule.
 
 \section{Validated Construction Scope}
 
-Table~\ref{tab:status} records the status of the present \MATRIX/\NEO\
+Table~\ref{tab:status} records the status of the present \NEO\
 construction.  The purpose is not to document a program interface, but to state
 which mathematical objects belong to the present coordinate contract and which
 objects remain methodological extensions.  This separation is important because
@@ -949,16 +954,17 @@ center-atom distances, translations and orientations are protected before
 ordinary rank completion. \\
 Interaction centers & Active baseline & Ring centers, bond centers and related
 virtual centers can enter protected center-atom coordinates. \\
-Semantic \texttt{PROTECT}/\texttt{OBSERVABLE} front-end & Active baseline &
+Semantic \texttt{PROTECT}/\texttt{OBSERVABLE} layer & Active baseline &
 Protected user rows are deduplicated, substituted when row-equivalent to an
 automatic primitive and rejected when they exceed the target rank; observables
 use sparse chain-rule propagation. \\
-Pseudo-bond/pseudo-cycle fragment mode & Excluded release-grade & Candidate
-families and constants exist, but the present contract rejects pseudo-bond
-fragment mode and directs weak complexes to \texttt{SPECIAL\_COORDINATES}. \\
+Pseudo-bond/pseudo-cycle mode & Active baseline & Typed weak contacts can be
+inserted as pseudo-edges; pseudo-cycle bend and torsion families remain
+separate from covalent coordinates and are regression-tested on hydrogen-bonded
+weak complexes and glycine I/II contact fixtures. \\
 Point-group projector & Active & Applied to homogeneous blocks after
 non-redundant reduction; local SALC fallback is recorded explicitly. \\
-\SYCART\ comparison basis & Active in \MATRIX & Symmetry-adapted Cartesian
+NEO symmetry-adapted Cartesian reference basis & Active in \NEO & Symmetry-adapted Cartesian
 nullspace coordinates provide a Cartesian reference active space for
 downstream validation, without changing the \GIC\ construction. \\
 Sparse Wilson-\(\Bmat\) representation & Validated baseline & Sparse derivative
@@ -1017,13 +1023,13 @@ The narrow range of
 fixed row-space audit tolerance and floating-point floor of the comparison, not
 by a molecule-specific physical error.  Their role is to show that the two
 implementation paths saturate the same numerical equivalence criterion across
-systems of different size and symmetry.  The formic-acid--water row uses the release-grade
+systems of different size and symmetry.  The formic-acid--water row uses the
 \texttt{SPECIAL\_COORDINATES} fragment path, for which the covalent Fortran
 control reference is not the relevant comparison; there the table reports direct
 analytic \(\Bmat\)-rank closure and the number of protected special coordinates.
 Because this weak-complex probe is \(C_1\), \(\epsilon_\mathrm{SALC}=0\) is
 trivial by construction and should be read only as the absence of nontrivial
-SALC blocks, not as a symmetry-adaptation test.  The semantic-front-end row is
+SALC blocks, not as a symmetry-adaptation test.  The semantic-layer row is
 a unit-level contract test of the \texttt{PROTECT}/\texttt{OBSERVABLE} layer
 introduced in Sec.~4; it exercises duplicate rejection, row-equivalent
 substitution and the fail-fast protected-prefix rule.
@@ -1051,7 +1057,8 @@ Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\ma
 Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 11 protected & direct \(\Bmat\)-rank \(=18\); \(\epsilon_\mathrm{SALC}=0\) \\
-Semantic front-end & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probes & duplicate protected row rejected; row-equivalent substitution recorded; protected rank excess fails fast \\
+Glycine I/II & Intramolecular pseudo-bond contacts & \(C_1\) & 24/24 & one-bridge and bifurcated-contact pseudo-bond modes close analytic \(\Bmat\) rank \\
+Semantic layer & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probes & duplicate protected row rejected; row-equivalent substitution recorded; protected rank excess fails fast \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1308,6 +1315,35 @@ large-amplitude coordinate path can be exported either as ordinary Cartesians or
 as an automatically generated Gaussian GIC model without changing the electronic
 energy surface being sampled.
 
+Because the Cartesian branch is ordinary molecular geometry, it is not tied to
+Gaussian.  The same three representative points were also evaluated on the
+Oracle machine with ORCA and Molpro at PBE0/def2-SVP, a different level from
+the B3LYP/6-31+G* Gaussian check.  The absolute energies differ slightly
+between codes, as expected from independent DFT implementations and defaults,
+but the relative fixed-frame puckering profile is the same at the level needed
+for this export test (Table~\ref{tab:external-codes}).  This verifies the
+intended division of labor: \NEO\ constructs the model and coordinates, while
+external electronic-structure programs consume the resulting Cartesian
+geometries or GIC serializations.
+
+\begin{table}[htbp]
+\centering
+\caption{Portable cyclohexane puckering coordinates evaluated by non-Gaussian
+codes on Oracle.  Energies are PBE0/def2-SVP single points on the same
+\NEO{}-generated Cartesian geometries; relative energies are in kJ mol\(^{-1}\)
+with respect to \(p00\).}
+\label{tab:external-codes}
+\begin{tabular}{lrrrr}
+\toprule
+Point & ORCA \(E_h\) & ORCA \(\Delta E\) & Molpro \(E_h\) & Molpro \(\Delta E\) \\
+\midrule
+\(p00\) & -235.422463982 & 0.000 & -235.422142275 & 0.000 \\
+\(p02\) & -235.321345943 & 265.485 & -235.321038853 & 265.447 \\
+\(p04\) & -235.103704314 & 836.903 & -235.103335256 & 837.028 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.78\linewidth]{figures/cyclohexane_puckering_equivalence.png}
@@ -1332,9 +1368,7 @@ high-coordination angular blocks, fragment translations, fragment orientations
 and center-based distances.  The method is deliberately not a single global
 orthogonalization.  It is a sequence of local and block-local decisions followed
 by a rank audit in the physical Wilson \(\Bmat\)-row space.
-Theorem~\ref{thm:relabel}, Propositions~\ref{prop:determinism}
-and~\ref{prop:protected}, and Theorems~\ref{thm:block-scaling}
-and~\ref{thm:local-stability} make the main structural claims precise: \NEO\ is
+The compact structural statements above make the main claims precise: \NEO\ is
 natural with respect to symmetry-preserving relabellings, the contract is
 deterministic on a frozen state, protected semantic coordinates are retained
 whenever rank compatibility allows them, block-local reduction is insensitive
@@ -1362,7 +1396,7 @@ but on the shared topology, symmetry and rank of the molecular problem.
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
 symmetry-projector normalization and Python--Fortran row-space equivalence for
 representative cases.  This is an implementation-level cross-check inside the
-\MATRIX\ development lineage, not a comparison with an external published
+\ORACLE\ development lineage, not a comparison with an external published
 natural-coordinate program.  Table~\ref{tab:frisch-si} addresses the more
 external-facing question raised by the Gaussian GIC Supporting Information: can
 the same kinds of chemically specialized variables be generated without
@@ -1394,8 +1428,7 @@ homogeneous source blocks rather than to a global primitive matrix.  A timed
 scaling benchmark is not yet included and should be added before treating
 performance as a validated claim.
 
-Several validation items also remain intentionally open.  The local-stability
-theorem, Theorem~\ref{thm:local-stability}, gives an existence threshold
+Several validation items also remain intentionally open.  The local-stability statement gives an existence threshold
 \(\delta\) in terms of decision margins \(\mu_a\) and Lipschitz constants
 \(L_a\), but the present draft does not report a numerical \(\delta\), \(\mu_a\)
 or \(L_a\) for a real molecule.  A future validation table should instantiate
@@ -1408,16 +1441,13 @@ coordinate-generator benchmark.  The protected-prefix rejection rule is covered
 in the semantic coordinate layer unit probes in Table~\ref{tab:validation}; a chemically
 realistic overconstrained example remains a useful future diagnostic.
 
-The main limitation is currently intermolecular pseudo-cycle construction.
-Protected fragment and special-center coordinates are already suitable for weak
-complexes and coordination motifs.  What is not yet release-grade is the more
-ambitious model in which weak contacts are inserted as pseudo-bonds and then
-used to construct ring-like angular and torsional components.  That model is
-scientifically attractive because it would give a unified internal-coordinate
-description of hydrogen-bonded cycles, but it must avoid contaminating the
-covalent topology and must remain stable under symmetry.  Until that contract
-is closed, pseudo-bonds should be presented as a development target,
-not as the release-grade intermolecular method.
+The main limitation is no longer the absence of pseudo-bonds in the code path,
+but the small size of the validation set for pseudo-cycles.  Protected fragment
+and special-center coordinates are already suitable for weak complexes and
+coordination motifs, while the pseudo-bond layer now covers typed hydrogen-bond
+closures and bifurcated contacts.  What remains to be expanded is the corpus of
+symmetry-rich intermolecular cycles and the numerical stress testing of those
+pseudo-cycle rows under geometry changes.
 
 \subsection{Scope and Limitations}
 \label{sec:scope-limitations}
@@ -1452,7 +1482,7 @@ claim made here is that the priority order is explicit, versioned and
 diagnosed, and that protected coordinates are not silently displaced by
 ordinary coordinates when they are compatible with the target rank.
 
-Finally, determinism is conditional on the frozen \ORACLE/\MATRIX\ state:
+Finally, determinism is conditional on the frozen \ORACLE\ state:
 geometry, topology, symmetry operations, continuous atom perception, synthon
 descriptors, tolerances, semantic grammar version and contract schema version.
 A different perception model or tolerance policy may produce a different
@@ -1462,7 +1492,7 @@ provenance rather than hidden in an implementation choice.
 \section{Conclusions}
 
 \NEO\ provides a general, frozen and symmetry-aware construction of
-generalized internal coordinates for \MATRIX.  Its main contribution is a
+generalized internal coordinates for \ORACLE.  Its main contribution is a
 deterministic coordinate contract that integrates ingredients usually treated
 separately: natural-coordinate locality, analytic Wilson-\(\Bmat\) rank control,
 homogeneous point-group symmetrization and protected special coordinates for
@@ -1476,11 +1506,10 @@ this base by analytic chain-rule differentiation.
 
 The present construction supports the intramolecular machinery needed for
 acyclic, cyclic, fused, bridged, spiro and high-symmetry molecules, together
-with a release-grade special-coordinate model for weak complexes.  The next
-methodological step is the rigorous public release of pseudo-bond and
-pseudo-cycle coordinates for intermolecular systems, with validation against the
-same rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of
-\NEO.
+with special-coordinate and pseudo-bond models for weak complexes.  The next
+methodological step is to enlarge the pseudo-cycle validation corpus for
+intermolecular systems, using the same rank, symmetry and analytic-\(\Bmat\)
+invariants used by the rest of \NEO.
 The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
 contract is already usable as an external solver coordinate set.  The Hessian,
 puckering, GF/PED scaling and portable chair-to-boat export probes illustrate
@@ -1491,89 +1520,10 @@ that a \NEO{}-generated puckering path can be represented either as ordinary
 Cartesians or as Gaussian \texttt{ReadAllGIC} input with numerically identical
 energies.
 
-\appendix
-\section{Proofs}
-\label{app:proofs}
-
-\paragraph{Proof of Theorem~\ref{thm:relabel}.}
-Primitive generation depends only on labelled molecular data that are preserved
-by \(\pi\).  Under relabelling, distance, angle, torsional, fragment and center
-rows are therefore permuted, and oriented rows may acquire the corresponding
-sign; this is exactly the action \(U_\pi\), while Cartesian columns are
-permuted by \(Q_\pi\).  Euclidean row norms, Gram--Schmidt residuals and
-block-local Gram matrices are unchanged by these orthogonal transformations.
-Consequently the same protected-prefix and rank decisions are made after
-transport by \(\pi\).  The point-group representations on homogeneous blocks
-are conjugate, so their character projectors and projected subspaces are also
-conjugate.  The complete contract is therefore transported to an isomorphic
-contract.
-
-\paragraph{Proof of Proposition~\ref{prop:determinism}.}
-Each stage of the construction is a deterministic map of the frozen input data.
-Primitive generation is determined by the stored topology, fragments,
-interaction centers and \ORACLE/\MATRIX\ equivalence descriptors.  Candidate
-ordering is the fixed total order extending the family preorder and local
-tie-breaking keys.  Rank decisions are Boolean tests of normalized analytic
-Wilson-row residuals against stored tolerances.  Symmetry adaptation is
-performed block by block from the stored permutation representation and a fixed
-normalization/sign convention for the projected coefficient vectors.  Composing
-these maps gives either one contract or one recorded incompatibility certificate.
-
-\paragraph{Proof of Proposition~\ref{prop:protected}.}
-Protected candidates are tested before ordinary rank-completion candidates.
-During this prefix, a protected row is rejected only by the singular-row test or
-by dependence on rows already accepted from the protected prefix.  Once accepted,
-rows are never replaced by a later exchange step; subsequent ordinary candidates
-can only add missing independent directions until the target rank is reached.
-Therefore ordinary coordinates cannot remove a protected coordinate that has
-passed the protected-prefix rank test.  If the protected prefix alone contains
-more independent rows than the target rank, the construction has no
-rank-compatible protected basis and records that failure explicitly.
-
-\paragraph{Proof of Proposition~\ref{prop:rank-selection}.}
-At step \(k\), Gram--Schmidt decomposes \(\bmat(p_k)\) into its projection onto
-the span of the previously accepted independent rows and an orthogonal
-residual.  A zero residual is equivalent to membership in that span, so rejecting
-the row leaves the span unchanged.  A nonzero residual adds one independent
-direction, so accepting the row increases the dimension by one.  Induction over
-\(k\) gives equality between the span of accepted rows and the span of all
-processed rows.  Taking \(k=m\) proves the claim.
-
-\paragraph{Proof of Theorem~\ref{thm:block-scaling}.}
-Normalized Gram--Schmidt uses only row directions, so multiplying every row in
-\(H\) by the same nonzero scalar leaves every normalized row and every residual
-direction unchanged.  For local SVD or projector construction,
-\((\lambda\Bmat_H)(\lambda\Bmat_H)^T=\lambda^2\Bmat_H\Bmat_H^T\), which rescales
-eigenvalues but not eigenspaces.  If two heterogeneous blocks are concatenated
-before decomposition, independent factors \(\lambda_H\) change the relative
-off-block and diagonal contributions of the full Gram matrix; unless the block
-row spaces are already mutually orthogonal, the resulting global eigenvectors
-can change.
-
-\paragraph{Proof of Theorem~\ref{thm:local-stability}.}
-Within the fixed discrete stratum, all primitive coordinate formulas and their
-analytic Wilson rows are smooth functions of the Cartesian geometry away from
-the singular configurations excluded by hypothesis.  The decision functions
-\(f_a\) are therefore continuous and locally Lipschitz on a sufficiently small
-closed ball inside the stratum.  If
-\(\|\x-\x_0\|<\mu_a/(2L_a)\) for \(L_a>0\), then
-\[
-  |f_a(\x)-f_a(\x_0)| \le L_a\|\x-\x_0\| < \mu_a/2 ,
-\]
-so \(f_a(\x)\) remains on the same side of \(\tau_a\) as \(f_a(\x_0)\).  Tests
-with \(L_a=0\) are constant in the neighbourhood and require no additional
-restriction.  Taking the minimum over the finite decision set and the stratum
-radius preserves every Boolean decision made by the construction.  The
-deterministic ordering then forces the same accepted and rejected primitive
-identities.  Fixed point-group representations give the same projectors, and
-the projected vectors remain nonzero with the same normalization convention.
-Hence the discrete contract is unchanged up to isomorphism, and the analytic
-rows and coefficients vary continuously.
-
 \section*{Reproducibility}
 
 The calculations reported in the validation and application sections were
-generated with the \MATRIX/\NEO\ development tree and Python 3.13.11.  Gaussian
+generated with the \NEO\ development tree and Python 3.13.11.  Gaussian
 jobs used the local Gaussian DV executable documented in the accompanying
 scripts; the method and basis set are stated with each probe.  The reported
 construction tests are deterministic and do not use stochastic seeds.  The
@@ -1583,21 +1533,21 @@ implementation for the corpus rows where that comparison is applicable.
 \section*{Data and Code Availability}
 
 The manuscript repository contains the scripts, JSON data files and figures
-used to generate the tables and application plots.  The \MATRIX/\NEO\ source
-code is under active development and will be released with the \MATRIX\
+used to generate the tables and application plots.  The \NEO\ source
+code is under active development and will be released with the \ORACLE\
 distribution; until public release, the code and frozen input/output data are
 available from the author upon reasonable request.
 
 \section*{Author Contributions}
 
-Vincenzo Barone conceived the method, designed the \MATRIX/\NEO\ coordinate
+Vincenzo Barone conceived the method, designed the \NEO\ coordinate
 contract, implemented the active code paths used here, performed the
 calculations and wrote the manuscript.  External refinement and PES-fitting
 consumers are discussed only as downstream uses of the coordinate contract.
 
 \section*{Acknowledgments}
 
-The author acknowledges the broader \MATRIX\ development environment used to
+The author acknowledges the broader \ORACLE\ development environment used to
 test the coordinate contracts, the Gaussian GIC work that motivated the
 distinction between coordinate-description languages and automatic generation,
 and the ring-reconstruction work of Lema-Saavedra and Fern{\'a}ndez-Ramos that
