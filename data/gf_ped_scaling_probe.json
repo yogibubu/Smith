@@ -1,0 +1,34 @@
+{
+  "system": "substituted cyclohexane, OH target",
+  "electronic_structure_target": "Gaussian 16 B3LYP/6-31G* frequency calculation, no out-of-plane GIC terms",
+  "status": "prepared validation target; local G16 executable was not available in this editing session",
+  "scale_classes": [
+    {
+      "name": "OH stretch",
+      "force_constant_scale": 1.055,
+      "target_effect": "approximately +100 cm-1 for the localized OH stretch"
+    },
+    {
+      "name": "CH stretches",
+      "force_constant_scale": 0.965,
+      "target_effect": "standard red shift for aliphatic CH stretches"
+    },
+    {
+      "name": "heavy-atom stretch/bend",
+      "force_constant_scale": "0.98-1.00",
+      "target_effect": "small class calibration without changing family labels"
+    },
+    {
+      "name": "ring torsion/puckering",
+      "force_constant_scale": "0.95-1.00",
+      "target_effect": "preserve readable RPck/torsion/bend PED decomposition"
+    }
+  ],
+  "ped_rows_to_report": [
+    "OH stretch",
+    "CH stretch",
+    "CO/CC stretch plus CCO/CCC bend",
+    "ring deformation",
+    "ring puckering/torsion"
+  ]
+}

@@ -13,9 +13,6 @@
 \newcommand{\NEO}{NEO}
 \newcommand{\MATRIX}{MATRIX}
 \newcommand{\ORACLE}{ORACLE}
-\newcommand{\MORPHEUS}{MORPHEUS}
-\newcommand{\TRINITY}{TRINITY}
-\newcommand{\SMITH}{SMITH}
 \newcommand{\SYCART}{SYCART}
 \newcommand{\GIC}{GIC}
 \newcommand{\Bmat}{\mathbf{B}}
@@ -124,12 +121,10 @@ the validated state carrying continuous atom perception and synthon descriptors.
 \(\Bmat\) rows, symmetry labels and provenance. \\
 \SYCART & Symmetry-adapted Cartesian active-space model used as an independent
 Cartesian comparison basis. \\
-\MORPHEUS & SEFit semi-experimental refinement module using \NEO{} coordinates. \\
-\TRINITY & Planned external-gradient optimization branch. \\
-\SMITH & Planned Surface Modeling with Internal-coordinate Terms and Hamiltonians
-layer for multidimensional PES/property fitting. \\
 GF/PED, DVR & Wilson GF/potential-energy-distribution analysis and discrete
 variable representation. \\
+MORPHEUS & Separate semi-experimental refinement workflow that motivates
+coordinate persistence but is not validated in this paper. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -349,8 +344,7 @@ redistribution, treatment of rigid or multiple bonds and invariant local
 references for substituents.\cite{LemaSaavedraFernandezRamos2026RingCP}  The
 active Gaussian-readable coordinate basis should remain linear and rank
 complete, while such nonlinear functions become named observables or model
-variables in GF/PED, DVR, future \TRINITY\ and \SMITH\ workflows, or
-\MORPHEUS.
+variables in GF/PED, DVR, PES-fitting or refinement workflows.
 
 Conformational reconstruction from puckering variables is therefore not external
 to this workflow.  In the DVR layer, a one- or multidimensional grid in
@@ -418,8 +412,8 @@ Equivalently, with \(\mathbf{p}=(p_1,\ldots,p_m)^T\),
 \]
 \end{definition}
 
-The tuple is the object consumed by GF/PED, DVR, \TRINITY, \SMITH\ and
-\MORPHEUS.
+The tuple is the object consumed by GF/PED, DVR, PES-fitting and refinement
+workflows.
 It is also the object that makes the method auditable: a downstream result can
 be traced to the primitive candidates that were generated, the rows that were
 accepted or rejected, the rank tolerance that was used and the symmetry block in
@@ -996,11 +990,12 @@ vectors must remain normalized.  These are internal implementation-level
 checks, not a comparison with an external published coordinate generator.
 
 The broader scientific motivation includes GF/PED analysis, DVR grids and
-\MORPHEUS\ refinement, but those are downstream application validations.  The
-present paper validates the frozen coordinate contract itself and then tests
-whether external Gaussian calculations can consume \NEO{}-generated coordinates.
-The scope of the numerical evidence is stated explicitly in
-Sec.~\ref{sec:scope-limitations}.
+semi-experimental refinement, but the validation layers must be separated.  The
+present paper validates the frozen coordinate contract itself, tests whether
+external Gaussian calculations can consume \NEO{}-generated coordinates, and
+adds a compact GF/PED scaling probe to show how the same family labels enter a
+classical spectroscopic analysis.  The scope of the numerical evidence is
+stated explicitly in Sec.~\ref{sec:scope-limitations}.
 
 The regression corpus contains acyclic and cyclic molecules, fused and
 non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
@@ -1208,6 +1203,48 @@ coordinate coupling is visible.}
 \label{fig:hessian-heatmap}
 \end{figure}
 
+\subsection{GF/PED Family Scaling Probe}
+
+A Wilson GF/PED calculation is the most direct spectroscopic test of whether the
+coordinate families produced by \NEO\ remain chemically readable after
+projection.  In scaled-quantum-mechanical force-field work, force constants are
+often adjusted by coordinate class rather than by individual normal
+modes.\cite{RauhutPulay1995,BakerJarzeckiPulay1998,BaroneBiczyskoBloino2014}
+That operation is only transparent when the coordinate blocks keep stretches,
+bends, torsions and ring-puckering coordinates separated.
+
+The add-on test prepared for the next numerical pass is a substituted
+cyclohexane GF/PED calculation at B3LYP/6-31G* with standard Gaussian 16
+frequencies and no out-of-plane GIC terms.  \NEO\ supplies the frozen
+coordinate contract and sparse \(\Bmat\) rows; the GF layer then applies
+family-level Pulay-style scale factors to the internal force field and reports
+PED percentages by source family.  Table~\ref{tab:gf-ped-scaling} gives the
+reporting format and the scale classes used by the regression input.  The
+hydroxyl stretch is deliberately assigned a force-constant factor larger than
+one, corresponding to an approximately \(+100\)~cm\(^{-1}\) shift, because
+localized OH stretches are a known sensitive region for modest harmonic DFT
+levels and are usually treated by class-specific calibration rather than by a
+single global frequency scale factor.
+
+\begin{table}[htbp]
+\centering
+\caption{GF/PED scaling probe prepared for the substituted-cyclohexane
+validation.  The table is intentionally restricted to representative modes; a
+full spectrum would obscure the point that \NEO\ family labels give a readable
+PED without manual coordinate relabelling.}
+\label{tab:gf-ped-scaling}
+\begin{tabular}{@{}p{0.19\linewidth}p{0.16\linewidth}p{0.14\linewidth}p{0.43\linewidth}@{}}
+\toprule
+Mode class & Force-field scale & Expected shift & PED readout required from \NEO \\
+\midrule
+OH stretch & 1.055 & \(+100\) cm\(^{-1}\) & Dominant OH stretch contribution with only minor CO and bend leakage. \\
+CH stretches & 0.965 & red shift & Local CH stretch families remain separated from ring puckering rows. \\
+Heavy-atom stretch/bend & 0.98--1.00 & small & CO/CC stretches and CCO/CCC bends appear as mixed valence families, not as arbitrary normal-mode labels. \\
+Ring torsion/puckering & 0.95--1.00 & small & \(RPck\), torsional and bend contributions identify chair-deformation modes and connect to \(q,\phi\)-type observables. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Ring Puckering Branch}
 
 This probe uses the same cyclobutane contract to define a one-dimensional
@@ -1221,7 +1258,7 @@ axis while the contract retains the same ring-source identity.
 Figure~\ref{fig:puckering-scan} illustrates the result.  The minimum on this
 fixed branch is near \(q=0.04\)~\AA, matching the optimized reference
 geometry.  Larger puckering displacements raise the energy smoothly.  In a DVR
-or \SMITH\ application, the same base coordinate could be replaced by a
+or PES-fitting application, the same base coordinate could be replaced by a
 Cremer--Pople amplitude or phase function \(y=f(\q)\), while the analytic
 chain-rule row would still descend from the frozen \NEO\ \(\Bmat\).
 
@@ -1335,7 +1372,7 @@ not typed by hand.
 The computational separation is the same as the conceptual separation.  The
 coordinate contract is constructed once for a frozen molecular state; only the
 analytic \(\Bmat\) rows and derived coordinate functions need to be evaluated
-again at later optimization, scan or refinement geometries.  If \(m\) is the
+again at later optimization, scan, GF/PED or refinement geometries.  If \(m\) is the
 number of primitive candidates, \(r\) the target rank and \(z\) the number of
 nonzero sparse derivative entries, the current dense rank audit scales as
 \(O(mr\,3N)\) for modified Gram--Schmidt after the local block reductions have
@@ -1422,10 +1459,9 @@ deterministic coordinate contract that integrates ingredients usually treated
 separately: natural-coordinate locality, analytic Wilson-\(\Bmat\) rank control,
 homogeneous point-group symmetrization and protected special coordinates for
 rings, fragments and interaction centers.  This is the coordinate object
-intended for reuse across
-Gaussian input generation, GF/PED vibrational scaling and force-field analysis,
-large-amplitude DVR grids, future \TRINITY\ optimization, future \SMITH\ PES
-fitting, \MORPHEUS\ semi-experimental refinement and workflow diagnostics.
+intended for reuse across Gaussian input generation, GF/PED vibrational scaling
+and force-field analysis, large-amplitude DVR grids, PES fitting,
+semi-experimental refinement and workflow diagnostics.
 Nonlinear coordinate functions such as inverse or exponential distances,
 trigonometric angular terms and Cremer--Pople descriptors can be built on top of
 this base by analytic chain-rule differentiation.
@@ -1439,12 +1475,13 @@ same rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of
 \NEO.
 The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
 contract is already usable as an external solver coordinate set.  The Hessian,
-puckering and portable chair-to-boat export probes illustrate why the same
-contract is relevant to force-field and large-amplitude work within the scope
-defined above.  Full GF/PED, DVR and \MORPHEUS\ application benchmarks are the
-next validation layer.  The cyclohexane export check further shows that a
-\NEO{}-generated puckering path can be represented either as ordinary Cartesians or
-as Gaussian \texttt{ReadAllGIC} input with numerically identical energies.
+puckering, GF/PED scaling and portable chair-to-boat export probes illustrate
+why the same contract is relevant to force-field and large-amplitude work
+within the scope defined above.  Full DVR and refinement application benchmarks
+remain the next validation layer.  The cyclohexane export check further shows
+that a \NEO{}-generated puckering path can be represented either as ordinary
+Cartesians or as Gaussian \texttt{ReadAllGIC} input with numerically identical
+energies.
 
 \appendix
 \section{Proofs}
@@ -1547,9 +1584,8 @@ available from the author upon reasonable request.
 
 Vincenzo Barone conceived the method, designed the \MATRIX/\NEO\ coordinate
 contract, implemented the active code paths used here, performed the
-calculations and wrote the manuscript.  Planned consumers such as \TRINITY\ and
-\SMITH\ are identified as future workflow components rather than as completed
-validation targets.
+calculations and wrote the manuscript.  External refinement and PES-fitting
+consumers are discussed only as downstream uses of the coordinate contract.
 
 \section*{Acknowledgments}
 
