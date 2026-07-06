@@ -663,19 +663,7 @@ are carried into each other by the induced row and coefficient-space
 isomorphisms.
 \end{theorem}
 
-\begin{proof}
-Primitive generation depends only on labelled molecular data that are preserved
-by \(\pi\).  Under relabelling, distance, angle, torsional, fragment and center
-rows are therefore permuted, and oriented rows may acquire the corresponding
-sign; this is exactly the action \(U_\pi\), while Cartesian columns are
-permuted by \(Q_\pi\).  Euclidean row norms, Gram--Schmidt residuals and
-block-local Gram matrices are unchanged by these orthogonal transformations.
-Consequently the same protected-prefix and rank decisions are made after
-transport by \(\pi\).  The point-group representations on homogeneous blocks
-are conjugate, so their character projectors and projected subspaces are also
-conjugate.  The complete contract is therefore transported to an isomorphic
-contract.
-\end{proof}
+The proof is given in Appendix~\ref{app:proofs}.
 
 Equivalently, \NEO\ is natural with respect to symmetry-preserving atom
 relabellings: relabelling the molecular state and then constructing the
@@ -692,17 +680,7 @@ incompatibility certificate.  In particular, no stochastic search, optimizer
 history or manual choice is part of the contract definition.
 \end{proposition}
 
-\begin{proof}
-Each stage of the construction is a deterministic map of the frozen input data.
-Primitive generation is determined by the stored topology, fragments,
-interaction centers and \ORACLE/\MATRIX\ equivalence descriptors.  Candidate ordering is
-the fixed total order extending the family preorder and local tie-breaking keys.
-Rank decisions are Boolean tests of normalized analytic Wilson-row residuals
-against stored tolerances.  Symmetry adaptation is performed block by block from
-the stored permutation representation and a fixed normalization/sign convention
-for the projected coefficient vectors.  Composing these maps gives either one
-contract or one recorded incompatibility certificate.
-\end{proof}
+The proof is given in Appendix~\ref{app:proofs}.
 
 \begin{proposition}[Semantic preservation of protected coordinates]
 \label{prop:protected}
@@ -715,17 +693,7 @@ protected prefix already exceeds the target vibrational rank, \NEO\ reports an
 invalid contract rather than removing protected coordinates by exchange.
 \end{proposition}
 
-\begin{proof}
-Protected candidates are tested before ordinary rank-completion candidates.
-During this prefix, a protected row is rejected only by the singular-row test or
-by dependence on rows already accepted from the protected prefix.  Once accepted,
-rows are never replaced by a later exchange step; subsequent ordinary candidates
-can only add missing independent directions until the target rank is reached.
-Therefore ordinary coordinates cannot remove a protected coordinate that has
-passed the protected-prefix rank test.  If the protected prefix alone contains
-more independent rows than the target rank, the construction has no
-rank-compatible protected basis and records that failure explicitly.
-\end{proof}
+The proof is given in Appendix~\ref{app:proofs}.
 
 \begin{proposition}[Rank-preserving selection]
 \label{prop:rank-selection}
@@ -742,15 +710,7 @@ the accepted subset \(\mathcal{A}\) is an ordered basis of
 \(\operatorname{span}\Bmat(\mathcal{A})=\operatorname{span}\Bmat(\mathcal{P})\).
 \end{proposition}
 
-\begin{proof}
-At step \(k\), Gram--Schmidt decomposes \(\bmat(p_k)\) into its projection onto
-the span of the previously accepted independent rows and an orthogonal
-residual.  A zero residual is equivalent to membership in that span, so rejecting
-the row leaves the span unchanged.  A nonzero residual adds one independent
-direction, so accepting the row increases the dimension by one.  Induction over
-\(k\) gives equality between the span of accepted rows and the span of all
-processed rows.  Taking \(k=m\) proves the claim.
-\end{proof}
+The proof is given in Appendix~\ref{app:proofs}.
 
 The numerical construction is the finite-precision version of this statement.  \NEO\
 selects rows by incremental modified Gram--Schmidt rank testing with a fixed
@@ -795,17 +755,7 @@ decomposition of several heterogeneous blocks is generally not invariant to
 independent rescalings of those blocks.
 \end{theorem}
 
-\begin{proof}
-Normalized Gram--Schmidt uses only row directions, so multiplying every row in
-\(H\) by the same nonzero scalar leaves every normalized row and every residual
-direction unchanged.  For local SVD or projector construction,
-\((\lambda\Bmat_H)(\lambda\Bmat_H)^T=\lambda^2\Bmat_H\Bmat_H^T\), which rescales
-eigenvalues but not eigenspaces.  If two heterogeneous blocks are concatenated
-before decomposition, independent factors \(\lambda_H\) change the relative
-off-block and diagonal contributions of the full Gram matrix; unless the block
-row spaces are already mutually orthogonal, the resulting global eigenvectors
-can change.
-\end{proof}
+The proof is given in Appendix~\ref{app:proofs}.
 
 \begin{theorem}[Local stability]
 \label{thm:local-stability}
@@ -844,26 +794,7 @@ protected coordinates, family labels and symmetry labels are unchanged, while
 under the same normalization convention.
 \end{theorem}
 
-\begin{proof}
-Within the fixed discrete stratum, all primitive coordinate formulas and their
-analytic Wilson rows are smooth functions of the Cartesian geometry away from
-the singular configurations excluded by hypothesis.  The decision functions
-\(f_a\) are therefore continuous and locally Lipschitz on a sufficiently small
-closed ball inside the stratum.  If
-\(\|\x-\x_0\|<\mu_a/(2L_a)\) for \(L_a>0\), then
-\[
-  |f_a(\x)-f_a(\x_0)| \le L_a\|\x-\x_0\| < \mu_a/2 ,
-\]
-so \(f_a(\x)\) remains on the same side of \(\tau_a\) as \(f_a(\x_0)\).  Tests
-with \(L_a=0\) are constant in the neighbourhood and require no additional
-restriction.  Taking the minimum over the finite decision set and the stratum
-radius preserves every Boolean decision made by the construction.  The
-deterministic ordering then forces the same accepted and rejected primitive
-identities.  Fixed point-group representations give the same projectors, and
-the projected vectors remain nonzero with the same normalization convention.
-Hence the discrete contract is unchanged up to isomorphism, and the analytic
-rows and coefficients vary continuously.
-\end{proof}
+The proof is given in Appendix~\ref{app:proofs}.
 
 This is the technical reason for block-local reduction.  \NEO\ does not claim
 that weights disappear from all possible coordinate constructions.  It avoids
@@ -1514,6 +1445,85 @@ defined above.  Full GF/PED, DVR and \MORPHEUS\ application benchmarks are the
 next validation layer.  The cyclohexane export check further shows that a
 \NEO{}-generated puckering path can be represented either as ordinary Cartesians or
 as Gaussian \texttt{ReadAllGIC} input with numerically identical energies.
+
+\appendix
+\section{Proofs}
+\label{app:proofs}
+
+\paragraph{Proof of Theorem~\ref{thm:relabel}.}
+Primitive generation depends only on labelled molecular data that are preserved
+by \(\pi\).  Under relabelling, distance, angle, torsional, fragment and center
+rows are therefore permuted, and oriented rows may acquire the corresponding
+sign; this is exactly the action \(U_\pi\), while Cartesian columns are
+permuted by \(Q_\pi\).  Euclidean row norms, Gram--Schmidt residuals and
+block-local Gram matrices are unchanged by these orthogonal transformations.
+Consequently the same protected-prefix and rank decisions are made after
+transport by \(\pi\).  The point-group representations on homogeneous blocks
+are conjugate, so their character projectors and projected subspaces are also
+conjugate.  The complete contract is therefore transported to an isomorphic
+contract.
+
+\paragraph{Proof of Proposition~\ref{prop:determinism}.}
+Each stage of the construction is a deterministic map of the frozen input data.
+Primitive generation is determined by the stored topology, fragments,
+interaction centers and \ORACLE/\MATRIX\ equivalence descriptors.  Candidate
+ordering is the fixed total order extending the family preorder and local
+tie-breaking keys.  Rank decisions are Boolean tests of normalized analytic
+Wilson-row residuals against stored tolerances.  Symmetry adaptation is
+performed block by block from the stored permutation representation and a fixed
+normalization/sign convention for the projected coefficient vectors.  Composing
+these maps gives either one contract or one recorded incompatibility certificate.
+
+\paragraph{Proof of Proposition~\ref{prop:protected}.}
+Protected candidates are tested before ordinary rank-completion candidates.
+During this prefix, a protected row is rejected only by the singular-row test or
+by dependence on rows already accepted from the protected prefix.  Once accepted,
+rows are never replaced by a later exchange step; subsequent ordinary candidates
+can only add missing independent directions until the target rank is reached.
+Therefore ordinary coordinates cannot remove a protected coordinate that has
+passed the protected-prefix rank test.  If the protected prefix alone contains
+more independent rows than the target rank, the construction has no
+rank-compatible protected basis and records that failure explicitly.
+
+\paragraph{Proof of Proposition~\ref{prop:rank-selection}.}
+At step \(k\), Gram--Schmidt decomposes \(\bmat(p_k)\) into its projection onto
+the span of the previously accepted independent rows and an orthogonal
+residual.  A zero residual is equivalent to membership in that span, so rejecting
+the row leaves the span unchanged.  A nonzero residual adds one independent
+direction, so accepting the row increases the dimension by one.  Induction over
+\(k\) gives equality between the span of accepted rows and the span of all
+processed rows.  Taking \(k=m\) proves the claim.
+
+\paragraph{Proof of Theorem~\ref{thm:block-scaling}.}
+Normalized Gram--Schmidt uses only row directions, so multiplying every row in
+\(H\) by the same nonzero scalar leaves every normalized row and every residual
+direction unchanged.  For local SVD or projector construction,
+\((\lambda\Bmat_H)(\lambda\Bmat_H)^T=\lambda^2\Bmat_H\Bmat_H^T\), which rescales
+eigenvalues but not eigenspaces.  If two heterogeneous blocks are concatenated
+before decomposition, independent factors \(\lambda_H\) change the relative
+off-block and diagonal contributions of the full Gram matrix; unless the block
+row spaces are already mutually orthogonal, the resulting global eigenvectors
+can change.
+
+\paragraph{Proof of Theorem~\ref{thm:local-stability}.}
+Within the fixed discrete stratum, all primitive coordinate formulas and their
+analytic Wilson rows are smooth functions of the Cartesian geometry away from
+the singular configurations excluded by hypothesis.  The decision functions
+\(f_a\) are therefore continuous and locally Lipschitz on a sufficiently small
+closed ball inside the stratum.  If
+\(\|\x-\x_0\|<\mu_a/(2L_a)\) for \(L_a>0\), then
+\[
+  |f_a(\x)-f_a(\x_0)| \le L_a\|\x-\x_0\| < \mu_a/2 ,
+\]
+so \(f_a(\x)\) remains on the same side of \(\tau_a\) as \(f_a(\x_0)\).  Tests
+with \(L_a=0\) are constant in the neighbourhood and require no additional
+restriction.  Taking the minimum over the finite decision set and the stratum
+radius preserves every Boolean decision made by the construction.  The
+deterministic ordering then forces the same accepted and rejected primitive
+identities.  Fixed point-group representations give the same projectors, and
+the projected vectors remain nonzero with the same normalization convention.
+Hence the discrete contract is unchanged up to isomorphism, and the analytic
+rows and coefficients vary continuously.
 
 \section*{Reproducibility}
 
