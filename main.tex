@@ -81,9 +81,8 @@ therefore provides a constructive counterpart to natural internal coordinates:
 it preserves their locality and interpretability while extending them to the
 topological and symmetry cases that usually require manual intervention.
 The numerical evidence reported here validates the construction invariants,
-sparse derivative machinery and Gaussian export path; production GF/PED, DVR
-and semi-experimental refinement benchmarks are downstream applications rather
-than claims of the present validation set.
+sparse derivative machinery and Gaussian export path.  We also discuss the
+intended scope of the method and its current limitations.
 \end{abstract}
 
 \section{Introduction}
@@ -158,10 +157,20 @@ remaining rank.  The result is not merely a coordinate list but a frozen
 coordinate contract: a persistent mathematical object that downstream modules
 can audit, reuse and compare against independent active-space constructions.
 
+Equally important, \NEO\ is not a new coordinate language.  Modern GIC
+implementations already provide expressive syntax for nonlinear and mixed
+coordinate expressions.  The novelty here is the preceding step: a
+deterministic generator that converts a frozen molecular state into a
+rank-complete, symmetry-consistent and chemically semantic coordinate contract
+that can then be serialized as Gaussian-readable GICs or consumed directly by
+\MATRIX\ modules.
+
 The name \NEO\ uses ``equivariant'' in this classical molecular-symmetry sense:
 coordinate rows are constructed so that point-group operations map them into the
 same coordinate space with the corresponding atom permutation and vector or
 pseudovector signs.  It does not denote a machine-learning equivariant model.
+The acronym is also unrelated to nuclear-electronic orbital methods, which use
+the same three letters for a different quantum-chemical context.
 Likewise, ``orthogonalizer'' refers to normalized Wilson-row rank selection and
 orthonormal SALC coefficient vectors within homogeneous source blocks.  It does
 not claim global orthogonality in the kinetic \(\Gmat\) metric; that metric is a
@@ -254,6 +263,26 @@ to make the corresponding objects part of the frozen contract whenever they
 follow from topology, local equivalence, point-group symmetry, fragments, ring
 centers, bond centers or protected semantic coordinates.
 
+This distinction is central to the positioning of the method.  Gaussian GIC is
+an expressive coordinate-description language: a user can write arbitrary
+primitive, nonlinear, redundant or mixed expressions and let Gaussian evaluate
+them.  \NEO\ addresses a different problem.  It constructs the coordinate model
+before any optimizer, force-field fit or refinement sees it, and records why
+each protected or ordinary coordinate was accepted.  The Gaussian syntax is
+therefore a serialization target for \NEO, not the theoretical object being
+introduced.
+
+In practical terms, the user should not have to write pages of molecule-specific
+GIC definitions to obtain chemically natural variables such as local
+\(XY_n\)-type combinations, proton-transfer sums and differences, fragment
+translations or ring-puckering components.  When those variables are consequences
+of the frozen molecular state, \NEO\ can generate and protect them
+automatically; when they are requested explicitly, the request is recorded as a
+semantic coordinate rather than as an opaque handwritten expression.  To the
+author's knowledge, no publicly available coordinate generator currently
+combines automatic point-group treatment, rank-complete non-redundant selection
+and protected semantic coordinates in a single reusable contract.
+
 \section{Molecular State and Atom Equivalence}
 
 \NEO\ does not rediscover the molecule at every downstream step.  Its input is a
@@ -299,6 +328,7 @@ ring-puckering descriptor.  We therefore distinguish base coordinates
 For any differentiable coordinate function \(y_a=f_a(\q)\), the Wilson row used
 by a fit or force-field model follows from the chain rule,
 \begin{equation}
+  \label{eq:chain-rule}
   \frac{\partial y_a}{\partial \x}
   =
   \sum_i
@@ -351,6 +381,22 @@ which later functional variables can be built.  Implementing these coordinate
 functions systematically is part of the next development layer, but it does not
 require a different coordinate-generation theory.
 
+\NEO\ therefore exposes a small semantic front-end rather than a second GIC
+language.  A user may request protected base objects, such as
+\texttt{DISTANCE}, \texttt{TORSION}, \texttt{RING\_PUCKERING},
+\texttt{BUTTERFLY}, fragment translations or center distances, and derived
+observables, such as inverse distances, exponentials, trigonometric functions,
+linear combinations, Cremer--Pople variables or proton-transfer coordinates.
+Protected semantic coordinates enter the same rank and symmetry contract as
+automatically generated protected coordinates whenever they are independent.
+Observable coordinates never compete in the rank selection; they are evaluated
+later as \(y=f(\q)\) from named base coordinates by the chain rule in
+Eq.~\eqref{eq:chain-rule}.  Duplicate user-protected rows are rejected, row-equivalent user
+coordinates substitute the automatic primitive with provenance recorded, and a
+partial user-specified symmetry orbit is diagnosed explicitly before local SALC
+fallback.  Thus the user expresses intent, while \NEO\ remains responsible for
+model construction, rank resolution and export.
+
 \section{The Frozen Coordinate Contract}
 
 The central output of \NEO\ is a frozen coordinate contract, not a transient
@@ -371,7 +417,8 @@ matrix; \(\Bmat\) contains the analytic Wilson rows of the accepted basis;
 \(\Sigma\) contains point-group transformation matrices,
 irreducible-representation labels and SALC coefficients; and \(\mathcal{M}\)
 contains the frozen molecular state, source-family labels, protection flags,
-family priority order, numerical tolerances, diagnostics and provenance.
+family priority order, numerical tolerances, semantic grammar and contract
+schema versions, diagnostics and provenance.
 Equivalently, with \(\mathbf{p}=(p_1,\ldots,p_m)^T\),
 \[
   \mathbf{g}=\Cmat_{\mathcal{G}}\mathbf{p},
@@ -1026,10 +1073,9 @@ checks, not a comparison with an external published coordinate generator.
 The broader scientific motivation includes GF/PED analysis, DVR grids and
 \MORPHEUS\ refinement, but those are downstream application validations.  The
 present paper validates the frozen coordinate contract itself and then tests
-whether external Gaussian calculations can consume NEO-generated coordinates.
-It therefore shows that the geometric and algebraic object is well defined; it
-does not claim a production benchmark of GF/PED scaling, DVR dynamics or
-semi-experimental refinement.
+whether external Gaussian calculations can consume \NEO{}-generated coordinates.
+The scope of the numerical evidence is stated explicitly in
+Sec.~\ref{sec:scope-limitations}.
 
 The regression corpus contains acyclic and cyclic molecules, fused and
 non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
@@ -1081,7 +1127,7 @@ Norbornane & Bridged saturated ring & \(C_{2v}\) & 51/51; 3 \(RPck\) & \(\Delta_
 Cubane & High-symmetry cage & \(O_h\) & 42/42; cyclic bends & \(\Delta_\mathrm{PF}=6.41\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\mathrm{PF}=6.71\times10^{-9}\); \(\epsilon_\mathrm{SALC}=3.33\times10^{-16}\) \\
 Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
-Cyclottane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 11 protected & direct \(\Bmat\)-rank \(=18\); \(\epsilon_\mathrm{SALC}=0\) \\
 \bottomrule
 \end{tabular}
@@ -1145,8 +1191,7 @@ preserves its symmetry labels.  The compact application probes ask a different
 question: whether the same frozen coordinate object gives a physically useful
 representation for force constants and ring deformation.  They are deliberately
 small Gaussian DV calculations, because their role is to test the coordinate
-representation, not to benchmark an electronic-structure method or to replace
-full GF/PED, DVR and \MORPHEUS\ validation studies.
+representation under external electronic-structure consumption.
 
 \subsection{Gaussian ReadAllGIC Optimization}
 
@@ -1161,8 +1206,7 @@ combinations of those primitives, with no out-of-plane coordinates.  The same
 inputs are therefore compatible with standard Gaussian \texttt{ReadAllGIC}
 usage; the calculations reported here used Gaussian DV at HF/STO-3G.
 
-This is still a solver and coordinate-contract check, not an electronic
-structure benchmark.  The relevant observations are that Gaussian accepts the
+The relevant observations are that Gaussian accepts the
 automatically generated coordinate block, reports \(NTRed=NRank\) equal to the
 \NEO\ rank at every optimization step, and reaches a stationary point in three
 to five steps for saturated ring and cage systems with different symmetry and
@@ -1170,7 +1214,7 @@ rank.
 
 \begin{table}[htbp]
 \centering
-\caption{Gaussian \texttt{ReadAllGIC} optimizations using \NEO-generated
+\caption{Gaussian \texttt{ReadAllGIC} optimizations using \NEO{}-generated
 coordinate contracts.  The route was HF/STO-3G
 \texttt{Opt=(ReadAllGIC,MaxCycle=80) NoSymm}.  The equality
 \(NTRed=NRank\) is the Gaussian-side rank reported for the GIC coordinate
@@ -1213,13 +1257,11 @@ Figure~\ref{fig:hessian-heatmap} shows an illustrative result for cyclobutane.  
 orthonormal Cartesian vibrational basis the normalized Hessian is broadly
 coupled, with a mean off-diagonal value of 0.151 and a 95th percentile of
 0.394.  In the frozen \NEO\ contract these values fall to 0.028 and 0.085.  In
-the symmetry-adapted contract they fall further to 0.013 and 0.056.  The point
-is not that \NEO\ constructs normal modes, nor that one small molecule proves a
-general vibrational benchmark.  The figure shows the diagnostic that will be
-applied across a broader corpus.  It is therefore an illustrative locality
-check: in this case, a chemically labelled basis makes the Hessian visibly more
-block structured before any empirical scaling or normal-mode diagonalization is
-applied.
+the symmetry-adapted contract they fall further to 0.013 and 0.056.  These
+numbers are single-calculation diagnostics, not quantified robustness estimates
+over geometry or method variations.  In this case, a chemically labelled basis
+makes the Hessian visibly more block structured before any empirical scaling or
+normal-mode diagonalization is applied.
 
 \begin{figure}[htbp]
 \centering
@@ -1276,7 +1318,7 @@ that the two energy traces are numerically identical: the largest
 Cartesian--\texttt{ReadAllGIC} difference is \(3.0\times10^{-3}\,\mu E_h\),
 about \(8\times10^{-6}\)~kJ~mol\(^{-1}\).  The large rise along the path is not
 a chair--boat barrier; it is the expected cost of an unrelaxed fixed-frame
-puckering deformation.  The result instead shows that the same NEO-generated
+puckering deformation.  The result instead shows that the same \NEO{}-generated
 large-amplitude coordinate path can be exported either as ordinary Cartesians or
 as an automatically generated Gaussian GIC model without changing the electronic
 energy surface being sampled.
@@ -1286,7 +1328,7 @@ energy surface being sampled.
 \includegraphics[width=0.78\linewidth]{figures/cyclohexane_puckering_equivalence.png}
 \caption{Cyclohexane fixed-frame chair-to-boat puckering export test
 (Gaussian DV B3LYP/6-31+G*).  The upper panel compares the same five geometries
-evaluated from portable Cartesian inputs and from \NEO-generated
+evaluated from portable Cartesian inputs and from \NEO{}-generated
 \texttt{ReadAllGIC} inputs.  The lower panel gives the energy difference in
 microhartree.}
 \label{fig:cyclohexane-puckering-equivalence}
@@ -1334,21 +1376,18 @@ but on the shared topology, symmetry and rank of the molecular problem.
 
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
 symmetry-projector normalization and Python--Fortran row-space equivalence for
-representative cases.  This is an implementation-level
-cross-check inside the \MATRIX\ lineage, not a claim of agreement with an
-external natural-coordinate program.  Table~\ref{tab:frisch-si} adds the more external-facing
-question raised by the Gaussian GIC Supporting Information: can the same kinds
-of chemically specialized variables be obtained without hand-writing the GIC
-expressions?  The answer is positive for the tested motifs.  Gaussian supplies
-a powerful expression and derivative language; \NEO\ supplies automatic
-construction, semantic interning of generated coordinates, sparse derivative
-propagation and frozen provenance.  A direct numerical run in Gaussian using
-explicitly written GIC input remains useful before submission, but it is now a
-cross-method reproducibility check rather than the first evidence that the
-\NEO\ model can generate these variables.  By contrast, production GF/PED,
-DVR and \MORPHEUS\ examples remain outside the validation set of this paper:
-the present figures show coordinate locality, large-amplitude export and
-Gaussian consumption, not a completed spectroscopy or refinement benchmark.
+representative cases.  This is an implementation-level cross-check inside the
+\MATRIX\ development lineage, not a comparison with an external published
+natural-coordinate program.  Table~\ref{tab:frisch-si} addresses the more
+external-facing question raised by the Gaussian GIC Supporting Information: can
+the same kinds of chemically specialized variables be generated without
+hand-writing molecule-specific GIC expressions?  Gaussian supplies a powerful
+expression and derivative language; \NEO\ supplies automatic construction,
+semantic interning of generated coordinates, sparse derivative propagation and
+frozen provenance.  In this sense, GIC syntax is a serialization and solver
+interface for \NEO, not a competing coordinate-generation theory.  A direct
+numerical comparison with explicitly written Gaussian GIC input would still be a
+useful cross-method reproducibility check.
 
 \subsection{Computational Cost and Remaining Validation}
 
@@ -1395,8 +1434,48 @@ used to construct ring-like angular and torsional components.  That model is
 scientifically attractive because it would give a unified internal-coordinate
 description of hydrogen-bonded cycles, but it must avoid contaminating the
 covalent topology and must remain stable under symmetry.  Until that contract
-is closed, the manuscript should present pseudo-bonds as a development target,
+is closed, pseudo-bonds should be presented as a development target,
 not as the release-grade intermolecular method.
+
+\subsection{Scope and Limitations}
+\label{sec:scope-limitations}
+
+\NEO\ is intended for high-accuracy quantum-chemical, spectroscopic and
+refinement workflows in which the coordinate model carries chemical information
+and must be reused across modules.  It is not designed as a large-scale
+thousand-atom molecular-dynamics coordinate generator, a generic classical
+force-field engine or a machine-learning featurizer.  Users who need a frozen,
+auditable, symmetry-aware coordinate contract for molecules, rings, fragments
+or coordination motifs are the target audience; users who only need a
+black-box optimizer coordinate for very large systems should normally use a
+lighter optimizer-specific representation.
+
+The construction is conditional on a fixed molecular-state stratum.  Bond
+breaking or forming, proton transfer that changes the covalent graph, and
+coordination rearrangements require separate contracts or a future
+state-interpolation model.  An EVB-like or subspace-interpolation layer may be
+possible, but it is not part of the present theory.
+
+The Wilson rows used here are first-order derivatives at the frozen geometry.
+Large distortions along scans, optimizations or refinement trajectories may
+require recomputing the \(\Bmat\) rows or decomposing a large transformation
+into smaller steps.  A future adaptive update could preserve the semantic
+contract while refreshing local derivative information, but the present draft
+does not validate such an update scheme.
+
+The protected-first rule is a chemically motivated modelling principle, not a
+mathematical uniqueness theorem over all possible coordinate bases.  Alternative
+priority orders would define different, still reproducible contracts.  The
+claim made here is that the priority order is explicit, versioned and
+diagnosed, and that protected coordinates are not silently displaced by
+ordinary coordinates when they are compatible with the target rank.
+
+Finally, determinism is conditional on the frozen \ORACLE/\MATRIX\ state:
+geometry, topology, symmetry operations, continuous atom perception, synthon
+descriptors, tolerances, semantic grammar version and contract schema version.
+A different perception model or tolerance policy may produce a different
+contract; the scientific requirement is that such a change is visible in the
+provenance rather than hidden in an implementation choice.
 
 \section{Conclusions}
 
@@ -1424,11 +1503,44 @@ same rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of
 The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
 contract is already usable as an external solver coordinate set.  The Hessian,
 puckering and portable chair-to-boat export probes illustrate why the same
-contract is relevant to force-field and large-amplitude work, but they remain
-coordinate diagnostics.  Full GF/PED, DVR and \MORPHEUS\ application benchmarks
-are the next validation layer.  The cyclohexane export check further shows that
-a NEO-generated puckering path can be represented either as ordinary Cartesians
-or as Gaussian \texttt{ReadAllGIC} input with numerically identical energies.
+contract is relevant to force-field and large-amplitude work within the scope
+defined above.  Full GF/PED, DVR and \MORPHEUS\ application benchmarks are the
+next validation layer.  The cyclohexane export check further shows that a
+\NEO{}-generated puckering path can be represented either as ordinary Cartesians or
+as Gaussian \texttt{ReadAllGIC} input with numerically identical energies.
+
+\section*{Reproducibility}
+
+The calculations reported in the validation and application sections were
+generated with the \MATRIX/\NEO\ development tree and Python 3.13.11.  Gaussian
+jobs used the local Gaussian DV executable documented in the accompanying
+scripts; the method and basis set are stated with each probe.  The reported
+construction tests are deterministic and do not use stochastic seeds.  The
+Python implementation is checked against a separate Fortran control
+implementation for the corpus rows where that comparison is applicable.
+
+\section*{Data and Code Availability}
+
+The manuscript repository contains the scripts, JSON data files and figures
+used to generate the tables and application plots.  The \MATRIX/\NEO\ source
+code is under active development and will be released with the \MATRIX\
+distribution; until public release, the code and frozen input/output data are
+available from the author upon reasonable request.
+
+\section*{Author Contributions}
+
+Vincenzo Barone conceived the method, designed the \MATRIX/\NEO\ coordinate
+contract, implemented the active code paths used here, performed the
+calculations and wrote the manuscript.  Planned consumers such as \TRINITY\ and
+\SMITH\ are identified as future workflow components rather than as completed
+validation targets.
+
+\section*{Acknowledgments}
+
+The author acknowledges the broader \MATRIX\ development environment used to
+test the coordinate contracts and the Gaussian GIC work that motivated the
+explicit distinction between coordinate-description languages and automatic
+coordinate generation.
 
 \bibliographystyle{unsrtnat}
 \bibliography{references}
