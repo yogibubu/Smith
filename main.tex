@@ -7,6 +7,8 @@
 \usepackage{graphicx}
 \usepackage{longtable}
 \usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 
@@ -61,7 +63,7 @@ rings and fragments, reduces the coordinate space using analytic Wilson
 coordinate blocks.  The result is a deterministic constructive protocol and a
 frozen coordinate contract, rather than an arbitrary non-redundant basis.  The
 contract can also incorporate optional user-defined protected semantic
-coordinates and derived observables.  The same frozen definition is designed to
+coordinates and derived observables.  This stored definition is designed to
 supply Gaussian-readable coordinates, analytic
 \(\Bmat\) rows, symmetry labels and total-symmetric subsets for geometry
 optimization, Wilson GF/potential-energy-distribution analysis, vibrational
@@ -123,6 +125,57 @@ coordinate persistence but is not validated in this paper. \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=0.50cm,
+  stepbox/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    minimum width=0.60\linewidth,
+    minimum height=0.52cm,
+    font=\small
+  },
+  sinkbox/.style={
+    draw,
+    rounded corners=2pt,
+    align=center,
+    minimum width=0.16\linewidth,
+    minimum height=0.52cm,
+    font=\small
+  },
+  arrow/.style={-{Latex[length=2.0mm]}, line width=0.35pt}
+]
+\node[stepbox] (geometry) {Geometry};
+\node[stepbox, below=of geometry] (topology) {Topology and symmetry-perception state};
+\node[stepbox, below=of topology] (primitive) {Primitive coordinate families};
+\node[stepbox, below=of primitive] (protected) {Protected semantic, ring and fragment coordinates};
+\node[stepbox, below=of protected] (rank) {Block-local rank reduction};
+\node[stepbox, below=of rank] (symmetry) {Homogeneous symmetry adaptation};
+\node[stepbox, below=of symmetry] (contract) {Frozen coordinate contract};
+\node[sinkbox, below=0.72cm of contract, xshift=-0.34\linewidth] (gf) {GF/PED};
+\node[sinkbox, right=0.12cm of gf] (opt) {Optimization};
+\node[sinkbox, right=0.12cm of opt] (dvr) {DVR};
+\node[sinkbox, right=0.12cm of dvr] (refine) {Refinement};
+\node[sinkbox, right=0.12cm of refine] (ff) {Force field};
+\draw[arrow] (geometry) -- (topology);
+\draw[arrow] (topology) -- (primitive);
+\draw[arrow] (primitive) -- (protected);
+\draw[arrow] (protected) -- (rank);
+\draw[arrow] (rank) -- (symmetry);
+\draw[arrow] (symmetry) -- (contract);
+\foreach \target in {gf,opt,dvr,refine,ff}
+  \draw[arrow] (contract.south) |- (\target.north);
+\end{tikzpicture}
+\caption{Constructive workflow implemented by \NEO.  The model-building stage
+ends at the frozen coordinate contract; downstream modules reuse that object
+and update only the numerical quantities required for their task, such as
+Wilson \(\Bmat\) rows, force constants, path coordinates or refinement
+Jacobians.}
+\label{fig:neo-workflow}
+\end{figure}
 
 The novelty is not a new coordinate formula, but a deterministic constructive
 protocol.  The central claim is not that a new Wilson matrix is needed.  It is
@@ -358,7 +411,7 @@ definition.
 
 This distinction also prevents a common ambiguity in the word ``GIC.''  A
 general GIC expression can be an optimizer coordinate.  A \NEO\ coordinate
-definition is a reusable coordinate contract: it specifies the base coordinate
+definition is reusable: it specifies the base coordinate
 space, the analytic derivatives and the symmetry transformation rules from
 which later functional variables can be built.  Implementing these coordinate
 functions systematically is part of the next development layer, but it does not
@@ -652,7 +705,11 @@ a family are resolved by deterministic topology, \ORACLE\ equivalence and
 CIP-like priority keys stored in \(\mathcal{M}\).  Thus the construction works on a
 fixed total order that extends a chemically motivated partial order.
 
-\paragraph{Relabelling covariance.}
+The following statements are construction properties of that ordered protocol.
+They are included to make the design verifiable, not to claim uniqueness over
+all possible internal-coordinate bases.
+
+\paragraph{Property: relabelling covariance.}
 \label{thm:relabel}
 Let two frozen molecular states be related by an atom relabelling \(\pi\) that
 preserves element identities, geometry, topology, \ORACLE\ descriptors, fragments,
@@ -680,19 +737,19 @@ relabellings: relabelling the molecular state and then constructing the
 contract gives the same object, up to the canonical contract isomorphism, as
 constructing the contract first and then transporting it by the relabelling.
 
-\paragraph{Deterministic coordinate contract.}
+\paragraph{Construction principle: deterministic contract.}
 \label{prop:determinism}
 For a fixed molecular state--geometry, topology, \ORACLE\ descriptors, point-group
 operations and fragment data--and for fixed primitive generators, family
 priority order, tie-breaking keys, row-normalization rule and numerical
-tolerances, \NEO\ returns a unique frozen coordinate contract, or a unique
+tolerances, \NEO\ returns a unique contract, or a unique
 incompatibility certificate.  In particular, no stochastic search, optimizer
 history or manual choice is part of the contract definition.
 The verification is direct: each stage is a deterministic map of the frozen
 input data, and the fixed order of candidate rows converts every rank and
 symmetry decision into a stored threshold test.
 
-\paragraph{Semantic preservation of protected coordinates.}
+\paragraph{Construction principle: semantic preservation.}
 \label{prop:protected}
 Let \(\mathcal{P}_{\mathrm{prot}}\) be the protected prefix of the ordered
 candidate set.  Every protected candidate whose Wilson row is nonsingular and
@@ -705,7 +762,7 @@ This is a consequence of the ordered-prefix construction: protected rows are
 tested before ordinary rows and, once accepted, are never replaced by a later
 exchange step.
 
-\paragraph{Rank-preserving selection.}
+\paragraph{Property: rank-preserving selection.}
 \label{prop:rank-selection}
 Assume exact arithmetic and define
 \[
@@ -743,7 +800,7 @@ absolute row norm is used only to reject singular coordinates; independence is
 decided by the direction of the analytic Wilson row.  This normalization avoids
 a direct comparison of raw angstrom and radian scales in the final rank test.
 It does not remove all modelling choices: the ordered candidate list remains a
-chemical convention, not a theorem of uniqueness.  Singular rows and rows
+chemical convention, not a uniqueness guarantee.  Singular rows and rows
 dependent on previously accepted rows are recorded in the frozen diagnostics.
 
 The decisive policy is therefore not only the linear algebra routine; it is the
@@ -756,7 +813,7 @@ first-order motion.  If independent protected coordinates alone exceed the
 vibrational rank, the construction is rejected rather than silently discarding a
 special coordinate.
 
-\paragraph{Block-local scaling invariance.}
+\paragraph{Property: block-local scaling invariance.}
 \label{thm:block-scaling}
 Let \(H\subset\mathcal{P}\) be a homogeneous coordinate block.  Uniformly
 rescaling all Wilson rows in that block by a nonzero scalar does not change the
@@ -769,7 +826,7 @@ The reason is that row normalization removes a uniform factor inside \(H\), and
 eigenvalues but not eigenspaces; concatenating heterogeneous blocks before
 diagonalization changes their relative weights.
 
-\paragraph{Local stability.}
+\paragraph{Property: local stability.}
 \label{thm:local-stability}
 Let \(S_0\) be a nonsingular frozen molecular state.  Assume that, in a
 neighbourhood of \(S_0\), topology, fragment decomposition, \ORACLE\ equivalence
@@ -797,10 +854,10 @@ for all \(\x,\y\) in that ball.  Then every
     \min_{a:L_a>0}\frac{\mu_a}{2L_a}
   \right]
 \]
-preserves the discrete coordinate contract, with the usual convention that the
+preserves the discrete contract, with the usual convention that the
 inner minimum is \(+\infty\) if all \(L_a=0\).  Thus every state \(S\) in the
 same discrete stratum with \(\|\x(S)-\x(S_0)\|<\delta\) generates an isomorphic
-coordinate contract: the primitive identities, accepted/rejected rank decisions,
+contract: the primitive identities, accepted/rejected rank decisions,
 protected coordinates, family labels and symmetry labels are unchanged, while
 \(\Bmat\) rows and coefficient matrices vary continuously with the geometry
 under the same normalization convention.
@@ -949,7 +1006,7 @@ without converting the underlying covalent topology into a different molecule.
 
 Table~\ref{tab:status} records the status of the present \NEO\
 construction.  The purpose is not to document a program interface, but to state
-which mathematical objects belong to the present coordinate contract and which
+which mathematical objects belong to the present contract and which
 objects remain methodological extensions.  This separation is important because
 downstream validation is meaningful only for coordinates that are part of the
 frozen contract.
@@ -1030,7 +1087,7 @@ checks, not a comparison with an external published coordinate generator.
 
 The broader scientific motivation includes GF/PED analysis, DVR grids and
 semi-experimental refinement, but the validation layers must be separated.  The
-present paper validates the frozen coordinate contract itself, tests whether
+present paper validates the contract itself, tests whether
 external Gaussian calculations can consume \NEO{}-generated coordinates, and
 adds a compact GF/PED scaling probe to show how the same family labels enter a
 classical spectroscopic analysis.  The scope of the numerical evidence is
@@ -1255,7 +1312,7 @@ bends, torsions and ring-puckering coordinates separated.
 
 The add-on test uses cyclohexanol at GDV B3LYP/6-31G(d), with standard
 \texttt{Opt Freq NoSymm} and no out-of-plane GIC terms.  \NEO\ supplies the
-frozen coordinate contract and sparse \(\Bmat\) rows; the GF layer then applies
+stored contract and sparse \(\Bmat\) rows; the GF layer then applies
 family-level Pulay-style scale factors to the internal force field and reports
 PED percentages by source family.  The contract has rank \(51/51\).  The
 unscaled GF frequencies reproduce the Gaussian/FCHK harmonic frequencies with
@@ -1358,7 +1415,7 @@ but the relative fixed-frame puckering profile is the same at the level needed
 for this export test (Table~\ref{tab:external-codes}).  This verifies the
 intended division of labor: \NEO\ constructs the model and coordinates, while
 external electronic-structure programs consume the resulting Cartesian
-geometries or GIC serializations.  It confirms that the coordinate contract is
+geometries or GIC serializations.  It confirms that the contract is
 independent of the electronic-structure implementation.
 
 \begin{table}[htbp]
@@ -1422,7 +1479,7 @@ a global diagonalization.
 
 This is also the practical answer to the possible ``black box'' criticism.
 The output of \NEO\ is not an undocumented list of optimizer variables.  It is a
-frozen coordinate contract with primitive definitions, coefficients, family
+stored contract with primitive definitions, coefficients, family
 labels, irreducible representations, rank diagnostics and analytic derivative
 rows.  Moreover, downstream calculations can compare the \GIC\ active space
 with a symmetry-adapted Cartesian nullspace that is not built from GIC
@@ -1449,7 +1506,7 @@ not typed by hand.
 \subsection{Computational Cost and Remaining Validation}
 
 The computational separation is the same as the conceptual separation.  The
-coordinate contract is constructed once for a frozen molecular state; only the
+contract is constructed once for a frozen molecular state; only the
 analytic \(\Bmat\) rows and derived coordinate functions need to be evaluated
 again at later optimization, scan, GF/PED or refinement geometries.  If \(m\) is the
 number of primitive candidates, \(r\) the target rank and \(z\) the number of
@@ -1477,7 +1534,7 @@ for the frozen \ORACLE\ state, but an unconstrained optimization that moves
 back and forth across a symmetry tolerance can legitimately produce different
 frozen strata.  The implementation records point-operation residuals and the
 minimum residual margin against the stored symmetry tolerance, and flags
-near-threshold operations in the frozen coordinate contract; quantitative
+near-threshold operations in the stored contract; quantitative
 tolerance-sensitivity
 tables are part of the roadmap rather than a claim made by the present
 validation.  Likewise, the manuscript does not yet compare \NEO\ against an
@@ -1522,7 +1579,7 @@ contract while refreshing local derivative information, but the present draft
 does not validate such an update scheme.
 
 The protected-first rule is a chemically motivated modelling principle, not a
-mathematical uniqueness theorem over all possible coordinate bases.  Alternative
+mathematical uniqueness result over all possible coordinate bases.  Alternative
 priority orders would define different, still reproducible contracts.  The
 claim made here is that the priority order is explicit, versioned and
 diagnosed, and that protected coordinates are not silently displaced by
@@ -1589,12 +1646,12 @@ available from the author upon reasonable request.
 Vincenzo Barone conceived the method, designed the \NEO\ coordinate
 contract, implemented the active code paths used here, performed the
 calculations and wrote the manuscript.  External refinement and PES-fitting
-consumers are discussed only as downstream uses of the coordinate contract.
+consumers are discussed only as downstream uses of the contract.
 
 \section*{Acknowledgments}
 
 The author acknowledges the broader \ORACLE\ development environment used to
-test the coordinate contracts, the Gaussian GIC work that motivated the
+test the contracts, the Gaussian GIC work that motivated the
 distinction between coordinate-description languages and automatic generation,
 and the ring-reconstruction work of Lema-Saavedra and Fern{\'a}ndez-Ramos that
 clarified how puckering coordinates connect to closed molecular geometries.
