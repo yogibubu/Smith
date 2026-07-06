@@ -110,7 +110,9 @@ coordinates enter a fit, force field, scan or surface model.
 Name & Role \\
 \midrule
 \ORACLE & Operator for Routing, Analysis, Control, Launch and Exploration; here,
-the validated state carrying continuous atom perception and synthon descriptors. \\
+the unpublished state layer used by \NEO.  It is a new implementation of the
+continuous molecular perception ideas introduced in Proxima and of the synthon
+descriptors used in previous templating-synthon work.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
 \NEO & Coordinate-generation engine: \GIC\ construction, symmetry-adapted
 Cartesian reference spaces, analytic \(\Bmat\) rows, symmetry labels and
 provenance. \\
@@ -272,7 +274,12 @@ representations, total-symmetric subsets and the metadata required to
 reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
 they do not rebuild topology, ring sets or coordinate rows.
 
-Initial local equivalence is not based only on element symbols.  The
+ORACLE is not yet a published program.  In the present manuscript it should be
+read as the new molecular-state implementation used to provide \NEO\ with
+published chemical descriptors: continuous molecular perception in the spirit
+of Proxima,\cite{Lazzari2020Proxima} and molecular/spectral synthons developed
+for accurate structural templating.\cite{Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141}
+Initial local equivalence is therefore not based only on element symbols.  The
 \ORACLE\ molecular-state layer supplies continuous atom perception and
 synthon descriptors, and \NEO\ uses them to make deterministic local choices.
 The present construction uses effective atomic numbers
