@@ -663,7 +663,10 @@ second state.  In particular,
 and the accepted coordinate spaces, family labels and symmetry-adapted blocks
 are carried into each other by the induced row and coefficient-space
 isomorphisms.
-
+This follows because every primitive generator, row norm, rank residual and
+homogeneous-block projector is evaluated from data preserved by \(\pi\);
+orthogonal permutation/sign transformations do not change the Boolean
+acceptance tests.
 
 Equivalently, \NEO\ is natural with respect to symmetry-preserving atom
 relabellings: relabelling the molecular state and then constructing the
@@ -678,7 +681,9 @@ priority order, tie-breaking keys, row-normalization rule and numerical
 tolerances, \NEO\ returns a unique frozen coordinate contract, or a unique
 incompatibility certificate.  In particular, no stochastic search, optimizer
 history or manual choice is part of the contract definition.
-
+The verification is direct: each stage is a deterministic map of the frozen
+input data, and the fixed order of candidate rows converts every rank and
+symmetry decision into a stored threshold test.
 
 \paragraph{Semantic preservation of protected coordinates.}
 \label{prop:protected}
@@ -689,7 +694,9 @@ rows is retained in any returned final contract.  No ordinary stretch, bend or
 torsion can displace an accepted protected coordinate.  If the independent
 protected prefix already exceeds the target vibrational rank, \NEO\ reports an
 invalid contract rather than removing protected coordinates by exchange.
-
+This is a consequence of the ordered-prefix construction: protected rows are
+tested before ordinary rows and, once accepted, are never replaced by a later
+exchange step.
 
 \paragraph{Rank-preserving selection.}
 \label{prop:rank-selection}
@@ -704,7 +711,10 @@ the accepted subset \(\mathcal{A}\) is an ordered basis of
 \(\operatorname{rank}\Bmat(\mathcal{P})=r\), then
 \(|\mathcal{A}|=r\) and
 \(\operatorname{span}\Bmat(\mathcal{A})=\operatorname{span}\Bmat(\mathcal{P})\).
-
+Indeed, at step \(k\) Gram--Schmidt decomposes \(\bmat(p_k)\) into its
+projection on the current accepted span plus an orthogonal residual; a zero
+residual leaves the span unchanged, and a nonzero residual adds exactly one
+new independent direction.
 
 The numerical construction is the finite-precision version of this statement.  \NEO\
 selects rows by incremental modified Gram--Schmidt rank testing with a fixed
@@ -747,7 +757,10 @@ normalized-row rank decisions inside \(H\), nor the singular-vector or projector
 subspaces obtained from \(\Bmat_H\Bmat_H^T\).  By contrast, a global
 decomposition of several heterogeneous blocks is generally not invariant to
 independent rescalings of those blocks.
-
+The reason is that row normalization removes a uniform factor inside \(H\), and
+\((\lambda\Bmat_H)(\lambda\Bmat_H)^T=\lambda^2\Bmat_H\Bmat_H^T\) rescales
+eigenvalues but not eigenspaces; concatenating heterogeneous blocks before
+diagonalization changes their relative weights.
 
 \paragraph{Local stability.}
 \label{thm:local-stability}
@@ -784,7 +797,10 @@ coordinate contract: the primitive identities, accepted/rejected rank decisions,
 protected coordinates, family labels and symmetry labels are unchanged, while
 \(\Bmat\) rows and coefficient matrices vary continuously with the geometry
 under the same normalization convention.
-
+This is the usual finite-decision margin argument: each decision function stays
+on the same side of its threshold for perturbations smaller than
+\(\mu_a/(2L_a)\), and the minimum over the finite decision set preserves the
+entire ordered construction.
 
 This is the technical reason for block-local reduction.  \NEO\ does not claim
 that weights disappear from all possible coordinate constructions.  It avoids
@@ -1371,12 +1387,14 @@ high-coordination angular blocks, fragment translations, fragment orientations
 and center-based distances.  The method is deliberately not a single global
 orthogonalization.  It is a sequence of local and block-local decisions followed
 by a rank audit in the physical Wilson \(\Bmat\)-row space.
-The compact structural statements above make the main claims precise: \NEO\ is
+The compact structural observations above are intentionally modest: \NEO\ is
 natural with respect to symmetry-preserving relabellings, the contract is
 deterministic on a frozen state, protected semantic coordinates are retained
 whenever rank compatibility allows them, block-local reduction is insensitive
 to homogeneous scaling, and the discrete contract is locally stable inside a
-fixed molecular-state stratum.
+fixed molecular-state stratum.  Each point follows directly from the fixed
+candidate order, normalized Gram--Schmidt rank tests and homogeneous
+point-group projectors described in Sec.~6--7.
 
 The method should therefore be read as a documented coordinate-selection
 protocol, not as a proof that only one internal-coordinate basis is possible.
