@@ -1,0 +1,286 @@
+{
+  "method": "SMITH/SONIC construction scaling microbenchmark",
+  "repeats": 5,
+  "python": "3.13.11",
+  "notes": [
+    "Median wall times from one local macOS run; values are implementation diagnostics, not hardware-independent constants.",
+    "Build time includes coordinate construction, rank reduction, optional symmetry projection and writing the xyzin GIC sections.",
+    "B time is one analytic Wilson B evaluation from an already frozen contract.",
+    "Peak memory is tracemalloc peak during build plus B evaluation for a single trial."
+  ],
+  "systems": [
+    {
+      "system": "benzene",
+      "source": "benzene.inp",
+      "point_group": "D6h",
+      "symmetrize": true,
+      "fragment_mode": "none",
+      "atoms": 12,
+      "candidates": 30,
+      "primitive_rows_stored": 42,
+      "gics": 30,
+      "rank": 30,
+      "target_rank": 30,
+      "b_nnz": 414,
+      "b_density": 0.38333333333333336,
+      "build_time_median_s": 0.12863450008444488,
+      "b_time_median_s": 0.005386459059081972,
+      "peak_memory_median_mib": 0.2280740737915039,
+      "build_time_trials_s": [
+        0.17456795903854072,
+        0.13108141697011888,
+        0.12852054205723107,
+        0.12863450008444488,
+        0.12711404100991786
+      ],
+      "b_time_trials_s": [
+        0.005548999994061887,
+        0.005474208970554173,
+        0.005386459059081972,
+        0.00490704202093184,
+        0.005245374981313944
+      ],
+      "peak_memory_trials_mib": [
+        1.241302490234375,
+        0.2914133071899414,
+        0.2280740737915039,
+        0.17363452911376953,
+        0.1735219955444336
+      ]
+    },
+    {
+      "system": "norbornane",
+      "source": "norbornane.inp",
+      "point_group": "C2v",
+      "symmetrize": true,
+      "fragment_mode": "none",
+      "atoms": 19,
+      "candidates": 52,
+      "primitive_rows_stored": 70,
+      "gics": 51,
+      "rank": 51,
+      "target_rank": 51,
+      "b_nnz": 1134,
+      "b_density": 0.39009287925696595,
+      "build_time_median_s": 0.09928137494716793,
+      "b_time_median_s": 0.011872207978740335,
+      "peak_memory_median_mib": 0.30361080169677734,
+      "build_time_trials_s": [
+        0.1030796249397099,
+        0.09928137494716793,
+        0.09932616597507149,
+        0.0991226660553366,
+        0.09903791593387723
+      ],
+      "b_time_trials_s": [
+        0.011596958036534488,
+        0.012219249969348311,
+        0.011817916994914412,
+        0.012183375074528158,
+        0.011872207978740335
+      ],
+      "peak_memory_trials_mib": [
+        0.3769855499267578,
+        0.3035316467285156,
+        0.303680419921875,
+        0.30361080169677734,
+        0.3036050796508789
+      ]
+    },
+    {
+      "system": "camphor",
+      "source": "camphor.inp",
+      "point_group": "C1",
+      "symmetrize": false,
+      "fragment_mode": "none",
+      "atoms": 27,
+      "candidates": 76,
+      "primitive_rows_stored": 103,
+      "gics": 75,
+      "rank": 75,
+      "target_rank": 75,
+      "b_nnz": 786,
+      "b_density": 0.12938271604938273,
+      "build_time_median_s": 0.14413220901042223,
+      "b_time_median_s": 0.015023875050246716,
+      "peak_memory_median_mib": 0.45110130310058594,
+      "build_time_trials_s": [
+        0.15402479097247124,
+        0.14532079105265439,
+        0.14391091710422188,
+        0.143773666000925,
+        0.14413220901042223
+      ],
+      "b_time_trials_s": [
+        0.015555709018372,
+        0.014843166922219098,
+        0.015444333082996309,
+        0.015023875050246716,
+        0.014750249916687608
+      ],
+      "peak_memory_trials_mib": [
+        0.6352224349975586,
+        0.45157527923583984,
+        0.45110130310058594,
+        0.44911766052246094,
+        0.44321632385253906
+      ]
+    },
+    {
+      "system": "ferrocene",
+      "source": "ferrocene.inp",
+      "point_group": "D5h",
+      "symmetrize": true,
+      "fragment_mode": "special-coordinates",
+      "atoms": 21,
+      "candidates": 651,
+      "primitive_rows_stored": 651,
+      "gics": 57,
+      "rank": 57,
+      "target_rank": 57,
+      "b_nnz": 2014,
+      "b_density": 0.5608465608465608,
+      "build_time_median_s": 3.30270616710186,
+      "b_time_median_s": 0.0642774160951376,
+      "peak_memory_median_mib": 2.8446950912475586,
+      "build_time_trials_s": [
+        3.30270616710186,
+        3.3164602500619367,
+        3.319720958941616,
+        3.2971575829433277,
+        3.274385292083025
+      ],
+      "b_time_trials_s": [
+        0.06423854199238122,
+        0.06440279202070087,
+        0.06420158303808421,
+        0.06512666598428041,
+        0.0642774160951376
+      ],
+      "peak_memory_trials_mib": [
+        2.8716812133789062,
+        2.8448877334594727,
+        2.8446950912475586,
+        2.832284927368164,
+        2.8269033432006836
+      ]
+    },
+    {
+      "system": "spiro",
+      "source": "spiro.inp",
+      "point_group": "D2",
+      "symmetrize": true,
+      "fragment_mode": "none",
+      "atoms": 31,
+      "candidates": 87,
+      "primitive_rows_stored": 110,
+      "gics": 87,
+      "rank": 87,
+      "target_rank": 87,
+      "b_nnz": 1833,
+      "b_density": 0.22654801631442342,
+      "build_time_median_s": 0.25278108299244195,
+      "b_time_median_s": 0.022547375061549246,
+      "peak_memory_median_mib": 0.7480907440185547,
+      "build_time_trials_s": [
+        0.25451358302962035,
+        0.2537882919423282,
+        0.2518773330375552,
+        0.25278108299244195,
+        0.2501903329975903
+      ],
+      "b_time_trials_s": [
+        0.02259999990928918,
+        0.02250041696242988,
+        0.022545124986208975,
+        0.022547375061549246,
+        0.022567917010746896
+      ],
+      "peak_memory_trials_mib": [
+        0.7487173080444336,
+        0.749267578125,
+        0.7475910186767578,
+        0.7472772598266602,
+        0.7480907440185547
+      ]
+    },
+    {
+      "system": "cyclooctane",
+      "source": "cyclottane.inp",
+      "point_group": "D2",
+      "symmetrize": true,
+      "fragment_mode": "none",
+      "atoms": 24,
+      "candidates": 66,
+      "primitive_rows_stored": 80,
+      "gics": 66,
+      "rank": 66,
+      "target_rank": 66,
+      "b_nnz": 1272,
+      "b_density": 0.2676767676767677,
+      "build_time_median_s": 0.14074383303523064,
+      "b_time_median_s": 0.020168042043223977,
+      "peak_memory_median_mib": 0.5376882553100586,
+      "build_time_trials_s": [
+        0.14074383303523064,
+        0.1416115000611171,
+        0.14054758404381573,
+        0.14019437495153397,
+        0.14108545903582126
+      ],
+      "b_time_trials_s": [
+        0.020168042043223977,
+        0.020017792005091906,
+        0.020759791950695217,
+        0.02035008301027119,
+        0.02007462503388524
+      ],
+      "peak_memory_trials_mib": [
+        0.537846565246582,
+        0.5389022827148438,
+        0.49071788787841797,
+        0.5373468399047852,
+        0.5376882553100586
+      ]
+    },
+    {
+      "system": "coronene",
+      "source": "coronene.inp",
+      "point_group": "D6h",
+      "symmetrize": true,
+      "fragment_mode": "none",
+      "atoms": 36,
+      "candidates": 120,
+      "primitive_rows_stored": 186,
+      "gics": 102,
+      "rank": 102,
+      "target_rank": 102,
+      "b_nnz": 2794,
+      "b_density": 0.2536310820624546,
+      "build_time_median_s": 0.7168928750324994,
+      "b_time_median_s": 0.03391108301002532,
+      "peak_memory_median_mib": 1.0710678100585938,
+      "build_time_trials_s": [
+        0.757984415977262,
+        0.7227989169768989,
+        0.7168928750324994,
+        0.7168378749629483,
+        0.7158662090077996
+      ],
+      "b_time_trials_s": [
+        0.060048375045880675,
+        0.03391108301002532,
+        0.033771291957236826,
+        0.033997584017924964,
+        0.03354350000154227
+      ],
+      "peak_memory_trials_mib": [
+        1.5776901245117188,
+        1.075190544128418,
+        1.0710678100585938,
+        1.069793701171875,
+        1.0702896118164062
+      ]
+    }
+  ]
+}

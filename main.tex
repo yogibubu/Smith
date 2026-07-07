@@ -1689,13 +1689,51 @@ refinement step evaluates sparse Wilson rows with cost \(O(z)\), plus sparse
 chain-rule work for derived functions.  This separation is the reason the code
 keeps coordinate construction and \(\Bmat\) evaluation as distinct services.
 
-These estimates describe the implemented algorithms, not a timed benchmark.
-The present evidence validates rank closure, sparse-row construction and
-external solver consumption on representative systems; it does not yet provide
-scaling curves versus \(N\), ring complexity, point-group order or fragment
-count.  A release-quality performance table should therefore report
-construction time, per-geometry \(\Bmat\) time, sparse density, peak memory and
-projector time for controlled molecular series.
+Table~\ref{tab:construction-cost} gives a first timed implementation benchmark.
+The values are median wall times from five local Python runs on the same
+machine used for this draft, measured with \texttt{tracemalloc}; they are
+therefore engineering diagnostics rather than hardware-independent constants.
+They nevertheless make the intended split visible.  Once the coordinate
+contract exists, one analytic Wilson-\(\Bmat\) evaluation costs milliseconds to
+a few \(10^{-2}\)~s for the tested covalent and ring systems.  Construction is
+larger because it includes candidate generation, protected-first rank
+reduction, optional symmetry projection and writing the frozen sections.  The
+ferrocene entry is the expected expensive case in this set: the
+special-coordinate mode retains a large ring-center/metal primitive source
+space through symmetry projection before reducing to the 57-dimensional active
+contract.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Construction and \(\Bmat\)-evaluation microbenchmark for the present
+\SMITH/\SONIC\ implementation.  Times are medians of five local Python runs.
+The build column includes construction, rank reduction, optional symmetry
+projection and section writing.  The \(\Bmat\) column is one analytic
+Wilson-\(\Bmat\) evaluation from the stored contract.}
+\label{tab:construction-cost}
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+System & \(N\) & PG & Cand. & Rank & Build / s & \(\Bmat\) / s & Peak MiB \\
+\midrule
+Benzene & 12 & \(D_{6h}\) & 30 & 30 & 0.129 & 0.0054 & 0.23 \\
+Norbornane & 19 & \(C_{2v}\) & 52 & 51 & 0.099 & 0.0119 & 0.30 \\
+Camphor & 27 & \(C_1\) & 76 & 75 & 0.144 & 0.0150 & 0.45 \\
+Ferrocene & 21 & \(D_{5h}\) & 651 & 57 & 3.303 & 0.0643 & 2.84 \\
+Spiro system & 31 & \(D_2\) & 87 & 87 & 0.253 & 0.0225 & 0.75 \\
+Cyclooctane & 24 & \(D_2\) & 66 & 66 & 0.141 & 0.0202 & 0.54 \\
+Coronene & 36 & \(D_{6h}\) & 120 & 102 & 0.717 & 0.0339 & 1.07 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The benchmark is still not a full scaling study.  It samples chemically diverse
+systems rather than a controlled homologous series, and peak memory is Python
+allocator memory observed during one build-plus-\(\Bmat\) trial.  A final
+release benchmark should add controlled growth series for ring size,
+point-group order, number of fragments and number of protected semantic
+coordinates.
 
 Other validation items remain open.  The local-stability statement gives an
 existence threshold \(\delta\) in terms of decision margins and Lipschitz
