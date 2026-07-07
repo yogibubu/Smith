@@ -1689,51 +1689,81 @@ refinement step evaluates sparse Wilson rows with cost \(O(z)\), plus sparse
 chain-rule work for derived functions.  This separation is the reason the code
 keeps coordinate construction and \(\Bmat\) evaluation as distinct services.
 
-Table~\ref{tab:construction-cost} gives a first timed implementation benchmark.
-The values are median wall times from five local Python runs on the same
-machine used for this draft, measured with \texttt{tracemalloc}; they are
-therefore engineering diagnostics rather than hardware-independent constants.
-They nevertheless make the intended split visible.  Once the coordinate
-contract exists, one analytic Wilson-\(\Bmat\) evaluation costs milliseconds to
-a few \(10^{-2}\)~s for the tested covalent and ring systems.  Construction is
-larger because it includes candidate generation, protected-first rank
-reduction, optional symmetry projection and writing the frozen sections.  The
-ferrocene entry is the expected expensive case in this set: the
-special-coordinate mode retains a large ring-center/metal primitive source
-space through symmetry projection before reducing to the 57-dimensional active
-contract.
+Table~\ref{tab:construction-cost} and Figure~\ref{fig:construction-scaling}
+give a first scaling study for the present implementation.  The values are
+median wall times from five local Python runs on the same machine used for this
+draft, measured with \texttt{tracemalloc}; they are therefore engineering
+diagnostics rather than hardware-independent constants.  The test set contains
+three slices: a controlled fused-PAH series from benzene to coronene, a
+ring/cage topology set, and two metallocene special-coordinate cases.  The
+intended split is visible.  Once the coordinate contract exists, one analytic
+Wilson-\(\Bmat\) evaluation costs milliseconds to a few \(10^{-2}\)~s for the
+tested covalent and ring systems.  Construction is larger because it includes
+candidate generation, protected-first rank reduction, optional symmetry
+projection and writing the frozen sections.
+
+In the PAH series, a log--log fit gives a build-time slope of 1.48 versus atom
+count (\(R^2=0.79\)) and a \(\Bmat\)-evaluation slope of 0.94 versus the number
+of sparse nonzero derivative entries (\(R^2=0.94\)).  Across the non-special
+systems, peak Python memory scales approximately linearly with the number of
+stored primitive rows (slope 1.06, \(R^2=0.81\)).  The build-time fit against
+candidate count is intentionally not used as a universal law: cubane and the
+high-symmetry PAHs show that topology and point-group projection can dominate a
+simple one-variable model.  The ferrocene entries are the expected expensive
+cases in this set because the special-coordinate mode retains a large
+ring-center/metal primitive source space through symmetry projection before
+reducing to the 57-dimensional active contract.
 
 \begin{table}[htbp]
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\caption{Construction and \(\Bmat\)-evaluation microbenchmark for the present
+\caption{Construction and \(\Bmat\)-evaluation scaling study for the present
 \SMITH/\SONIC\ implementation.  Times are medians of five local Python runs.
 The build column includes construction, rank reduction, optional symmetry
 projection and section writing.  The \(\Bmat\) column is one analytic
 Wilson-\(\Bmat\) evaluation from the stored contract.}
 \label{tab:construction-cost}
-\begin{tabular}{@{}lrrrrrrr@{}}
+\begin{tabular}{@{}llrrrrrr@{}}
 \toprule
-System & \(N\) & PG & Cand. & Rank & Build / s & \(\Bmat\) / s & Peak MiB \\
+Series & System & \(N\) & Cand. & Rank & Build / s & \(\Bmat\) / s & Peak MiB \\
 \midrule
-Benzene & 12 & \(D_{6h}\) & 30 & 30 & 0.129 & 0.0054 & 0.23 \\
-Norbornane & 19 & \(C_{2v}\) & 52 & 51 & 0.099 & 0.0119 & 0.30 \\
-Camphor & 27 & \(C_1\) & 76 & 75 & 0.144 & 0.0150 & 0.45 \\
-Ferrocene & 21 & \(D_{5h}\) & 651 & 57 & 3.303 & 0.0643 & 2.84 \\
-Spiro system & 31 & \(D_2\) & 87 & 87 & 0.253 & 0.0225 & 0.75 \\
-Cyclooctane & 24 & \(D_2\) & 66 & 66 & 0.141 & 0.0202 & 0.54 \\
-Coronene & 36 & \(D_{6h}\) & 120 & 102 & 0.717 & 0.0339 & 1.07 \\
+PAH & Benzene & 12 & 30 & 30 & 0.131 & 0.0054 & 0.23 \\
+PAH & Naphthalene & 18 & 48 & 48 & 0.139 & 0.0093 & 0.28 \\
+PAH & Anthracene & 24 & 66 & 66 & 0.243 & 0.0139 & 0.51 \\
+PAH & Phenanthrene & 24 & 66 & 66 & 0.211 & 0.0131 & 0.52 \\
+PAH & Pyrene & 26 & 78 & 72 & 0.256 & 0.0162 & 0.59 \\
+PAH & Coronene & 36 & 120 & 102 & 0.722 & 0.0343 & 1.08 \\
+Ring/cage & Cubane & 16 & 54 & 42 & 0.400 & 0.0139 & 0.45 \\
+Ring/cage & Norbornane & 19 & 52 & 51 & 0.099 & 0.0120 & 0.29 \\
+Ring/cage & Cyclooctane & 24 & 66 & 66 & 0.142 & 0.0201 & 0.53 \\
+Ring/cage & Camphor & 27 & 76 & 75 & 0.145 & 0.0151 & 0.44 \\
+Ring/cage & Spiro & 31 & 87 & 87 & 0.253 & 0.0225 & 0.75 \\
+Special & Ferrocene \(D_{5h}\) & 21 & 651 & 57 & 3.324 & 0.0642 & 2.83 \\
+Special & Ferrocene \(D_{5d}\) & 21 & 656 & 57 & 3.182 & 0.0653 & 2.59 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The benchmark is still not a full scaling study.  It samples chemically diverse
-systems rather than a controlled homologous series, and peak memory is Python
-allocator memory observed during one build-plus-\(\Bmat\) trial.  A final
-release benchmark should add controlled growth series for ring size,
-point-group order, number of fragments and number of protected semantic
-coordinates.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/construction_scaling_benchmark.png}
+\caption{Scaling diagnostics from Table~\ref{tab:construction-cost}.  The left
+panel shows build time versus primitive-candidate count; the middle panel shows
+one \(\Bmat\) evaluation versus sparse nonzero entries; the right panel shows
+peak traced Python memory versus stored primitive rows.  The special-coordinate
+ferrocene cases are separated because they deliberately keep a much larger
+semantic source space than the final active rank.}
+\label{fig:construction-scaling}
+\end{figure}
+
+The study is still finite and implementation-specific.  It samples one PAH
+growth series plus chemically diverse topology and special-coordinate probes;
+peak memory is Python allocator memory observed during one build-plus-\(\Bmat\)
+trial.  A release benchmark should add larger controlled series for fragment
+count and for user-protected semantic coordinates, but the present data already
+quantify the construction/use separation on the molecular classes exercised in
+the paper.
 
 Other validation items remain open.  The local-stability statement gives an
 existence threshold \(\delta\) in terms of decision margins and Lipschitz
