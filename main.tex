@@ -135,47 +135,63 @@ coordinate persistence but is not validated in this paper. \\
 
 \begin{figure}[htbp]
 \centering
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
-  node distance=0.50cm,
-  stepbox/.style={
-    draw,
+  node distance=0.36cm and 0.42cm,
+  every node/.style={font=\small},
+  stage/.style={
+    draw=black!65,
+    line width=0.45pt,
+    rounded corners=2.2pt,
+    align=center,
+    text width=0.145\linewidth,
+    minimum height=0.80cm,
+    inner sep=3.5pt,
+    fill=#1
+  },
+  contract/.style={
+    draw=black!80,
+    line width=0.65pt,
+    rounded corners=2.4pt,
+    align=center,
+    text width=0.18\linewidth,
+    minimum height=0.92cm,
+    inner sep=4pt,
+    fill=black!6
+  },
+  app/.style={
+    draw=black!50,
+    line width=0.35pt,
     rounded corners=2pt,
     align=center,
-    minimum width=0.60\linewidth,
-    minimum height=0.52cm,
-    font=\small
+    text width=0.14\linewidth,
+    minimum height=0.58cm,
+    inner sep=2.5pt,
+    fill=black!2,
+    font=\footnotesize
   },
-  sinkbox/.style={
-    draw,
-    rounded corners=2pt,
-    align=center,
-    minimum width=0.16\linewidth,
-    minimum height=0.52cm,
-    font=\small
-  },
-  arrow/.style={-{Latex[length=2.0mm]}, line width=0.35pt}
+  arrow/.style={-{Latex[length=2.2mm]}, line width=0.45pt, draw=black!70}
 ]
-\node[stepbox] (geometry) {Geometry};
-\node[stepbox, below=of geometry] (topology) {Topology and symmetry-perception state};
-\node[stepbox, below=of topology] (primitive) {Primitive coordinate families};
-\node[stepbox, below=of primitive] (protected) {Protected semantic, ring and fragment coordinates};
-\node[stepbox, below=of protected] (rank) {Block-local rank reduction};
-\node[stepbox, below=of rank] (symmetry) {Homogeneous symmetry adaptation};
-\node[stepbox, below=of symmetry] (contract) {Frozen coordinate contract};
-\node[sinkbox, below=0.72cm of contract, xshift=-0.34\linewidth] (gf) {GF/PED};
-\node[sinkbox, right=0.12cm of gf] (opt) {Optimization};
-\node[sinkbox, right=0.12cm of opt] (dvr) {DVR};
-\node[sinkbox, right=0.12cm of dvr] (refine) {Refinement};
-\node[sinkbox, right=0.12cm of refine] (ff) {Force field};
-\draw[arrow] (geometry) -- (topology);
-\draw[arrow] (topology) -- (primitive);
-\draw[arrow] (primitive) -- (protected);
-\draw[arrow] (protected) -- (rank);
-\draw[arrow] (rank) -- (symmetry);
-\draw[arrow] (symmetry) -- (contract);
-\foreach \target in {gf,opt,dvr,refine,ff}
+\node[stage=blue!7] (state) {Geometry\\Topology\\Symmetry state};
+\node[stage=green!8, right=of state] (families) {Primitive\\coordinate\\families};
+\node[stage=orange!10, right=of families] (semantic) {Protected\\semantic, ring\\and fragment rows};
+\node[stage=purple!8, right=of semantic] (reduction) {Block-local\\rank reduction\\and symmetry};
+\node[contract, right=of reduction] (contract) {Frozen\\coordinate\\contract};
+
+\node[app, below=0.62cm of contract, xshift=-0.32\linewidth] (opt) {Optimization};
+\node[app, right=0.14cm of opt] (gf) {GF/PED};
+\node[app, right=0.14cm of gf] (dvr) {DVR};
+\node[app, right=0.14cm of dvr] (pes) {PES fitting};
+\node[app, right=0.14cm of pes] (refine) {Refinement};
+
+\draw[arrow] (state) -- (families);
+\draw[arrow] (families) -- (semantic);
+\draw[arrow] (semantic) -- (reduction);
+\draw[arrow] (reduction) -- (contract);
+\foreach \target in {opt,gf,dvr,pes,refine}
   \draw[arrow] (contract.south) |- (\target.north);
 \end{tikzpicture}
+}
 \caption{Constructive workflow implemented by \SMITH\ for \SONIC\ coordinates.
 The model-building stage
 ends at the frozen coordinate contract; downstream modules reuse that object
@@ -234,22 +250,27 @@ Strategy & Strength & Limitation addressed by \NEO \\
 Z matrices & Compact, local and interpretable for small molecules. & Tree
 dependence, singularities, and manual choices make them fragile for rings,
 symmetry and automated workflows.\cite{BakerHehre1991ZMatrix} \\
+\midrule
 Redundant internal coordinates & Robust for optimization and easy to generate
 from a graph.\cite{PulayFogarasi1992,Peng1996Redundant,BakkenHelgaker2002} &
 They do not define a unique active basis for vibrational analysis, symmetry
 projection or least-squares refinement. \\
+\midrule
 Delocalized internal coordinates & Automatic non-redundant bases can be
 obtained from global rank decompositions.\cite{Baker1996Delocalized} & The
 coordinates can mix stretches, bends, torsions and weak contacts; weights used
 to control this mixing are method choices rather than chemical observables. \\
+\midrule
 Natural internal coordinates & Highly interpretable symmetry and force-field
 variables for well understood local motifs.\cite{Berces1997NaturalMetal,VonArnimAhlrichs1999GNIC,SwartBickelhaupt2006StrongWeak}
 & General construction is difficult for fused or bridged rings, high
 coordination, fragments, interaction centers and arbitrary point groups. \\
+\midrule
 TRIC/geomeTRIC coordinates & Fragment translations and rotations give excellent
 optimization variables for weakly connected systems.\cite{WangSong2016GeomeTRIC}
 & Optimization coordinates are not by themselves a frozen, symmetry-labelled
 internal-coordinate model for GF analysis or semi-experimental refinement. \\
+\midrule
 Gaussian GIC syntax & Very general symbolic coordinate expressions, including
 nontraditional geometric parameters, sparse derivative rows and automatic
 symbolic differentiation, can be evaluated by an external optimizer; the recent
@@ -261,6 +282,7 @@ specified in input or activated through dedicated options.  The syntax does not
 define a complete natural-coordinate generator with protected rank reduction,
 homogeneous point-group projectors and reusable symmetry-labelled blocks for
 refinement or force-field analysis. \\
+\midrule
 \NEO & Builds a rank-complete, type-labelled, symmetry-adapted coordinate basis
 from a validated molecular state. & Weak complexes can be represented either
 by fragment/center coordinates or by typed pseudo-bonds and
@@ -709,10 +731,13 @@ Stored row & Symmetry & Linear form \\
 \midrule
 \(A_{1g}RDef001\) & \(A_{1g}\) &
 \(\left(2A_1-A_2-A_3+2A_4-A_5-A_6\right)/\sqrt{12}\) \\
+\midrule
 \(A_{1g}RPck001\) & \(A_{1g}\) &
 \(\left(2\tau_1-\tau_2-\tau_3+2\tau_4-\tau_5-\tau_6\right)/\sqrt{12}\) \\
+\midrule
 \(E_uRPck001\) & \(E_u\) &
 \(\left(\tau_1-\tau_2-\tau_4+\tau_5\right)/2\) \\
+\midrule
 \(E_uRPck002\) & \(E_u\) &
 \(\left(\tau_1+\tau_2-2\tau_3-\tau_4-\tau_5+2\tau_6\right)/\sqrt{12}\) \\
 \bottomrule

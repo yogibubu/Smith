@@ -7,6 +7,7 @@ Build:
 
 ```bash
 latexmk -pdf main.tex
+latexmk -pdf supporting_information.tex
 ```
 
 The draft is intentionally source-close: the implementation-status table tracks

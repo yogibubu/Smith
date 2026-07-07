@@ -1,0 +1,50 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\lstset{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  rulecolor=\color{black!35},
+  xleftmargin=0.5em,
+  xrightmargin=0.5em
+}
+
+\title{Supporting Information for\\
+SONIC: Symmetry-Oriented Non-redundant Internal Coordinates}
+\author{Vincenzo Barone}
+\date{Working draft -- \today}
+
+\begin{document}
+\maketitle
+
+\section*{Norbornane SMITH/SONIC Input and Gaussian 16 Export}
+
+This Supporting Information records the complete norbornane coordinate-construction
+input and the Gaussian 16 \texttt{ReadAllGIC} input generated from it.  The files
+correspond to the norbornane test discussed in the main text.
+
+\subsection*{SMITH/SONIC input}
+
+\lstinputlisting[caption={Norbornane SMITH/SONIC enriched XYZ input.}]{si/norbornane_smith_input.xyzin}
+
+\subsection*{Generated Gaussian 16 input}
+
+\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input generated from the SONIC contract.}]{si/norbornane_g16_readallgic.gjf}
+
+\subsection*{Gaussian 16 output excerpt}
+
+The complete Gaussian log is retained in the reproducibility archive.  The
+excerpt below records the optimization progress and termination diagnostics.
+
+\lstinputlisting[caption={Selected Gaussian 16 output lines for the norbornane \texttt{ReadAllGIC} run.}]{si/norbornane_g16_output_excerpt.txt}
+
+\end{document}
