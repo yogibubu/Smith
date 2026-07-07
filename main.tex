@@ -804,11 +804,11 @@ a family are resolved by topology, continuous-perception equivalence and
 CIP-like priority keys stored in \(\mathcal{M}\).  Thus the construction works on a
 fixed total order that extends a chemically motivated partial order.
 
-The following statements are construction properties of that ordered protocol.
-They are included to make the design verifiable, not to claim uniqueness over
-all possible internal-coordinate bases.
+The following design invariants are consequences of that ordered protocol.
+They are stated explicitly to make the construction verifiable, not to claim
+uniqueness over all possible internal-coordinate bases.
 
-\paragraph{Property: relabelling covariance.}
+\paragraph{Relabelling covariance.}
 \label{thm:relabel}
 Let two frozen molecular states be related by an atom relabelling \(\pi\) that
 preserves element identities, geometry, topology, perception descriptors, fragments,
@@ -836,7 +836,7 @@ relabellings: relabelling the molecular state and then constructing the
 contract gives the same object, up to the canonical contract isomorphism, as
 constructing the contract first and then transporting it by the relabelling.
 
-\paragraph{Construction principle: reproducible contract.}
+\paragraph{Reproducible contract.}
 \label{prop:determinism}
 For a fixed molecular state--geometry, topology, perception descriptors, point-group
 operations and fragment data--and for fixed primitive generators, family
@@ -848,7 +848,7 @@ The verification is direct: each stage is a fixed map of the frozen
 input data, and the fixed order of candidate rows converts every rank and
 symmetry decision into a stored threshold test.
 
-\paragraph{Construction principle: semantic preservation.}
+\paragraph{Semantic preservation.}
 \label{prop:protected}
 Let \(\mathcal{P}_{\mathrm{prot}}\) be the priority prefix of the ordered
 candidate set.  Every candidate in this prefix whose Wilson row is nonsingular
@@ -859,7 +859,7 @@ already exceeds the target vibrational rank, \SONIC\ reports an invalid model
 rather than removing a semantic coordinate by exchange.  This follows directly
 from the ordered-prefix construction.
 
-\paragraph{Property: rank-preserving selection.}
+\paragraph{Rank-preserving selection.}
 \label{prop:rank-selection}
 Assume exact arithmetic and define
 \[
@@ -909,7 +909,7 @@ merely because an ordinary valence coordinate spans a similar first-order
 motion.  If these rows alone exceed the vibrational rank, the construction is
 rejected rather than silently discarding a special coordinate.
 
-\paragraph{Property: block-local scaling invariance.}
+\paragraph{Block-local scaling invariance.}
 \label{thm:block-scaling}
 Let \(H\subset\mathcal{P}\) be a homogeneous coordinate block.  Uniformly
 rescaling all Wilson rows in that block by a nonzero scalar does not change the
@@ -922,7 +922,7 @@ The reason is that row normalization removes a uniform factor inside \(H\), and
 eigenvalues but not eigenspaces; concatenating heterogeneous blocks before
 diagonalization changes their relative weights.
 
-\paragraph{Property: local stability.}
+\paragraph{Local stability.}
 \label{thm:local-stability}
 Let \(S_0\) be a nonsingular frozen molecular state.  Assume that, in a
 neighbourhood of \(S_0\), topology, fragment decomposition, perception equivalence
@@ -1269,6 +1269,25 @@ Asymptotic proof for all molecular graph families. \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+Figure~\ref{fig:validation-molecules} shows representative molecular systems
+used in the validation probes.  The figure is included to keep the coordinate
+discussion tied to the underlying chemistry: bridged hydrocarbons test ring and
+improper-coordinate choices, camphor adds a rigid asymmetric framework,
+ferrocene exercises special center coordinates, and the cyclohexane sequence
+tests portable puckering paths.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/validation_molecule_panel.png}
+\caption{Representative systems used in the validation and application probes.
+Norbornane and camphor test bridged-ring coordinate construction and
+Gaussian-compatible improper-coordinate export; ferrocene tests center-based
+special coordinates; the cyclohexane panels show three points along the
+chair-to-boat puckering path used for the portable Cartesian/Gaussian
+\texttt{ReadAllGIC} comparison.}
+\label{fig:validation-molecules}
+\end{figure}
 
 The regression corpus contains acyclic and cyclic molecules, fused and
 non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
