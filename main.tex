@@ -1641,18 +1641,33 @@ family-level Pulay-style scale factors to the internal force field and reports
 PED percentages by source family.  The basis has rank \(51/51\).  The
 unscaled GF frequencies reproduce the Gaussian/FCHK harmonic frequencies with
 an RMS difference of \(2.6\times10^{-6}\)~cm\(^{-1}\), and the aligned
-optimized geometry agrees to \(4.7\times10^{-7}\)~\AA.  The hydroxyl stretch is
-deliberately assigned a force-constant factor larger than one, corresponding to
-an approximately \(+100\)~cm\(^{-1}\) shift, because localized OH stretches are
-a known sensitive region for modest harmonic DFT levels and are usually treated
-by class-specific calibration rather than by a single global frequency scale
-factor.
+optimized geometry agrees to \(4.7\times10^{-7}\)~\AA.  This is not intended as
+a new optimized scale-factor set.  It is a targeted demonstration of how a
+chemically labelled coordinate contract supports class-specific calibration:
+localized OH stretches, and similarly CN stretching modes in nitriles, are
+well-known sensitive regions for hybrid-DFT harmonic force fields and often
+require dedicated anharmonic or class-specific treatment rather than one global
+frequency factor.\cite{BaroneBiczyskoBloino2014,BaroneCeselinFuseTasinato2020,VazartLatoucheCiminoBarone2015}
+For that reason the hydroxyl stretch was chosen deliberately and assigned a
+force-constant factor larger than one, corresponding to an approximately
+\(+100\)~cm\(^{-1}\) shift.
+
+Because the scaling is applied to the internal force field before GF
+diagonalization, not to isolated normal-mode frequencies after the fact, modes
+other than the nearly pure OH stretch also move slightly.  The size and
+direction of those changes follow the PED mixing with the scaled coordinate
+families.  This is precisely the diagnostic value of the example: \SONIC\
+labels the coordinate families that receive the scale factor and then reports
+which normal modes are affected through the GF/PED analysis.
 
 \begin{table}[htbp]
 \centering
 \caption{Representative B3LYP/6-31G(d) GF/PED scaling probe for
 cyclohexanol.  Frequencies are in cm\(^{-1}\).  PED entries are summed over
-\SONIC\ coordinate families and rounded to one decimal percent.}
+\SONIC\ coordinate families and rounded to one decimal percent.  Scaling is
+applied to the internal force field by coordinate family before GF
+diagonalization; small shifts in non-OH modes therefore reflect ordinary
+force-field coupling, not independent mode-by-mode frequency fitting.}
 \label{tab:gf-ped-scaling}
 \begin{tabular}{@{}p{0.24\linewidth}ccp{0.42\linewidth}@{}}
 \toprule
