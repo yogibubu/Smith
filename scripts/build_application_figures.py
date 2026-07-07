@@ -33,7 +33,7 @@ def main() -> None:
     parser.add_argument(
         "--from-qm",
         action="store_true",
-        help="rebuild data from local Gaussian DV logs/FCHK and MATRIX SONIC",
+        help="rebuild data from local Gaussian logs/FCHK and MATRIX SONIC",
     )
     args = parser.parse_args()
 
@@ -105,7 +105,7 @@ def build_data_from_qm() -> dict[str, object]:
         ) * HARTREE_TO_KJMOL
 
     return {
-        "method": "Gaussian DV HF/STO-3G",
+        "method": "Gaussian HF/STO-3G",
         "system": "cyclobutane",
         "hessian": {
             "rank": 30,
@@ -314,7 +314,7 @@ def plot_puckering_scan(data: dict[str, object]) -> None:
     ax.text(
         0.98,
         0.94,
-        "Gaussian DV\nHF/STO-3G",
+        "Gaussian\nHF/STO-3G",
         transform=ax.transAxes,
         ha="right",
         va="top",

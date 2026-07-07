@@ -25,7 +25,7 @@ MATRIX_ROOT = Path("/Users/vincenzobarone/Documents/git/software/matrix")
 RUN_DIR = ROOT / "calculations" / "cyclohexane_puckering_equivalence"
 DATA = ROOT / "data" / "cyclohexane_puckering_equivalence.json"
 FIGURE = ROOT / "figures" / "cyclohexane_puckering_equivalence.png"
-DEFAULT_GAUSSIAN = Path("/Users/vincenzobarone/gdv_j32p/gdv/gdv")
+DEFAULT_GAUSSIAN = Path("g16")
 ROUTE = "#p b3lyp/6-31+g* nosymm"
 HARTREE_TO_KJMOL = 2625.499638
 SCF_RE = re.compile(r"SCF Done:\s+E\([^)]+\)\s+=\s+([-+0-9.Ee]+)")

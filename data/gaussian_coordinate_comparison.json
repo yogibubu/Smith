@@ -1,5 +1,5 @@
 {
-  "method": "Gaussian coordinate-system optimization comparison",
+  "method": "Gaussian 16 coordinate-system optimization comparison",
   "electronic_structure": "Gaussian 16 HF/STO-3G",
   "systems": [
     {
@@ -134,10 +134,11 @@
           "normal_termination": true,
           "stationary_point": true,
           "optimization_completed": true,
-          "steps": 20,
-          "scf_cycles": 20,
+          "steps": 9,
+          "scf_cycles": 9,
           "final_energy_hartree": -457.283638781,
-          "g16_improper_expression": "D(4,6,8,7)"
+          "g16_improper_expression": "D(4,6,8,7)",
+          "route": "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80) output=pickett"
         }
       ]
     },

@@ -1,7 +1,7 @@
 {
   "system": "cyclohexanol",
-  "method": "GDV B3LYP/6-31G(d) Opt Freq NoSymm",
-  "job": "20260706-054422-gdv32-cyclohexanol_b3lyp631gd",
+  "method": "Gaussian B3LYP/6-31G(d) Opt Freq NoSymm",
+  "job": "20260706-054422-gaussian-cyclohexanol_b3lyp631gd",
   "point_group": "C1",
   "gic_count": 51,
   "rank": "51/51",

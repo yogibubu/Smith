@@ -1,5 +1,5 @@
 {
-  "method": "Gaussian DV HF/STO-3G",
+  "method": "Gaussian HF/STO-3G",
   "system": "cyclobutane",
   "hessian": {
     "rank": 30,

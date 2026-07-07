@@ -33,7 +33,7 @@ ROUTES = {
     "default": "#p hf/sto-3g opt=(redundant,maxcycle=80)",
     "cartesian": "#p hf/sto-3g opt=(cartesian,maxcycle=80)",
     "zmatrix": "#p hf/sto-3g opt=(z-matrix,maxcycle=80)",
-    "sonic": "#p hf/sto-3g opt=(readallgic,maxcycle=80)",
+    "sonic": "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)",
 }
 SCF_RE = re.compile(r"SCF Done:\s+E\([^)]+\)\s+=\s+([-+0-9.Ee]+)")
 STEP_RE = re.compile(r"Step number\s+(\d+)\s+out of a maximum")

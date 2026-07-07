@@ -29,7 +29,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
 
-\title{\SONIC\ (Symmetry-Oriented Natural Internal Coordinates): Block-Local, Symmetry-Consistent Generalized Internal Coordinates for Molecular and Intermolecular Coordinate Spaces}
+\title{\SMITH: Automatic Construction of \SONIC\ (Symmetry-Oriented Natural Internal Coordinates) for Molecular and Intermolecular Coordinate Spaces}
 \author{Vincenzo Barone\\
 INSTM, National Interuniversity Consortium for Materials Science and Technology\\
 via G. Giusti 9, 50121 Firenze, Italy\\
@@ -648,6 +648,14 @@ Cremer--Pople-like descriptors \(Q\) and \(\phi\) are useful for
 interpretation, but the active coordinate basis stores linear \(RPck\) rows
 because their \(\Bmat\) rows are analytic linear combinations of dihedral
 derivatives.\cite{CremerPople1975}
+For every selected cosine--sine puckering pair, \SMITH\ can also emit the
+derived observables
+\[
+  QPck_m=\sqrt{(RPck_m^c)^2+(RPck_m^s)^2},\qquad
+  \Phi P_m=\operatorname{atan2}(RPck_m^s,RPck_m^c).
+\]
+These \(QPck/\Phi P\) variables are functions of the stored linear rows rather
+than additional rank-carrying coordinates.
 
 The ring rows are a constructive extension of the natural-coordinate principle
 to cyclic source lists rather than a direct quotation of a published
@@ -1061,6 +1069,35 @@ that define it.  This gives a practical route to coordination complexes,
 metallocenes and eta-like interactions without pretending that a metal-ring
 centroid is a covalent atom in the molecular graph.
 
+Ferrocene provides a compact example.  If the two cyclopentadienyl ring
+centers are
+\[
+ C_{031}=\frac{1}{5}\sum_{i\in R_1}\mathbf{x}_i,\qquad
+ C_{032}=\frac{1}{5}\sum_{i\in R_2}\mathbf{x}_i,
+\]
+and the iron atom is atom 2, \SMITH\ first defines the two center--atom
+distances
+\[
+ d_1=|C_{031}-\mathbf{x}_2|,\qquad d_2=|C_{032}-\mathbf{x}_2|.
+\]
+The protected symmetry-adapted rows retained in the contract are then
+\[
+ A_1'CnAt001=\frac{d_1+d_2}{\sqrt2},\qquad
+ A_2''CnAt001=\frac{d_1-d_2}{\sqrt2}.
+\]
+The \(A_1'\) row is the total-symmetric metal--ring breathing coordinate; the
+\(A_2''\) partner is kept in the full contract and marked frozen when only
+total-symmetric coordinates are requested for an optimization or
+semi-experimental fit.  In Gaussian syntax the centers are serialized as
+inactive Cartesian functions such as
+\[
+ CxC031=(X_1+X_3+X_6+X_5+X_4)/5,
+\]
+and the active distance row is written as the corresponding square-root
+function of the center coordinates and the iron Cartesian coordinates.  The
+special coordinate is therefore generated from the molecular model, not
+hand-entered as an extra atom.
+
 In the current validated \texttt{PSEUDO\_BONDS} baseline, selected
 non-covalent contacts are inserted into the construction graph as typed
 pseudo-edges, and the resulting pseudo-cycles generate angular and torsional
@@ -1103,8 +1140,8 @@ One-dihedral exocyclic torsions & Active default & The intramolecular path uses
 \texttt{ONEDIH} by default; a legacy alternative is kept for diagnostics. \\
 Ring deformation and puckering & Active & Endocyclic angle and torsional source
 spaces generate \(RDef\) and \(RPck\) components; \(Q/\phi\)-like descriptors
-are GDV/post-processing and DVR variables, not commercial Gaussian 16
-\texttt{ReadAllGIC} rows. \\
+are post-processing and DVR variables, not commercial Gaussian 16
+\texttt{ReadAllGIC} optimizer rows. \\
 Butterfly and condensed rings & Active & Fused-ring butterfly and condensed
 torsion families are kept as separate homogeneous source blocks. \\
 Out-of-plane/improper coordinates & Active & \(U\) out-of-plane coordinates are
@@ -1310,7 +1347,7 @@ usage; the calculations reported here used Gaussian 16 at HF/STO-3G.
 The relevant observations are that Gaussian accepts the
 automatically generated coordinate block, reports \(NTRed=NRank\) equal to the
 \NEO\ rank at every optimization step, and reaches a stationary point in three
-three to nine steps for saturated ring and cage systems with different symmetry and
+to nine steps for saturated ring and cage systems with different symmetry and
 rank.
 
 \begin{table}[htbp]
@@ -1347,7 +1384,9 @@ larger bridged-ring cases, with camphor reaching 75 vibrational degrees of
 freedom.  These calculations
 are not a benchmark of electronic
 structure theory or a claim that one coordinate choice always minimizes the
-iteration count.  They test the narrower point that \SMITH\ can generate a
+iteration count.  The \SONIC\ Gaussian input uses an initial force-constant
+evaluation, as is common for difficult non-redundant coordinate optimizations.
+They test the narrower point that \SMITH\ can generate a
 Gaussian-readable \SONIC\ coordinate model without manual GIC transcription and
 that Gaussian can optimize from it using the commercial \texttt{ReadAllGIC}
 parser.  At HF/STO-3G, water and hydrogen peroxide give essentially
@@ -1355,22 +1394,32 @@ the same iteration counts across the tested coordinate choices.  Norbornane
 converges in four steps with Gaussian redundant internals and Cartesians, six
 steps with a sequential Z matrix and nine steps with the automatically
 generated \SONIC\ block.  Camphor converges in eight steps with Gaussian
-redundant internals, 14 Cartesian steps, 20 \SONIC\ steps and 33 steps for a
+redundant internals, 14 Cartesian steps, nine \SONIC\ steps and 33 steps for a
 sequential Z matrix.  The point of this diagnostic is therefore not that
 \SONIC\ is always the shortest optimizer path in Gaussian, but that the
 automatic generated GIC block is accepted by the commercial Gaussian
 \texttt{ReadAllGIC} parser and remains competitive while carrying a much more
 explicit coordinate contract.
 
-A separate Gaussian DV check was carried out with the native \(U\)
+A separate native-coordinate check was carried out with the \(U\)
 out-of-plane export enabled, rather than replacing \(U\) rows by
-Gaussian-compatible improper dihedrals.  In this mode camphor contains one
-native \(U(6,4,7,8)\) row and converges in eight HF/STO-3G optimization steps.
-The commercial Gaussian 16 compatibility input uses active linear \(RPck\)
-rows for ring puckering and the Fortran/G16 improper-dihedral convention
-\(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving \(D(4,6,8,7)\) for the same local
-non-planarity.  Polar \(Q/\phi\) puckering functions and native \(U\) rows are
-therefore reserved for the Gaussian DV profile.
+Gaussian-compatible improper dihedrals.  For a three-coordinate center \(j\)
+with ligands \(a,b,c\), the signed coordinate is
+\[
+  U(j;a,b,c)=
+  \arcsin\!\left[
+  \frac{\hat r_{ja}\cdot(\hat r_{jb}\times\hat r_{jc})}
+       {|\hat r_{jb}\times\hat r_{jc}|}
+  \right],
+\]
+with the stored atom ordering fixing the sign convention.  In this mode
+camphor contains one native \(U(6,4,7,8)\) row and converges in eight
+HF/STO-3G optimization steps.  The commercial Gaussian 16 compatibility input
+uses active linear \(RPck\) rows for ring puckering and the Fortran/G16
+improper-dihedral convention \(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving
+\(D(4,6,8,7)\) for the same local non-planarity.  The improper-dihedral and
+linear-\(RPck\) export is therefore a compatibility layer; the native \SONIC\
+contract still defines \(U\), \(QPck\) and \(\Phi P\).
 The symmetry-enabled norbornane input, run without \texttt{NoSymm}, contains
 51 generated rows of which 36 non-totally symmetric rows are marked
 \texttt{Frozen}; it converges in five steps.  These runs isolate the
@@ -1442,7 +1491,7 @@ modes.\cite{RauhutPulay1995,BakerJarzeckiPulay1998,BaroneBiczyskoBloino2014}
 That operation is only transparent when the coordinate blocks keep stretches,
 bends, torsions and ring-puckering coordinates separated.
 
-The add-on test uses cyclohexanol at GDV B3LYP/6-31G(d), with standard
+The add-on test uses cyclohexanol at B3LYP/6-31G(d), with standard
 \texttt{Opt Freq NoSymm} and no out-of-plane GIC terms.  \NEO\ supplies the
 stored definition and sparse \(\Bmat\) rows; the GF layer then applies
 family-level Pulay-style scale factors to the internal force field and reports
@@ -1458,7 +1507,7 @@ factor.
 
 \begin{table}[htbp]
 \centering
-\caption{Representative GDV B3LYP/6-31G(d) GF/PED scaling probe for
+\caption{Representative B3LYP/6-31G(d) GF/PED scaling probe for
 cyclohexanol.  Frequencies are in cm\(^{-1}\).  PED entries are summed over
 \NEO\ coordinate families and rounded to one decimal percent.}
 \label{tab:gf-ped-scaling}
@@ -1523,7 +1572,7 @@ and then constructs a fixed-frame cyclohexane puckering path from the chair
 two independent external representations of the same geometry: a portable
 Cartesian input, usable by any electronic-structure program, and a Gaussian
 \texttt{ReadAllGIC} input containing the automatically generated coordinate
-contract.  Gaussian DV B3LYP/6-31+G* single-point energies were then evaluated
+contract.  Gaussian B3LYP/6-31+G* single-point energies were then evaluated
 from both inputs.
 
 All five points have rank \(48/48\) and contain no out-of-plane GIC terms, so
@@ -1572,7 +1621,7 @@ Point & ORCA \(E_h\) & ORCA \(\Delta E\) & Molpro \(E_h\) & Molpro \(\Delta E\) 
 \centering
 \includegraphics[width=0.78\linewidth]{figures/cyclohexane_puckering_equivalence.png}
 \caption{Cyclohexane fixed-frame chair-to-boat puckering export test
-(Gaussian DV B3LYP/6-31+G*).  The upper panel compares the same five geometries
+(Gaussian B3LYP/6-31+G*).  The upper panel compares the same five geometries
 evaluated from portable Cartesian inputs and from \NEO{}-generated
 \texttt{ReadAllGIC} inputs.  The lower panel gives the energy difference in
 microhartree.}
