@@ -56,7 +56,8 @@ fragments.
 
 We present \SONIC\ (Symmetry-Oriented Natural Internal Coordinates) as a general
 construction of non-redundant, symmetry-adapted generalized internal
-coordinates.  \SMITH\ starts
+coordinates.  The \SMITH\ (Symmetry-Mapped Internal-coordinate Template
+Handler) implementation starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
 point-group operations, fragments and optional interaction centers.  It then
 builds chemically typed primitive families, protects special coordinates for
@@ -1344,11 +1345,9 @@ combinations of those primitives, with no out-of-plane coordinates.  The same
 inputs are therefore compatible with standard Gaussian \texttt{ReadAllGIC}
 usage; the calculations reported here used Gaussian 16 at HF/STO-3G.
 
-The relevant observations are that Gaussian accepts the
-automatically generated coordinate block, reports \(NTRed=NRank\) equal to the
-\NEO\ rank at every optimization step, and reaches a stationary point in three
-to nine steps for saturated ring and cage systems with different symmetry and
-rank.
+The relevant observations are that Gaussian 16 accepts the automatically
+generated coordinate block and reaches a stationary point in three to nine
+steps for saturated ring and cage systems with different symmetry and rank.
 
 \begin{table}[htbp]
 \centering
@@ -1369,7 +1368,8 @@ Cubane & \(O_h\) & 42/42 & -- & 3 & \(-303.781399977\) \\
 \end{tabular}
 \end{table}
 
-A symmetry-enabled variant was run for norbornane without \texttt{NoSymm}.  The
+A symmetry-enabled Gaussian 16 variant was run for norbornane without
+\texttt{NoSymm}.  The
 Gaussian input contains the full rank-complete \SONIC\ block required by
 \texttt{ReadAllGIC}, but all non-totally symmetric rows are marked
 \texttt{Frozen}.  Thus only the 15 \(A_1\) coordinates are active while the
@@ -1420,11 +1420,12 @@ improper-dihedral convention \(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving
 \(D(4,6,8,7)\) for the same local non-planarity.  The improper-dihedral and
 linear-\(RPck\) export is therefore a compatibility layer; the native \SONIC\
 contract still defines \(U\), \(QPck\) and \(\Phi P\).
-The symmetry-enabled norbornane input, run without \texttt{NoSymm}, contains
-51 generated rows of which 36 non-totally symmetric rows are marked
-\texttt{Frozen}; it converges in five steps.  These runs isolate the
-out-of-plane and frozen-irrep handling from the commercial Gaussian 16 parser
-limitations.
+The corresponding native-coordinate norbornane check, also run with the same
+total-symmetric active subset, contains 51 generated rows of which 36
+non-totally symmetric rows are marked \texttt{Frozen}; it converges in five
+steps.  This is a distinct input from the Gaussian 16 \texttt{ReadAllGIC}
+compatibility run above and isolates the out-of-plane and frozen-irrep handling
+before export through the commercial Gaussian parser.
 
 \begin{figure}[htbp]
 \centering
@@ -1588,8 +1589,8 @@ as an automatically generated Gaussian GIC model without changing the electronic
 energy surface being sampled.
 
 Because the Cartesian branch is ordinary molecular geometry, it is not tied to
-Gaussian.  The same three representative points were also evaluated on the
-Oracle machine with ORCA and Molpro at PBE0/def2-SVP, a different level from
+Gaussian.  The same three representative points were also evaluated on a local
+workstation with ORCA and Molpro at PBE0/def2-SVP, a different level from
 the B3LYP/6-31+G* Gaussian check.  The absolute energies differ slightly
 between codes, as expected from independent DFT implementations and defaults,
 but the relative fixed-frame puckering profile is the same at the level needed
@@ -1702,14 +1703,17 @@ tested covalent and ring systems.  Construction is larger because it includes
 candidate generation, protected-first rank reduction, optional symmetry
 projection and writing the frozen sections.
 
-In the PAH series, a log--log fit gives a build-time slope of 1.48 versus atom
-count (\(R^2=0.79\)) and a \(\Bmat\)-evaluation slope of 0.94 versus the number
-of sparse nonzero derivative entries (\(R^2=0.94\)).  Across the non-special
-systems, peak Python memory scales approximately linearly with the number of
-stored primitive rows (slope 1.06, \(R^2=0.81\)).  The build-time fit against
-candidate count is intentionally not used as a universal law: cubane and the
-high-symmetry PAHs show that topology and point-group projection can dominate a
-simple one-variable model.  The ferrocene entries are the expected expensive
+In the controlled PAH growth series, a log--log fit gives a build-time slope of
+1.48 versus atom count (\(R^2=0.79\)) and a \(\Bmat\)-evaluation slope of 0.94
+versus the number of sparse nonzero derivative entries (\(R^2=0.94\)).  The
+left panel of Figure~\ref{fig:construction-scaling} reports a different
+diagnostic fit: build time against primitive-candidate count over the
+non-special systems.  That broader fit has slope close to unity but is
+intentionally not used as a universal law, because cubane and the high-symmetry
+PAHs show that topology and point-group projection can dominate a simple
+one-variable model.  Across the non-special systems, peak Python memory scales
+approximately linearly with the number of stored primitive rows (slope 1.06,
+\(R^2=0.81\)).  The ferrocene entries are the expected expensive
 cases in this set because the special-coordinate mode retains a large
 ring-center/metal primitive source space through symmetry projection before
 reducing to the 57-dimensional active contract.
