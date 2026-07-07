@@ -14,6 +14,7 @@
 
 \newcommand{\SONIC}{SONIC}
 \newcommand{\NEO}{\SONIC}
+\newcommand{\TheONE}{\textsc{The\_ONE}}
 \newcommand{\ORACLE}{ORACLE}
 \newcommand{\GIC}{GIC}
 \newcommand{\Bmat}{\mathbf{B}}
@@ -55,7 +56,7 @@ fragments.
 
 We present \SONIC\ (Symmetry-Oriented Natural Internal Coordinates) as a general
 construction of non-redundant, symmetry-adapted generalized internal
-coordinates.  \NEO\ starts
+coordinates.  The \TheONE\ implementation starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
 point-group operations, fragments and optional interaction centers.  It then
 builds chemically typed primitive families, protects special coordinates for
@@ -100,7 +101,9 @@ metal or high-coordination environments.
 
 \SONIC\ is designed to make this choice explicit and reproducible.  Table~\ref{tab:framework-roles}
 defines the workflow names used below.  The essential separation is that
-\SONIC\ defines the non-redundant generalized internal-coordinate basis, analytic
+\TheONE\ is the standalone tool that constructs \SONIC\ contracts, while
+\SONIC\ is the coordinate family: the non-redundant generalized
+internal-coordinate basis, analytic
 Wilson matrix and symmetry labels; downstream modules choose how those
 coordinates enter a fit, force field, scan or surface model.
 
@@ -114,10 +117,11 @@ Name & Role \\
 \midrule
 Molecular-state tools & Input layer that either reads saved topology,
 symmetry and synthon sections from the \texttt{xyzin} file or constructs them
-from Cartesian coordinates with the bundled MATRIX perception tools.  The
+from Cartesian coordinates with bundled perception tools.  The
 continuous molecular perception follows the ideas introduced in Proxima and in
 previous templating-synthon work.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
-\SONIC & Coordinate-generation engine: \GIC\ construction, symmetry-adapted
+\TheONE{}--\SONIC & Coordinate-construction tool and its coordinate
+contract: \GIC\ construction, symmetry-adapted
 Cartesian reference spaces, analytic \(\Bmat\) rows, symmetry labels and
 provenance. \\
 GF/PED, DVR & Wilson GF/potential-energy-distribution analysis and discrete
@@ -171,7 +175,8 @@ coordinate persistence but is not validated in this paper. \\
 \foreach \target in {gf,opt,dvr,refine,ff}
   \draw[arrow] (contract.south) |- (\target.north);
 \end{tikzpicture}
-\caption{Constructive workflow implemented by \NEO.  The model-building stage
+\caption{Constructive workflow implemented by \TheONE\ for \SONIC\ coordinates.
+The model-building stage
 ends at the frozen coordinate contract; downstream modules reuse that object
 and update only the numerical quantities required for their task, such as
 Wilson \(\Bmat\) rows, force constants, path coordinates or refinement
@@ -188,7 +193,7 @@ translations and fragment orientations.  The result is not merely a coordinate
 list but a persistent object that downstream modules can audit, reuse and
 compare against independent active-space constructions.
 
-Equally important, \NEO\ is not a new coordinate language.  Modern GIC
+Equally important, \SONIC\ is not a new coordinate language.  Modern GIC
 implementations already provide expressive syntax for nonlinear and mixed
 coordinate expressions.  The novelty here is the preceding step: a
 deterministic generator that converts a frozen molecular state into a
@@ -199,7 +204,9 @@ Gaussian-readable GICs or consumed directly by downstream modules.
 established nuclear-electronic-orbital usage of that acronym.  The new name
 also states the intended object more directly: natural internal-coordinate
 families made usable in symmetry-adapted, automatically constructed GIC
-contracts.  Symmetry is used in the classical molecular sense: point-group
+contracts.  The standalone command-line tool is named \TheONE; legacy
+\texttt{neo} and \texttt{gicforge} command aliases are kept only for
+reproducibility of older inputs.  Symmetry is used in the classical molecular sense: point-group
 operations map coordinate rows into the same space with the corresponding atom
 permutation and vector or pseudovector signs.  Orthogonality enters through
 normalized Wilson-row rank selection and orthonormal SALC coefficient vectors
@@ -631,6 +638,20 @@ Cremer--Pople-like descriptors \(Q\) and \(\phi\) are useful for
 interpretation, but the active coordinate basis stores linear \(RPck\) rows
 because their \(\Bmat\) rows are analytic linear combinations of dihedral
 derivatives.\cite{CremerPople1975}
+
+The coefficient pattern follows the natural-coordinate construction used by
+Pulay and co-workers for ring deformations.  If \(s_j\) denotes a cyclic source
+list, such as the endocyclic valence angles or a torsional puckering list, the
+stored rows are real Fourier-like combinations
+\[
+  Q_m^c = N_m\sum_{j=1}^{n} s_j\cos\frac{2\pi m(j-1)}{n},\qquad
+  Q_m^s = N_m\sum_{j=1}^{n} s_j\sin\frac{2\pi m(j-1)}{n},
+\]
+with the alternating row \(Q_{n/2}=n^{-1/2}\sum_j(-1)^{j-1}s_j\) for even
+\(n\).  The normalization \(N_m\) is chosen so that coefficient vectors are
+unit length before the symmetry projection.  Thus the same cyclic algebra is
+used for the CyGNA valence-angle family and for \(RPck\) torsional puckering
+rows; only the source primitive list changes.
 
 For a six-membered ring segment \(1\cdots6\), a typical generated angle row has
 the explicit form
@@ -1295,6 +1316,29 @@ Cubane & \(O_h\) & 42/42 & 42/42 & 3 & \(-303.781399977\) \\
 \end{tabular}
 \end{table}
 
+The same export path was then compared directly with three standard Gaussian
+optimization choices on two small systems for which a hand Z matrix is
+available or unambiguous.  These calculations are not a benchmark of electronic
+structure theory or a claim that one coordinate choice always minimizes the
+iteration count.  They test the narrower point that \TheONE\ can generate a
+Gaussian-readable \SONIC\ coordinate model without manual GIC transcription and
+that Gaussian can use it with the same convergence behavior as built-in
+coordinate choices.  At HF/STO-3G, water converges in four steps with default,
+Cartesian, hand Z-matrix and \SONIC\ \texttt{ReadAllGIC} coordinates.  Hydrogen
+peroxide converges in six steps with Gaussian default, Cartesian and \SONIC\
+coordinates and in five steps with the hand Z matrix.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.72\linewidth]{figures/gaussian_coordinate_comparison.png}
+\caption{Gaussian DV HF/STO-3G optimization-step comparison for built-in
+Gaussian coordinates and automatically generated \SONIC\ \texttt{ReadAllGIC}
+coordinates.  The water and hydrogen-peroxide tests are deliberately small:
+their role is to verify solver consumption and input portability, not to rank
+coordinate strategies statistically.}
+\label{fig:gaussian-coordinate-comparison}
+\end{figure}
+
 \subsection{Hessian Locality}
 
 Let \(\Fmat_x\) be a Cartesian Hessian at the reference geometry.  For a
@@ -1635,10 +1679,10 @@ validated baseline described above.  The next methodological step is to enlarge
 the pseudo-cycle validation corpus for intermolecular systems, using the same
 rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of \SONIC.
 The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
-contract is already usable as an external solver coordinate set; the next
-iteration-count comparison will place \SONIC\ against Gaussian defaults,
-Cartesians and hand-built Z matrices on the same systems.  The Hessian,
-puckering, GF/PED scaling and portable chair-to-boat export probes illustrate
+contract is already usable as an external solver coordinate set, and the small
+iteration-count comparison places the generated \SONIC\ coordinates next to
+Gaussian defaults, Cartesians and hand-built Z matrices on the same inputs.  The
+Hessian, puckering, GF/PED scaling and portable chair-to-boat export probes illustrate
 why the same stored definition is relevant to force-field and large-amplitude work
 within the scope defined above.  Full DVR and refinement application benchmarks
 remain the next validation layer.  The cyclohexane export check further shows
@@ -1649,7 +1693,8 @@ energies.
 \section*{Reproducibility}
 
 The calculations reported in the validation and application sections were
-generated with the \SONIC\ development tree and Python 3.13.11.  Gaussian
+generated with the \TheONE\ development tree for \SONIC\ coordinates and
+Python 3.13.11.  Gaussian
 jobs used the local Gaussian DV executable documented in the accompanying
 scripts; the method and basis set are stated with each probe.  The reported
 construction tests use fixed inputs and no stochastic seeds.  The
@@ -1659,8 +1704,8 @@ implementation for the corpus rows where that comparison is applicable.
 \section*{Data and Code Availability}
 
 The manuscript repository contains the scripts, JSON data files and figures
-used to generate the tables and application plots.  The \SONIC\ source
-code is under active development as an independently usable MATRIX package;
+used to generate the tables and application plots.  The \TheONE\ source
+code is under active development as an independently usable package;
 until public release, the code and frozen input/output data are
 available from the author upon reasonable request.
 

@@ -1,0 +1,98 @@
+{
+  "method": "Gaussian coordinate-system optimization comparison",
+  "electronic_structure": "HF/STO-3G",
+  "systems": [
+    {
+      "name": "water",
+      "source": "h2ocart.inp",
+      "zmatrix_source": null,
+      "point_group": "C2v",
+      "sonic_rank": 3,
+      "target_rank": 3,
+      "modes": [
+        {
+          "mode": "default",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 4,
+          "scf_cycles": 4,
+          "final_energy_hartree": -74.96590113
+        },
+        {
+          "mode": "cartesian",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 4,
+          "scf_cycles": 4,
+          "final_energy_hartree": -74.9659011798
+        },
+        {
+          "mode": "zmatrix",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 4,
+          "scf_cycles": 4,
+          "final_energy_hartree": -74.9659010395
+        },
+        {
+          "mode": "sonic",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 4,
+          "scf_cycles": 4,
+          "final_energy_hartree": -74.96590113
+        }
+      ]
+    },
+    {
+      "name": "hydrogen_peroxide",
+      "source": "h2o2zmat.inp",
+      "zmatrix_source": "h2o2.inp",
+      "point_group": "D2h",
+      "sonic_rank": 6,
+      "target_rank": 6,
+      "modes": [
+        {
+          "mode": "default",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 6,
+          "scf_cycles": 6,
+          "final_energy_hartree": -148.76488266
+        },
+        {
+          "mode": "cartesian",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 6,
+          "scf_cycles": 6,
+          "final_energy_hartree": -148.764883
+        },
+        {
+          "mode": "zmatrix",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 5,
+          "scf_cycles": 5,
+          "final_energy_hartree": -148.764882955
+        },
+        {
+          "mode": "sonic",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 6,
+          "scf_cycles": 6,
+          "final_energy_hartree": -148.76488266
+        }
+      ]
+    }
+  ]
+}

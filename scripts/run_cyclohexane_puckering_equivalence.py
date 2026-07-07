@@ -2,7 +2,7 @@
 """Cyclohexane chair-to-boat export equivalence probe.
 
 The script builds a fixed-frame puckering interpolation, writes both portable
-Cartesian Gaussian inputs and NEO ReadAllGIC inputs, optionally runs Gaussian,
+Cartesian Gaussian inputs and SONIC ReadAllGIC inputs, optionally runs Gaussian,
 and stores a compact JSON summary plus the manuscript figure.
 """
 
@@ -124,7 +124,7 @@ def prepare_inputs() -> None:
             xyzin,
             point_dir / f"cyclohexane_p{index:02d}_neo_gic.gjf",
             route=ROUTE,
-            title=f"cyclohexane NEO ReadAllGIC puckering point {index}",
+            title=f"cyclohexane SONIC ReadAllGIC puckering point {index}",
             link0=(
                 f"%chk=cyclohexane_p{index:02d}_neo_gic.chk",
                 "%nprocshared=4",
@@ -296,7 +296,7 @@ def plot(data: dict[str, object]) -> None:
         marker="s",
         markerfacecolor="none",
         markeredgewidth=1.7,
-        label="NEO ReadAllGIC",
+        label="SONIC ReadAllGIC",
     )
     top.set_ylabel(r"$\Delta E$ / kJ mol$^{-1}$")
     top.set_title("Cyclohexane chair-to-boat fixed puckering path")

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the application figures used by the NEO manuscript.
+"""Build the application figures used by the SONIC manuscript.
 
 The default mode redraws the figures from the compact JSON data stored in the
 repository.  Use ``--from-qm`` to rebuild the JSON data from the local Gaussian
@@ -33,7 +33,7 @@ def main() -> None:
     parser.add_argument(
         "--from-qm",
         action="store_true",
-        help="rebuild data from local Gaussian DV logs/FCHK and MATRIX NEO",
+        help="rebuild data from local Gaussian DV logs/FCHK and MATRIX SONIC",
     )
     args = parser.parse_args()
 
@@ -263,8 +263,8 @@ def plot_hessian_heatmap(data: dict[str, object]) -> None:
     metrics = hessian["metrics"]
     titles = [
         ("cartesian", "Cartesian vibrational"),
-        ("neo_contract", "NEO contract"),
-        ("neo_symmetry", "Symmetry-adapted NEO"),
+        ("neo_contract", "SONIC contract"),
+        ("neo_symmetry", "Symmetry-adapted SONIC"),
     ]
 
     fig, axes = plt.subplots(1, 3, figsize=(10.5, 3.35), constrained_layout=True)
