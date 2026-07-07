@@ -1,16 +1,20 @@
-\documentclass[10pt]{article}
+\documentclass[journal=jctcce,manuscript=article,layout=traditional]{achemso}
 
-\usepackage[a4paper,margin=2.6cm]{geometry}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{array}
 \usepackage{booktabs}
-\usepackage{graphicx}
 \usepackage{longtable}
 \usepackage{microtype}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,calc,positioning}
-\usepackage[numbers,sort&compress]{natbib}
-\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
+
+\providecommand{\href}[2]{#2}
+\providecommand{\keywords}[1]{\par\noindent\textbf{Keywords: }#1\par}
+\makeatletter
+\@ifundefined{tocentry}{%
+  \newenvironment{tocentry}{\section*{Graphical Table of Contents}}{}%
+}{}
+\makeatother
 
 \newcommand{\SONIC}{SONIC}
 \newcommand{\NEO}{\SONIC}
@@ -30,11 +34,10 @@
 \newtheorem{definition}{Definition}
 
 \title{\SONIC: Symmetry-Oriented Non-redundant Internal Coordinates}
-\author{Vincenzo Barone\\
-INSTM, National Interuniversity Consortium for Materials Science and Technology\\
-via G. Giusti 9, 50121 Firenze, Italy\\
-\href{mailto:vincebarone52@gmail.com}{vincebarone52@gmail.com}}
-\date{Working draft -- \today}
+\author{Vincenzo Barone}
+\affiliation{INSTM, National Interuniversity Consortium for Materials Science and Technology, via G. Giusti 9, 50121 Firenze, Italy}
+\email{vincebarone52@gmail.com}
+\keywords{internal coordinates, molecular symmetry, Wilson B matrix, Gaussian GIC, natural internal coordinates, vibrational analysis}
 
 \begin{document}
 \maketitle
@@ -82,6 +85,11 @@ The numerical evidence reported here validates the construction invariants,
 sparse derivative machinery and Gaussian export path.  We also discuss the
 intended scope of the method and its current limitations.
 \end{abstract}
+
+\begin{tocentry}
+\centering
+\includegraphics[width=0.9\linewidth]{figures/graphical_toc.png}
+\end{tocentry}
 
 \section{Introduction}
 
@@ -244,9 +252,12 @@ assembled into one frozen, reusable coordinate object.
 
 \begin{table}[htbp]
 \centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.92}
 \caption{How \NEO\ is positioned relative to established coordinate strategies.}
 \label{tab:context}
-\begin{tabular}{p{0.20\linewidth}p{0.32\linewidth}p{0.37\linewidth}}
+\begin{tabular}{p{0.19\linewidth}p{0.31\linewidth}p{0.39\linewidth}}
 \toprule
 Strategy & Strength & Limitation addressed by \NEO \\
 \midrule
@@ -1922,7 +1933,6 @@ distinction between coordinate-description languages and automatic generation,
 and the ring-reconstruction work of Lema-Saavedra and Fern{\'a}ndez-Ramos that
 clarified how puckering coordinates connect to closed molecular geometries.
 
-\bibliographystyle{unsrtnat}
 \bibliography{references}
 
 \end{document}

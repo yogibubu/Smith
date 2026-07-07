@@ -6,6 +6,9 @@
 \usepackage{listings}
 \usepackage{hyperref}
 
+\newcommand{\SONIC}{SONIC}
+\newcommand{\SMITH}{\textsc{SMITH}}
+
 \lstset{
   basicstyle=\ttfamily\scriptsize,
   breaklines=true,
@@ -21,24 +24,27 @@
 \title{Supporting Information for\\
 SONIC: Symmetry-Oriented Non-redundant Internal Coordinates}
 \author{Vincenzo Barone}
-\date{Working draft -- \today}
+\date{}
 
 \begin{document}
 \maketitle
 
-\section*{Norbornane SMITH/SONIC Input and Gaussian 16 Export}
+\section*{Norbornane SMITH/SONIC Standalone Input and Gaussian 16 Export}
 
-This Supporting Information records the complete norbornane coordinate-construction
-input and the Gaussian 16 \texttt{ReadAllGIC} input generated from it.  The files
-correspond to the norbornane test discussed in the main text.
+This Supporting Information records the minimal standalone input required to
+generate the norbornane \SONIC\ coordinate contract and the corresponding
+Gaussian 16 \texttt{ReadAllGIC} input.  The first listing is intentionally not
+the enriched \texttt{xyzin} container written after molecular perception and
+coordinate construction.  It contains only a standard XYZ geometry followed by
+the SMITH directives needed for this Gaussian-compatible export.
 
 \subsection*{SMITH/SONIC input}
 
-\lstinputlisting[caption={Norbornane SMITH/SONIC enriched XYZ input.}]{si/norbornane_smith_input.xyzin}
+\lstinputlisting[caption={Minimal norbornane SMITH/SONIC standalone input: standard XYZ block plus the required export directives.}]{si/norbornane_smith_input.xyzin}
 
 \subsection*{Generated Gaussian 16 input}
 
-\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input generated from the SONIC contract.}]{si/norbornane_g16_readallgic.gjf}
+\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input generated automatically from the SMITH/SONIC contract.}]{si/norbornane_g16_readallgic.gjf}
 
 \subsection*{Gaussian 16 output excerpt}
 

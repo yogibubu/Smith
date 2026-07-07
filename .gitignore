@@ -10,5 +10,6 @@
 *.run.xml
 *.synctex.gz
 *.toc
+acs-main.bib
 .DS_Store
 calculations/
