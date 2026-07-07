@@ -289,7 +289,7 @@ def plot_hessian_heatmap(data: dict[str, object]) -> None:
     colorbar = fig.colorbar(im, ax=axes, fraction=0.028, pad=0.02)
     colorbar.set_label(r"$|F_{ij}|/\sqrt{|F_{ii}F_{jj}|}$", fontsize=9)
     fig.suptitle("Cyclobutane HF/STO-3G Hessian: normalized off-diagonal coupling", fontsize=11)
-    fig.savefig(FIGURES / "neo_hessian_heatmap.png", dpi=320)
+    fig.savefig(FIGURES / "sonic_hessian_heatmap.png", dpi=320)
     plt.close(fig)
 
 
@@ -321,7 +321,7 @@ def plot_puckering_scan(data: dict[str, object]) -> None:
         fontsize=8,
         bbox={"boxstyle": "round,pad=0.25", "facecolor": "white", "edgecolor": "0.82", "alpha": 0.92},
     )
-    fig.savefig(FIGURES / "neo_puckering_scan.png", dpi=320)
+    fig.savefig(FIGURES / "sonic_puckering_scan.png", dpi=320)
     plt.close(fig)
 
 

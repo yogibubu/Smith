@@ -17,9 +17,7 @@
 \makeatother
 
 \newcommand{\SONIC}{SONIC}
-\newcommand{\NEO}{\SONIC}
 \newcommand{\SMITH}{\textsc{SMITH}}
-\newcommand{\ORACLE}{ORACLE}
 \newcommand{\GIC}{GIC}
 \newcommand{\Bmat}{\mathbf{B}}
 \newcommand{\bmat}{\mathbf{b}}
@@ -135,8 +133,6 @@ Cartesian reference spaces, analytic \(\Bmat\) rows, symmetry labels and
 provenance. \\
 GF/PED, DVR & Wilson GF/potential-energy-distribution analysis and discrete
 variable representation. \\
-MORPHEUS & Separate semi-experimental refinement workflow that motivates
-coordinate persistence but is not validated in this paper. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -209,7 +205,7 @@ ends at the frozen coordinate contract; downstream modules reuse that object
 and update only the numerical quantities required for their task, such as
 Wilson \(\Bmat\) rows, force constants, path coordinates or refinement
 Jacobians.}
-\label{fig:neo-workflow}
+\label{fig:workflow}
 \end{figure}
 
 The novelty is not a new coordinate formula, but a deterministic constructive
@@ -226,15 +222,9 @@ implementations already provide expressive syntax for nonlinear and mixed
 coordinate expressions.  The novelty here is the preceding step: a
 deterministic generator that converts a frozen molecular state into a
 rank-complete, symmetry-consistent coordinate basis that can be serialized as
-Gaussian-readable GICs or consumed directly by downstream modules.
-
-\SONIC\ replaces the earlier draft name NEO to avoid conflict with the
-established nuclear-electronic-orbital usage of that acronym.  The new name
-also states the intended object more directly: non-redundant internal-coordinate
-families made usable in symmetry-adapted, automatically constructed GIC
-contracts.  The standalone command-line tool is named \SMITH\ (Symmetry-Mapped Internal-coordinate Template Handler); legacy
-\texttt{neo} and \texttt{gicforge} command aliases are kept only for
-reproducibility of older inputs.  Symmetry is used in the classical molecular sense: point-group
+Gaussian-readable GICs or consumed directly by downstream modules.  The
+standalone command-line tool is named \SMITH\ (Symmetry-Mapped
+Internal-coordinate Template Handler).  Symmetry is used in the classical molecular sense: point-group
 operations map coordinate rows into the same space with the corresponding atom
 permutation and vector or pseudovector signs.  Orthogonality enters through
 normalized Wilson-row rank selection and orthonormal SALC coefficient vectors
@@ -243,9 +233,9 @@ inside homogeneous blocks, not through global orthogonality in the kinetic
 
 \section{Relationship to Existing Coordinate Models}
 
-Table~\ref{tab:context} summarizes the position of \NEO\ relative to the main
+Table~\ref{tab:context} summarizes the position of \SONIC\ relative to the main
 coordinate strategies used in quantum chemistry and molecular spectroscopy.
-The comparison is deliberately constructive.  \NEO\ is not a replacement for
+The comparison is deliberately constructive.  \SONIC\ is not a replacement for
 the Wilson formalism, natural internal coordinates or translation-rotation
 coordinates; it is a general layer that decides how such ingredients are
 assembled into one frozen, reusable coordinate object.
@@ -255,11 +245,11 @@ assembled into one frozen, reusable coordinate object.
 \scriptsize
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{0.92}
-\caption{How \NEO\ is positioned relative to established coordinate strategies.}
+\caption{How \SONIC\ is positioned relative to established coordinate strategies.}
 \label{tab:context}
 \begin{tabular}{p{0.19\linewidth}p{0.31\linewidth}p{0.39\linewidth}}
 \toprule
-Strategy & Strength & Limitation addressed by \NEO \\
+Strategy & Strength & Limitation addressed by \SONIC \\
 \midrule
 Z matrices & Compact, local and interpretable for small molecules. & Tree
 dependence, singularities, and manual choices make them fragile for rings,
@@ -297,7 +287,7 @@ define a complete natural-coordinate generator with protected rank reduction,
 homogeneous point-group projectors and reusable symmetry-labelled blocks for
 refinement or force-field analysis. \\
 \midrule
-\NEO & Builds a rank-complete, type-labelled, symmetry-adapted coordinate basis
+\SONIC & Builds a rank-complete, type-labelled, symmetry-adapted coordinate basis
 from a validated molecular state. & Weak complexes can be represented either
 by fragment/center coordinates or by typed pseudo-bonds and
 pseudo-cycles; the remaining development frontier is the breadth of the
@@ -318,7 +308,7 @@ degrees of freedom,\cite{Berces1997NaturalMetal} von Arnim and Ahlrichs
 generalized the automatic construction while still identifying multiply fused
 ring systems as a hard case,\cite{VonArnimAhlrichs1999GNIC} and Swart and
 Bickelhaupt emphasized the need to distinguish strong and weak coordinates in
-optimization.\cite{SwartBickelhaupt2006StrongWeak}  \NEO\ turns this lineage
+optimization.\cite{SwartBickelhaupt2006StrongWeak}  \SONIC\ turns this lineage
 into a frozen construction for spectroscopy and refinement by combining
 chemically typed primitive generation, block-local rank reduction,
 special-coordinate protection and point-group projectors.
@@ -332,7 +322,7 @@ variables, fragment rotor coordinates for benzene dimers and water clusters,
 and quaternion fragment coordinates for ferrocene.\cite{Marenich2025GIC}
 These examples clarify the distinction between an expressive coordinate
 language and an automatic generator.  Gaussian can evaluate and differentiate
-such expressions once they have been supplied or selected.  \NEO\ instead aims
+such expressions once they have been supplied or selected.  \SONIC\ instead aims
 to generate the corresponding objects whenever they follow from topology, local
 equivalence, point-group symmetry, fragments, ring centers, bond centers or
 semantic coordinate requests.
@@ -340,17 +330,17 @@ semantic coordinate requests.
 This distinction is central to the positioning of the method.  Gaussian GIC is
 an expressive coordinate-description language: a user can write arbitrary
 primitive, nonlinear, redundant or mixed expressions and let Gaussian evaluate
-them.  \NEO\ addresses a different problem.  It constructs the coordinate model
+them.  \SONIC\ addresses a different problem.  It constructs the coordinate model
 before any optimizer, force-field fit or refinement sees it, and records why
 each special or ordinary coordinate was accepted.  The Gaussian syntax is
-therefore a serialization target for \NEO, not the theoretical object being
+therefore a serialization target for \SONIC, not the theoretical object being
 introduced.
 
 In practical terms, the user should not have to write pages of molecule-specific
 GIC definitions to obtain chemically natural variables such as local
 \(XY_n\)-type combinations, proton-transfer sums and differences, fragment
 translations or ring-puckering components.  When those variables are consequences
-of the frozen molecular state, \NEO\ can generate and protect them
+of the frozen molecular state, \SONIC\ can generate and protect them
 automatically; when they are requested explicitly, the request is recorded as a
 semantic coordinate rather than as an opaque handwritten expression.
 
@@ -380,11 +370,9 @@ subgroup.  Thus a distributable input is one text file with coordinates and
 construction options, while the generated \texttt{xyzin} remains the frozen
 audited state.
 
-The ORACLE name is used in the broader development environment, but the present
-coordinate engine is not tied to an ORACLE executable.  The perception layer
-used here is a new implementation of published chemical descriptors:
-continuous molecular perception in the spirit of Proxima,\cite{Lazzari2020Proxima}
-and molecular/spectral synthons developed for accurate structural
+The perception layer used here is a standalone implementation of published
+chemical descriptors: continuous molecular perception in the spirit of
+Proxima,\cite{Lazzari2020Proxima} and molecular/spectral synthons developed for accurate structural
 templating.\cite{Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141}
 Initial local equivalence is therefore not based only on element symbols.  The
 molecular-state layer supplies continuous atom perception and synthon
@@ -400,14 +388,14 @@ classes.  In the present contract, this continuous perception enters ring
 orientation, ligand grouping, local stretch equivalence, high-coordination
 templates and the one-dihedral exocyclic torsion rule.
 The reproducibility statements below are conditional on these descriptors being
-part of the frozen input state.  In other words, \NEO\ does not assume an
+part of the frozen input state.  In other words, \SONIC\ does not assume an
 unstated human perception step: the descriptor values, perception version,
 topology and symmetry operations are stored as contract provenance, and a
 change in any of them is a different molecular-state stratum.
 
 \section{Coordinate Functions and Downstream Models}
 
-The frozen \NEO\ basis is the first-order coordinate frame.  Many downstream
+The frozen \SONIC\ basis is the first-order coordinate frame.  Many downstream
 models, however, are better written in functions of those coordinates than in
 the raw coordinates themselves.  This is especially true for force fields and
 PES fitting, where the physically smooth variable may be an inverse distance,
@@ -437,7 +425,7 @@ bond-sum and bond-difference coordinates for proton transfer, symmetrized
 \(XY_n\) local combinations, polar or elliptic functions of intermolecular
 Cartesian components, and quaternion or exponential-map functions of fragment
 orientation.\cite{Marenich2025GIC}  In a GIC input language these are written
-as explicit expressions or requested through a specific option; in \NEO\ they
+as explicit expressions or requested through a specific option; in \SONIC\ they
 are downstream functions of generated base coordinates or protected fragment
 coordinates, with the chain rule preserving the connection to the frozen
 Wilson rows.  Recent work by
@@ -458,20 +446,20 @@ wavefunctions can be interpreted.  The reconstruction layer of
 Ref.~\citenum{LemaSaavedraFernandezRamos2026RingCP} provides precisely this
 coordinate-to-geometry step: closure constraints, angular redistribution,
 rigid-bond treatment and substituent reference frames belong above the frozen
-\NEO\ basis, but they are natural consumers of it.  A DVR treatment can then
+\SONIC\ basis, but they are natural consumers of it.  A DVR treatment can then
 recompute the Wilson metric on the reconstructed structures, or use an explicitly
 validated reduced metric, without introducing a second private ring-coordinate
 definition.
 
 This distinction also prevents a common ambiguity in the word ``GIC.''  A
-general GIC expression can be an optimizer coordinate.  A \NEO\ coordinate
+general GIC expression can be an optimizer coordinate.  A \SONIC\ coordinate
 definition is reusable: it specifies the base coordinate
 space, the analytic derivatives and the symmetry transformation rules from
 which later functional variables can be built.  Implementing these coordinate
 functions systematically is part of the next development layer, but it does not
 require a different coordinate-generation theory.
 
-\NEO\ therefore exposes a small semantic coordinate layer rather than a second GIC
+\SONIC\ therefore exposes a small semantic coordinate layer rather than a second GIC
 language.  \texttt{PROTECT} requests name base objects such as distances,
 torsions, ring puckering, butterfly coordinates, fragment translations or
 center distances.  Independent requests enter rank and symmetry selection with
@@ -485,7 +473,7 @@ recorded, and partial symmetry orbits are diagnosed before local SALC fallback.
 
 \section{The Frozen Coordinate Contract}
 
-The central output of \NEO\ is a persistent coordinate object, not a transient
+The central output of \SONIC\ is a persistent coordinate object, not a transient
 list of internal coordinates.  This distinction is important because the same
 coordinate object must be used by independent modules, with no private
 reconstruction of topology, symmetry or rank choices.
@@ -560,7 +548,7 @@ when the primitive candidate set spans the full internal row space.  If this
 condition fails, the build is not silently repaired; the contract records the
 rank defect or excess and the molecular state must be reconsidered.
 
-The novelty of \NEO\ lies in the constraints imposed on this basis selection.
+The novelty of \SONIC\ lies in the constraints imposed on this basis selection.
 The accepted set \(\mathcal{A}\) is not just any basis of
 \(\mathcal{R}(\mathcal{P})\).  It is a chemically ordered basis selected under a
 source-family preorder: special fragment, center and ring coordinates are
@@ -617,7 +605,7 @@ depend on how the primitive rows have been scaled.  A stretch measured in
 angstrom, a bend measured in radians, a torsion, a fragment translation and a
 center distance have different natural units and different chemical roles.
 Changing their weights can change which delocalized coordinates are retained.
-\NEO\ instead uses rank-revealing linear algebra inside chemically typed
+\SONIC\ instead uses rank-revealing linear algebra inside chemically typed
 blocks and reserves the final cross-block competition for a fixed
 analytic \(\Bmat\)-rank test.  This does not make the construction unique in an
 abstract mathematical sense.  It replaces hidden numerical weighting choices by
@@ -641,7 +629,7 @@ are generated from pairs of neighbors around each center.  Nearly linear
 centers produce two linear-bend components, because one ordinary angular
 derivative becomes singular at linearity.
 
-For three- and four-coordinate centers, \NEO\ uses local equivalence classes to
+For three- and four-coordinate centers, \SONIC\ uses local equivalence classes to
 construct chemically recognizable bend combinations: symmetric deformations,
 rocking coordinates and tetrahedral or \(WXY_3/W_2XY_2\)-like patterns.  For
 coordination numbers between five and nine, the construction first attempts to match an
@@ -666,7 +654,7 @@ Here ``average'' means a stored linear combination of primitive torsional
 Wilson rows, together with a scalar value on the branch fixed by the reference
 geometry; it is not an arithmetic mean of periodic angles across a
 \(360^\circ\) wrap.  When a finite torsional value is needed for reporting or
-for a nonlinear model coordinate, \NEO\ uses the local reference branch, or an
+for a nonlinear model coordinate, \SONIC\ uses the local reference branch, or an
 explicit circular representation through \(\sin\phi\) and \(\cos\phi\).  Thus
 symmetry averaging never identifies \(179^\circ\) and \(-179^\circ\) with an
 unphysical zero-degree torsion.
@@ -675,7 +663,7 @@ unphysical zero-degree torsion.
 
 Ring coordinates are the main place where primitive internal coordinates must
 be replaced by natural combinations.  An \(n\)-membered ring has redundant
-endocyclic angle and dihedral lists.  \NEO\ constructs ring deformation
+endocyclic angle and dihedral lists.  \SONIC\ constructs ring deformation
 coordinates and \(RPck\) puckering components as linear combinations of those
 source rows, keeping \(n-3\) independent puckering components for rings larger
 than three atoms.  The endocyclic valence-angle combinations are the CyGNA
@@ -732,7 +720,7 @@ different orthonormal pair spans the same symmetry subspace.
 \begin{table}[htbp]
 \centering
 \small
-\caption{Representative six-membered-ring rows generated by \NEO.  The
+\caption{Representative six-membered-ring rows generated by \SONIC.  The
 examples show the kind of coordinate stored in the contract rather than only
 the family count.  A symmetry-preserving optimization or semiexperimental fit
 may request only the totally symmetric subset, e.g. the \(A_{1g}\) rows for the
@@ -763,11 +751,11 @@ Unsaturated rings and locally rigid ring fragments require more than a generic
 Fern{\'a}ndez-Ramos explicitly reduces the puckering dimensionality in the
 presence of rigid or multiple bonds and then recovers the full ring geometry by
 distributing the remaining distortions under constraints.\cite{LemaSaavedraFernandezRamos2026RingCP}
-The present \NEO\ construction already introduces bond-order-dependent
+The present \SONIC\ construction already introduces bond-order-dependent
 flexibility factors in \(RPck\) source vectors, so dihedrals centered on more
 rigid bonds contribute less to the puckering row.  The rigid-bond treatment of
 Ref.~\citenum{LemaSaavedraFernandezRamos2026RingCP} is therefore most naturally
-viewed in \NEO\ as a stronger, optional source-space contraction rather than as
+viewed in \SONIC\ as a stronger, optional source-space contraction rather than as
 a rewrite of the covalent graph.  A rigid bond \(i-j\) can be replaced, inside
 that ring source polygon only, by the virtual source point
 \(\mathbf{c}_{ij}=(\mathbf{r}_i+\mathbf{r}_j)/2\); the effective polygon then
@@ -786,7 +774,7 @@ and phases are exposed as derived functions for sampling, PES fitting and
 conformer classification.
 
 Fused, spiro and bridged systems are handled as connected ring-source spaces
-rather than as ordinary acyclic torsions.  When two rings share a bond, \NEO\
+rather than as ordinary acyclic torsions.  When two rings share a bond, \SONIC\
 adds butterfly coordinates around that shared bond.  Condensed-ring torsions
 and ring puckering components remain separate homogeneous blocks in the
 symmetry projector.  This is essential for high-symmetry systems such as cubane
@@ -827,7 +815,7 @@ preserves element identities, geometry, topology, perception descriptors, fragme
 interaction centers, point-group operations, priority keys and tolerances.  Let
 \(Q_\pi\) be the induced orthogonal permutation of Cartesian displacement
 coordinates and \(U_\pi\) the induced permutation/sign map on primitive
-coordinate rows.  If \NEO\ returns a contract \(\mathcal{C}\) for the first
+coordinate rows.  If \SONIC\ returns a contract \(\mathcal{C}\) for the first
 state, then it returns an isomorphic contract \(\pi_*\mathcal{C}\) for the
 second state.  In particular,
 \[
@@ -843,7 +831,7 @@ homogeneous-block projector is evaluated from data preserved by \(\pi\);
 orthogonal permutation/sign transformations do not change the Boolean
 acceptance tests.
 
-Equivalently, \NEO\ is natural with respect to symmetry-preserving atom
+Equivalently, \SONIC\ is natural with respect to symmetry-preserving atom
 relabellings: relabelling the molecular state and then constructing the
 contract gives the same object, up to the canonical contract isomorphism, as
 constructing the contract first and then transporting it by the relabelling.
@@ -853,7 +841,7 @@ constructing the contract first and then transporting it by the relabelling.
 For a fixed molecular state--geometry, topology, perception descriptors, point-group
 operations and fragment data--and for fixed primitive generators, family
 priority order, tie-breaking keys, row-normalization rule and numerical
-tolerances, \NEO\ returns a unique contract, or a unique
+tolerances, \SONIC\ returns a unique contract, or a unique
 incompatibility certificate.  In particular, no stochastic search, optimizer
 history or manual choice is part of the contract definition.
 The verification is direct: each stage is a fixed map of the frozen
@@ -867,7 +855,7 @@ candidate set.  Every candidate in this prefix whose Wilson row is nonsingular
 and independent, within the stored tolerance, of the previously accepted prefix
 rows is retained in any returned final object.  No ordinary stretch, bend or
 torsion can displace such an accepted coordinate.  If the independent prefix
-already exceeds the target vibrational rank, \NEO\ reports an invalid model
+already exceeds the target vibrational rank, \SONIC\ reports an invalid model
 rather than removing a semantic coordinate by exchange.  This follows directly
 from the ordered-prefix construction.
 
@@ -889,7 +877,7 @@ projection on the current accepted span plus an orthogonal residual; a zero
 residual leaves the span unchanged, and a nonzero residual adds exactly one
 new independent direction.
 
-The numerical construction is the finite-precision version of this statement.  \NEO\
+The numerical construction is the finite-precision version of this statement.  \SONIC\
 selects rows by incremental modified Gram--Schmidt rank testing with a fixed
 numerical tolerance, but the comparison is performed on normalized Wilson rows,
 \begin{equation}
@@ -974,7 +962,7 @@ on the same side of its threshold for perturbations smaller than
 \(\mu_a/(2L_a)\), and the minimum over the finite decision set preserves the
 entire ordered construction.
 
-This is the technical reason for block-local reduction.  \NEO\ does not claim
+This is the technical reason for block-local reduction.  \SONIC\ does not claim
 that weights disappear from all possible coordinate constructions.  It avoids
 using arbitrary cross-family weights to define chemically labelled variables.
 Only after typed blocks have been reduced and special coordinates have
@@ -1034,14 +1022,14 @@ projector
   \chi_\alpha(h)^*\,\Gamma_H(h),
 \end{equation}
 where \(\ell_\alpha\) is the dimension of \(\alpha\) and
-\(\chi_\alpha\) its character.  \NEO\ applies these projectors to the coefficient
+\(\chi_\alpha\) its character.  \SONIC\ applies these projectors to the coefficient
 space of the block, orthonormalizes the nonzero projected vectors and stores the
 resulting SALC matrix \(C_{\alpha H}\).  The symmetry-adapted Wilson rows are
 then
 \[
   \Bmat_{\alpha H}=C_{\alpha H}\Bmat_H .
 \]
-For tasks that must preserve the stored point-group symmetry, \NEO\ can export
+For tasks that must preserve the stored point-group symmetry, \SONIC\ can export
 only the totally symmetric rows, such as \(A_1\), \(A'\) or \(A_{1g}\)
 depending on the group.  This is the natural subset for symmetry-preserving
 geometry optimizations and semiexperimental structure fits.  The remaining
@@ -1049,7 +1037,7 @@ irreps are still retained in the full contract for rank closure, GF/PED block
 analysis, DVR coordinates and diagnostics.
 If an irreducible representation occurs with multiplicity greater than one in
 the same homogeneous block, the projector defines a subspace, not a unique
-printed basis.  \NEO\ fixes the stored basis by applying modified
+printed basis.  \SONIC\ fixes the stored basis by applying modified
 Gram--Schmidt to projected source vectors in the canonical block order, by
 discarding vectors below the saved norm tolerance, and by choosing the sign from
 the largest-magnitude coefficient pivot.  The subspace is the representation
@@ -1057,7 +1045,7 @@ theoretic object; the ordered, sign-gauged coefficient matrix is the
 deterministic serialization stored in the contract.
 Along scans or optimizations, a change in the identity of the largest pivot can
 flip the printed gauge even when the invariant subspace, rank and symmetry
-labels are unchanged.  \NEO\ therefore treats pivot changes as executable path
+labels are unchanged.  \SONIC\ therefore treats pivot changes as executable path
 diagnostics: consecutive SALC coefficient matrices are compared by subspace
 overlap, pivot changes are flagged as gauge events, and the same diagnostic
 module provides a Procrustes alignment for downstream GF/PED or DVR layers
@@ -1069,7 +1057,7 @@ The block-local rule is the key safeguard.  A stretch and a torsion may
 belong to the same irreducible representation, but they are not the same kind
 of coordinate.  Mixing them during symmetry adaptation would produce a valid
 vector in an abstract representation and an opaque variable in a chemical
-model.  \NEO\ therefore projects only within coordinate families and source
+model.  \SONIC\ therefore projects only within coordinate families and source
 blocks.  If a block is not closed under the stored operations, the construction uses
 an explicit local SALC fallback only where the contract allows it, and records
 that fallback in the symmetry diagnostics.
@@ -1086,7 +1074,7 @@ by GF, fitting and optimization.
 Weak complexes are a stress test for any internal-coordinate generator.  A
 covalent graph alone is disconnected, but adding arbitrary weak contacts as
 ordinary bonds can create artificial rings and mix covalent and non-covalent
-motions.  Within its current validated scope, \NEO\ therefore keeps two
+motions.  Within its current validated scope, \SONIC\ therefore keeps two
 explicit intermolecular constructions: a fragment-coordinate model
 and a pseudo-bond/pseudo-cycle model for selected hydrogen-bonded or
 contact-closed graphs.
@@ -1166,7 +1154,7 @@ or suppress them explicitly.
 
 \section{Validated Construction Scope}
 
-Table~\ref{tab:status} records the status of the present \NEO\
+Table~\ref{tab:status} records the status of the present \SONIC\
 construction.  The purpose is not to document a program interface, but to state
 which mathematical objects belong to the present contract and which
 objects remain methodological extensions.  This separation is important because
@@ -1178,7 +1166,7 @@ frozen contract.
 \scriptsize
 \setlength{\tabcolsep}{2.6pt}
 \renewcommand{\arraystretch}{0.88}
-\caption{Validated scope of the main \NEO\ coordinate families.}
+\caption{Validated scope of the main \SONIC\ coordinate families.}
 \label{tab:status}
 \begin{tabular}{@{}p{0.24\linewidth}p{0.17\linewidth}p{0.50\linewidth}@{}}
 \toprule
@@ -1222,7 +1210,7 @@ Coordinate-function layer & Validated baseline & Inverse/exponential distances, 
 \section{Validation Strategy}
 
 The validation target is not merely that a coordinate list can be printed.  A
-\NEO\ coordinate definition must first pass construction-level checks.  The
+\SONIC\ coordinate definition must first pass construction-level checks.  The
 final coordinate count and analytic \(\Bmat\) rank must match the vibrational
 rank.  The current Python construction and a separate Fortran control
 implementation must agree on coordinate families, final rank and
@@ -1234,10 +1222,53 @@ checks, not a comparison with an external published coordinate generator.
 The broader scientific motivation includes GF/PED analysis, DVR grids and
 semi-experimental refinement, but the validation layers must be separated.  The
 present paper validates the contract itself, tests whether
-external Gaussian calculations can consume \NEO{}-generated coordinates, and
+external Gaussian calculations can consume \SONIC{}-generated coordinates, and
 adds a compact GF/PED scaling probe to show how the same family labels enter a
 classical spectroscopic analysis.  The scope of the numerical evidence is
 stated explicitly in Sec.~\ref{sec:scope-limitations}.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.95}
+\caption{Validation map separating scientific claims from implementation
+diagnostics.}
+\label{tab:validation-map}
+\begin{tabular}{@{}p{0.23\linewidth}p{0.34\linewidth}p{0.33\linewidth}@{}}
+\toprule
+Evidence & What it tests & What it does not claim \\
+\midrule
+Internal corpus, Table~\ref{tab:validation} & Rank closure, analytic
+\(\Bmat\)-row consistency, point-group block closure and agreement with a
+separate Fortran control implementation. & External superiority over another
+published coordinate generator. \\
+\midrule
+Gaussian-GIC motifs, Table~\ref{tab:frisch-si} & Automatic construction of
+coordinate objects that otherwise appear as explicit GIC examples or dedicated
+motifs. & A benchmark of Gaussian's internal optimizer. \\
+\midrule
+Gaussian \texttt{ReadAllGIC} optimizations, Table~\ref{tab:readallgic-opt} &
+Whether a commercial Gaussian 16 parser and optimizer can consume the generated
+coordinate block. & A universal iteration-count advantage for every molecule. \\
+\midrule
+Hessian and GF/PED probes, Fig.~\ref{fig:hessian-heatmap} and
+Table~\ref{tab:gf-ped-scaling} & Chemical readability of the accepted
+coordinate families in vibrational and force-field-style analyses. & A complete
+spectroscopic scaling study. \\
+\midrule
+Puckering and portable-export probes, Figs.~\ref{fig:puckering-scan} and
+\ref{fig:cyclohexane-puckering-equivalence}, Table~\ref{tab:external-codes} & Reuse of
+the same generated coordinate path as Gaussian GIC input or ordinary Cartesian
+geometries for other electronic-structure codes. & A full DVR application. \\
+\midrule
+Construction-cost study, Table~\ref{tab:construction-cost} and
+Fig.~\ref{fig:construction-scaling} & Empirical scaling of coordinate
+construction and sparse-\(\Bmat\) evaluation on the present test corpus. &
+Asymptotic proof for all molecular graph families. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The regression corpus contains acyclic and cyclic molecules, fused and
 non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
@@ -1275,7 +1306,7 @@ substitution and the fail-fast protected-prefix rule.
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\caption{Representative internal validation of the present \NEO\ construction.
+\caption{Representative internal validation of the present \SONIC\ construction.
 Ranks are final/target ranks.  \(\Delta_\mathrm{PF}\) is the Python--Fortran
 Wilson-row-space residual where the Fortran control comparison is applicable.
 \(\epsilon_\mathrm{SALC}\) is the maximum norm error of nontrivial saved SALC
@@ -1303,11 +1334,11 @@ Semantic layer & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probe
 Table~\ref{tab:frisch-si} gives the first validation slice aimed directly at
 the recent Gaussian GIC examples.  These are not comparisons of optimizer
 performance; they test whether the chemically meaningful variables illustrated
-in the Supporting Information can be produced as \NEO\ contract objects or
+in the Supporting Information can be produced as \SONIC\ contract objects or
 coordinate functions without hand-writing a molecule-specific GIC input block.
 For the ferrocene row, the lower cyclopentadienyl ring is rotated through a
 five-point torsional scan from the eclipsed \(D_{5h}\) form to the staggered
-\(D_{5d}\) form.  The unprojected \NEO\ contract closes the full rank at every
+\(D_{5d}\) form.  The unprojected \SONIC\ contract closes the full rank at every
 grid point, while the high-symmetry endpoints are covered separately by the
 projector tests in Table~\ref{tab:validation}.  The sparse-\(\Bmat\) density
 reported there is the fraction
@@ -1322,13 +1353,13 @@ diagnostic for the sparse representation, not an additional rank criterion.
 \scriptsize
 \setlength{\tabcolsep}{3pt}
 \caption{Targeted tests inspired by the Gaussian GIC Supporting Information.
-The purpose is to test automatic \NEO\ construction of the same kind of
+The purpose is to test automatic \SONIC\ construction of the same kind of
 coordinate object that Gaussian can evaluate when supplied as a GIC expression
 or through a dedicated option.}
 \label{tab:frisch-si}
 \begin{tabular}{@{}p{0.20\linewidth}p{0.31\linewidth}p{0.41\linewidth}@{}}
 \toprule
-SI motif & \NEO\ object & Check \\
+SI motif & \SONIC\ object & Check \\
 \midrule
 Formamide proton transfer & Generated \(R_{\mathrm{NH}}\), \(R_{\mathrm{OH}}\)
 primitive signatures plus \(\Sigma r\) and \(\Delta r\) functions & Function
@@ -1371,13 +1402,13 @@ representation under external electronic-structure consumption.
 
 \subsection{Gaussian ReadAllGIC Optimization}
 
-The most direct external test is to let Gaussian use the \NEO\ coordinates as its
-optimization coordinate system.  In this probe \NEO\ generates the
+The most direct external test is to let Gaussian use the \SONIC\ coordinates as its
+optimization coordinate system.  In this probe \SONIC\ generates the
 Gaussian-readable \texttt{ReadAllGIC} block, and Gaussian reads that block,
 evaluates the GIC derivatives with its own machinery and performs the
 optimization.  No hand-written surrogate coordinates are introduced.  The three
 systems in Table~\ref{tab:readallgic-opt} were chosen because their
-\NEO\ definitions contain only stretches, bends, dihedrals and linear
+\SONIC\ definitions contain only stretches, bends, dihedrals and linear
 combinations of those primitives, with no out-of-plane coordinates.  The same
 inputs are therefore compatible with standard Gaussian \texttt{ReadAllGIC}
 usage; the calculations reported here used Gaussian 16 at HF/STO-3G.
@@ -1388,7 +1419,7 @@ steps for saturated ring and cage systems with different symmetry and rank.
 
 \begin{table}[htbp]
 \centering
-\caption{Gaussian \texttt{ReadAllGIC} optimizations using \NEO{}-generated
+\caption{Gaussian \texttt{ReadAllGIC} optimizations using \SONIC{}-generated
 coordinate definitions.  The route was HF/STO-3G
 \texttt{Opt=(ReadAllGIC,MaxCycle=80) NoSymm}.  Gaussian 16 does not print the
 same \(NTRed/NRank\) diagnostic in these logs, so the Gaussian-rank column is
@@ -1396,7 +1427,7 @@ left blank.}
 \label{tab:readallgic-opt}
 \begin{tabular}{lccccc}
 \toprule
-System & PG & \NEO\ rank & Gaussian \(NTRed/NRank\) & Steps & \(E_\mathrm{final}\) / \(E_h\) \\
+System & PG & \SONIC\ rank & Gaussian \(NTRed/NRank\) & Steps & \(E_\mathrm{final}\) / \(E_h\) \\
 \midrule
 Cyclohexane & \(D_{3d}\) & 48/48 & -- & 5 & \(-231.482671171\) \\
 Norbornane & \(C_{2v}\) & 51/51 & -- & 9 & \(-268.893823819\) \\
@@ -1479,7 +1510,7 @@ sequential Z matrix is less efficient.}
 \subsection{Hessian Locality}
 
 Let \(\Fmat_x\) be a Cartesian Hessian at the reference geometry.  For a
-full-rank \NEO\ Wilson matrix \(\Bmat\), the minimum-norm Cartesian
+full-rank \SONIC\ Wilson matrix \(\Bmat\), the minimum-norm Cartesian
 displacement associated with an internal displacement is
 \[
   \Delta \x = \Bmat^T(\Bmat\Bmat^T)^{-1}\Delta\q ,
@@ -1501,7 +1532,7 @@ then compares off-diagonal structure without mixing units.
 Figure~\ref{fig:hessian-heatmap} shows an illustrative result for cyclobutane.  In an
 orthonormal Cartesian vibrational basis the normalized Hessian is broadly
 coupled, with a mean off-diagonal value of 0.151 and a 95th percentile of
-0.394.  In the frozen \NEO\ basis these values fall to 0.028 and 0.085.  In
+0.394.  In the frozen \SONIC\ basis these values fall to 0.028 and 0.085.  In
 the symmetry-adapted contract they fall further to 0.013 and 0.056.  These
 numbers are single-calculation diagnostics, not quantified robustness estimates
 over geometry or method variations.  In this case, a chemically labelled basis
@@ -1510,11 +1541,11 @@ normal-mode diagonalization is applied.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figures/neo_hessian_heatmap.png}
+\includegraphics[width=\linewidth]{figures/sonic_hessian_heatmap.png}
 \caption{Normalized off-diagonal Hessian coupling for cyclobutane
 (Gaussian 16 HF/STO-3G).  The same Cartesian Hessian is represented in an
-orthonormal Cartesian vibrational basis, in the frozen \NEO\ basis and in the
-symmetry-adapted \NEO\ basis.  The diagonal is suppressed so that residual
+orthonormal Cartesian vibrational basis, in the frozen \SONIC\ basis and in the
+symmetry-adapted \SONIC\ basis.  The diagonal is suppressed so that residual
 coordinate coupling is visible.}
 \label{fig:hessian-heatmap}
 \end{figure}
@@ -1522,7 +1553,7 @@ coordinate coupling is visible.}
 \subsection{GF/PED Family Scaling Probe}
 
 A Wilson GF/PED calculation is the most direct spectroscopic test of whether the
-coordinate families produced by \NEO\ remain chemically readable after
+coordinate families produced by \SONIC\ remain chemically readable after
 projection.  In scaled-quantum-mechanical force-field work, force constants are
 often adjusted by coordinate class rather than by individual normal
 modes.\cite{RauhutPulay1995,BakerJarzeckiPulay1998,BaroneBiczyskoBloino2014}
@@ -1530,7 +1561,7 @@ That operation is only transparent when the coordinate blocks keep stretches,
 bends, torsions and ring-puckering coordinates separated.
 
 The add-on test uses cyclohexanol at B3LYP/6-31G(d), with standard
-\texttt{Opt Freq NoSymm} and no out-of-plane GIC terms.  \NEO\ supplies the
+\texttt{Opt Freq NoSymm} and no out-of-plane GIC terms.  \SONIC\ supplies the
 stored definition and sparse \(\Bmat\) rows; the GF layer then applies
 family-level Pulay-style scale factors to the internal force field and reports
 PED percentages by source family.  The basis has rank \(51/51\).  The
@@ -1547,7 +1578,7 @@ factor.
 \centering
 \caption{Representative B3LYP/6-31G(d) GF/PED scaling probe for
 cyclohexanol.  Frequencies are in cm\(^{-1}\).  PED entries are summed over
-\NEO\ coordinate families and rounded to one decimal percent.}
+\SONIC\ coordinate families and rounded to one decimal percent.}
 \label{tab:gf-ped-scaling}
 \begin{tabular}{@{}p{0.24\linewidth}ccp{0.42\linewidth}@{}}
 \toprule
@@ -1567,7 +1598,7 @@ separation: the torsion block gives 270.542~cm\(^{-1}\), while the three
 ring-puckering rows give 224.217, 417.617 and 473.078~cm\(^{-1}\).  The active
 DVR candidate is the \(RPck0003\) row at 225.084~cm\(^{-1}\).  This is the
 spectroscopic counterpart of the construction principle: scaling classes are
-assigned to \NEO\ family labels such as \texttt{Stre0012}, \texttt{RPck0002}
+assigned to \SONIC\ family labels such as \texttt{Stre0012}, \texttt{RPck0002}
 or \texttt{RDef0026}, not to handwritten normal-mode descriptions.
 
 \subsection{Ring Puckering Branch}
@@ -1585,13 +1616,13 @@ fixed branch is near \(q=0.04\)~\AA, matching the optimized reference
 geometry.  Larger puckering displacements raise the energy smoothly.  In a DVR
 or PES-fitting application, the same base coordinate could be replaced by a
 Cremer--Pople amplitude or phase function \(y=f(\q)\), while the analytic
-chain-rule row would still descend from the frozen \NEO\ \(\Bmat\).
+chain-rule row would still descend from the frozen \SONIC\ \(\Bmat\).
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.68\linewidth]{figures/neo_puckering_scan.png}
+\includegraphics[width=0.68\linewidth]{figures/sonic_puckering_scan.png}
 \caption{Fixed-frame cyclobutane puckering branch generated from the frozen
-\NEO\ ring coordinate and evaluated with Gaussian 16 HF/STO-3G single-point
+\SONIC\ ring coordinate and evaluated with Gaussian 16 HF/STO-3G single-point
 energies.  The branch is a coordinate diagnostic, not a relaxed conformational
 energy profile.}
 \label{fig:puckering-scan}
@@ -1603,7 +1634,7 @@ The final probe tests a stricter export question, using the same cyclohexane
 ring-flip motif discussed in the Gaussian GIC paper and its Supporting
 Information.  There, the puckering coordinate is encoded by an explicit
 molecule-specific input block containing variables such as \texttt{Gcyc},
-\texttt{Ccyc} and \texttt{Scn0}.  Here no such block is provided.  \NEO\ starts
+\texttt{Ccyc} and \texttt{Scn0}.  Here no such block is provided.  \SONIC\ starts
 from the molecular graph and geometry, generates the ring-puckering path,
 and then constructs a fixed-frame cyclohexane puckering path from the chair
 \(q_3\) component to the boat \(q_2\) component.  For each point it generated
@@ -1620,7 +1651,7 @@ that the two energy traces are numerically identical: the largest
 Cartesian--\texttt{ReadAllGIC} difference is \(3.0\times10^{-3}\,\mu E_h\),
 about \(8\times10^{-6}\)~kJ~mol\(^{-1}\).  The large rise along the path is not
 a chair--boat barrier; it is the expected cost of an unrelaxed fixed-frame
-puckering deformation.  The result instead shows that the same \NEO{}-generated
+puckering deformation.  The result instead shows that the same \SONIC{}-generated
 large-amplitude coordinate path can be exported either as ordinary Cartesians or
 as an automatically generated Gaussian GIC model without changing the electronic
 energy surface being sampled.
@@ -1632,7 +1663,7 @@ the B3LYP/6-31+G* Gaussian check.  The absolute energies differ slightly
 between codes, as expected from independent DFT implementations and defaults,
 but the relative fixed-frame puckering profile is the same at the level needed
 for this export test (Table~\ref{tab:external-codes}).  This verifies the
-intended division of labor: \NEO\ constructs the model and coordinates, while
+intended division of labor: \SONIC\ constructs the model and coordinates, while
 external electronic-structure programs consume the resulting Cartesian
 geometries or GIC serializations.  It confirms that the coordinate definition is
 independent of the electronic-structure implementation.
@@ -1641,7 +1672,7 @@ independent of the electronic-structure implementation.
 \centering
 \caption{Portable cyclohexane puckering coordinates evaluated by non-Gaussian
 codes on a local workstation.  Energies are PBE0/def2-SVP single points on the same
-\NEO{}-generated Cartesian geometries; relative energies are in kJ mol\(^{-1}\)
+\SONIC{}-generated Cartesian geometries; relative energies are in kJ mol\(^{-1}\)
 with respect to \(p00\).}
 \label{tab:external-codes}
 \begin{tabular}{lrrrr}
@@ -1660,7 +1691,7 @@ Point & ORCA \(E_h\) & ORCA \(\Delta E\) & Molpro \(E_h\) & Molpro \(\Delta E\) 
 \includegraphics[width=0.78\linewidth]{figures/cyclohexane_puckering_equivalence.png}
 \caption{Cyclohexane fixed-frame chair-to-boat puckering export test
 (Gaussian B3LYP/6-31+G*).  The upper panel compares the same five geometries
-evaluated from portable Cartesian inputs and from \NEO{}-generated
+evaluated from portable Cartesian inputs and from \SONIC{}-generated
 \texttt{ReadAllGIC} inputs.  The lower panel gives the energy difference in
 microhartree.}
 \label{fig:cyclohexane-puckering-equivalence}
@@ -1668,7 +1699,7 @@ microhartree.}
 
 \section{Discussion}
 
-\NEO\ can be viewed as a constructive generalization of natural internal
+\SONIC\ can be viewed as a constructive generalization of natural internal
 coordinates.  Its novelty is not the use of Wilson rows, SVD, Gram--Schmidt or
 SALC projectors separately, but the deterministic protocol that combines them
 while respecting locality, symmetry, semantic priority, protected coordinates,
@@ -1705,10 +1736,10 @@ natural-coordinate program.  Table~\ref{tab:frisch-si} addresses the more
 external-facing question raised by the Gaussian GIC Supporting Information: can
 the same kinds of chemically specialized variables be generated without
 hand-writing molecule-specific GIC expressions?  Gaussian supplies a powerful
-expression and derivative language; \NEO\ supplies automatic construction,
+expression and derivative language; \SONIC\ supplies automatic construction,
 semantic interning of generated coordinates, sparse derivative propagation and
 frozen provenance.  In this sense, GIC syntax is a serialization and solver
-interface for \NEO, not a competing coordinate-generation theory.  The
+interface for \SONIC, not a competing coordinate-generation theory.  The
 cyclohexane check makes this distinction concrete: the Gaussian-style puckering
 model is available to the external solver, but its coordinate definitions are
 not typed by hand.
@@ -1828,7 +1859,7 @@ pseudo-cycle rows under geometry changes.
 \subsection{Scope and Limitations}
 \label{sec:scope-limitations}
 
-\NEO\ is intended for high-accuracy quantum-chemical, spectroscopic and
+\SONIC\ is intended for high-accuracy quantum-chemical, spectroscopic and
 refinement workflows in which the coordinate model carries chemical information
 and must be reused across modules.  It is not designed as a large-scale
 thousand-atom molecular-dynamics coordinate generator, a generic classical
@@ -1927,11 +1958,10 @@ consumers are discussed only as downstream uses of the coordinate definition.
 
 \section*{Acknowledgments}
 
-The author acknowledges the broader \ORACLE\ development environment used to
-test the coordinate definitions, the Gaussian GIC work that motivated the
-distinction between coordinate-description languages and automatic generation,
-and the ring-reconstruction work of Lema-Saavedra and Fern{\'a}ndez-Ramos that
-clarified how puckering coordinates connect to closed molecular geometries.
+The author acknowledges the Gaussian GIC work that motivated the distinction
+between coordinate-description languages and automatic generation, and the
+ring-reconstruction work of Lema-Saavedra and Fern{\'a}ndez-Ramos that clarified
+how puckering coordinates connect to closed molecular geometries.
 
 \bibliography{references}
 
