@@ -93,6 +93,52 @@
           "final_energy_hartree": -148.76488266
         }
       ]
+    },
+    {
+      "name": "camphor",
+      "source": "camphor.inp",
+      "zmatrix_source": null,
+      "point_group": "C1",
+      "sonic_rank": 75,
+      "target_rank": 75,
+      "modes": [
+        {
+          "mode": "default",
+          "normal_termination": false,
+          "stationary_point": false,
+          "optimization_completed": false,
+          "steps": null,
+          "scf_cycles": 0,
+          "final_energy_hartree": null
+        },
+        {
+          "mode": "cartesian",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 14,
+          "scf_cycles": 14,
+          "final_energy_hartree": -457.283643077
+        },
+        {
+          "mode": "zmatrix",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 30,
+          "scf_cycles": 30,
+          "final_energy_hartree": -457.283642908
+        },
+        {
+          "mode": "sonic",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 8,
+          "scf_cycles": 8,
+          "final_energy_hartree": -457.283643058
+        }
+      ]
     }
   ]
 }

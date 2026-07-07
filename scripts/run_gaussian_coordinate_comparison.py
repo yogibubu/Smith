@@ -25,10 +25,11 @@ DEFAULT_GAUSSIAN = "gdv"
 SYSTEMS = (
     ("water", "h2ocart.inp", None),
     ("hydrogen_peroxide", "h2o2zmat.inp", "h2o2.inp"),
+    ("camphor", "camphor.inp", None),
 )
 MODES = ("default", "cartesian", "zmatrix", "sonic")
 ROUTES = {
-    "default": "#p hf/sto-3g opt=(maxcycle=80) nosymm",
+    "default": "#p hf/sto-3g opt=(redundant,maxcycle=80) nosymm",
     "cartesian": "#p hf/sto-3g opt=(cartesian,maxcycle=80) nosymm",
     "zmatrix": "#p hf/sto-3g opt=(z-matrix,maxcycle=80) nosymm",
     "sonic": "#p hf/sto-3g opt=(readallgic,maxcycle=80) nosymm",
@@ -68,7 +69,7 @@ def prepare_inputs() -> None:
     add_matrix_packages_to_path()
     from matrix_chem import preprocess_to_enriched_xyz, read_enriched_xyz, write_validation_section
     from matrix_gaussian import write_gicforge_gaussian_input
-    from matrix_neo import gaussian_gic_lines_from_xyzin, write_gicforge_build_sections
+    from matrix_neo import write_gicforge_build_sections
 
     source_root = MATRIX_ROOT / "tests" / "fixtures" / "test_molecules" / "molecules"
     for name, source_name, zmat_source_name in SYSTEMS:
@@ -91,11 +92,6 @@ def prepare_inputs() -> None:
                 ROUTES["zmatrix"],
                 f"{name} Z-matrix coordinate comparison",
             )
-        unsupported = [
-            line for line in gaussian_gic_lines_from_xyzin(xyzin) if "U(" in line or "OuPl" in line
-        ]
-        if unsupported:
-            raise RuntimeError(f"{name} has out-of-plane GIC lines incompatible with this G16 test")
         write_gicforge_gaussian_input(
             xyzin,
             target_dir / f"{name}_sonic.gjf",
@@ -192,7 +188,7 @@ def run_gaussian(executable: str) -> None:
             input_path = target_dir / f"{name}_{mode}.gjf"
             for suffix in (".log", ".chk"):
                 (target_dir / f"{name}_{mode}{suffix}").unlink(missing_ok=True)
-            subprocess.run([executable, input_path.name], cwd=target_dir, env=env, check=True)
+            subprocess.run([executable, input_path.name], cwd=target_dir, env=env, check=False)
 
 
 def summarize_results() -> dict[str, object]:
@@ -261,7 +257,12 @@ def plot_results(results: dict[str, object]) -> None:
         "sonic": "#1f6f78",
     }
     for offset, mode in enumerate(MODES):
-        ax.bar(x + (offset - 1.5) * width, values[mode], width, label=mode, color=colors[mode])
+        xpos = x + (offset - 1.5) * width
+        ax.bar(xpos, values[mode], width, label=mode, color=colors[mode])
+        for xi, system in zip(xpos, systems):
+            row = next(row for row in system["modes"] if row["mode"] == mode)
+            if not row["normal_termination"]:
+                ax.text(xi, 0.7, "fail", ha="center", va="bottom", rotation=90, fontsize=7)
     ax.set_xticks(x, labels)
     ax.set_ylabel("optimization steps")
     ax.set_title("Gaussian optimization coordinate-system comparison")

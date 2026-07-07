@@ -56,7 +56,7 @@ fragments.
 
 We present \SONIC\ (Symmetry-Oriented Natural Internal Coordinates) as a general
 construction of non-redundant, symmetry-adapted generalized internal
-coordinates.  The \TheONE\ implementation starts
+coordinates.  \TheONE\ starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
 point-group operations, fragments and optional interaction centers.  It then
 builds chemically typed primitive families, protects special coordinates for
@@ -325,13 +325,22 @@ rings, point-group operations, optional fragments, optional interaction centers
 and continuous chemical perception descriptors.  If those data are already
 present in the \texttt{xyzin} file, \SONIC\ consumes them as part of the frozen
 state; otherwise the standalone builder constructs the missing topology,
-synthon and symmetry sections from Cartesian coordinates using the bundled
-MATRIX tools.
+synthon and symmetry sections from Cartesian coordinates using bundled
+perception tools.
 The output is a frozen \(\#\)GIC definition: primitive coordinate records,
 final generalized coordinates, coefficients, family labels, irreducible
 representations, total-symmetric subsets and the metadata required to
 reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
 they do not rebuild topology, ring sets or coordinate rows.
+
+For standalone use the same information can be supplied in a single
+\TheONE\ TOML input file with schema \texttt{matrix.the\_one.input.v1}.  The file
+contains one \texttt{[geometry]} table, either as an external coordinate path or
+as inline Cartesian coordinates, and one options table controlling
+symmetrization, \texttt{SYCART} export, fragment treatment, X--H policies,
+improper-dihedral compatibility and an optional reduced working subgroup.
+Thus a distributable input is one file with coordinates and construction
+options, while the generated \texttt{xyzin} remains the frozen audited state.
 
 The ORACLE name is used in the broader development environment, but the present
 coordinate engine is not tied to an ORACLE executable.  The perception layer
@@ -639,10 +648,11 @@ interpretation, but the active coordinate basis stores linear \(RPck\) rows
 because their \(\Bmat\) rows are analytic linear combinations of dihedral
 derivatives.\cite{CremerPople1975}
 
-The coefficient pattern follows the natural-coordinate construction used by
-Pulay and co-workers for ring deformations.  If \(s_j\) denotes a cyclic source
-list, such as the endocyclic valence angles or a torsional puckering list, the
-stored rows are real Fourier-like combinations
+The ring rows are a constructive extension of the natural-coordinate principle
+to cyclic source lists rather than a direct quotation of a published
+molecule-specific formula.  If \(s_j\) denotes such a list, for example the
+endocyclic valence angles or a torsional puckering list, the stored rows are
+real Fourier-like combinations
 \[
   Q_m^c = N_m\sum_{j=1}^{n} s_j\cos\frac{2\pi m(j-1)}{n},\qquad
   Q_m^s = N_m\sum_{j=1}^{n} s_j\sin\frac{2\pi m(j-1)}{n},
@@ -1265,6 +1275,10 @@ ring-puckering block \(\mathrm{A}_{1g}RPck001+\mathrm{E}_uRPck001/002\) &
 No hand-written \texttt{Gcyc}, \texttt{Ccyc} or \texttt{Scn0} input is supplied;
 the model closes rank \(48/48\) and exports a Gaussian-readable puckering
 model. \\
+Reduced path subgroup & Same cyclohexane source state rebuilt with a requested
+\(C_1\) working subgroup & The rank remains \(48/48\), while labels and
+totally symmetric export are computed in the reduced group; this is the
+intended path mode when a scan leaves the high-symmetry stratum. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1317,8 +1331,10 @@ Cubane & \(O_h\) & 42/42 & 42/42 & 3 & \(-303.781399977\) \\
 \end{table}
 
 The same export path was then compared directly with three standard Gaussian
-optimization choices on two small systems for which a hand Z matrix is
-available or unambiguous.  These calculations are not a benchmark of electronic
+optimization choices.  Two very small systems verify that no special handling
+is needed when the coordinate problem is simple; camphor adds a larger
+bridged-ring case with 75 vibrational degrees of freedom.  These calculations
+are not a benchmark of electronic
 structure theory or a claim that one coordinate choice always minimizes the
 iteration count.  They test the narrower point that \TheONE\ can generate a
 Gaussian-readable \SONIC\ coordinate model without manual GIC transcription and
@@ -1326,16 +1342,21 @@ that Gaussian can use it with the same convergence behavior as built-in
 coordinate choices.  At HF/STO-3G, water converges in four steps with default,
 Cartesian, hand Z-matrix and \SONIC\ \texttt{ReadAllGIC} coordinates.  Hydrogen
 peroxide converges in six steps with Gaussian default, Cartesian and \SONIC\
-coordinates and in five steps with the hand Z matrix.
+coordinates and in five steps with the hand Z matrix.  For camphor the
+automatically generated \SONIC\ block converges in eight steps, compared with
+14 Cartesian steps and 30 steps for a sequential Z matrix; the Gaussian DV
+redundant-internal default did not complete from this generated Cartesian input
+in the present run.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.72\linewidth]{figures/gaussian_coordinate_comparison.png}
 \caption{Gaussian DV HF/STO-3G optimization-step comparison for built-in
 Gaussian coordinates and automatically generated \SONIC\ \texttt{ReadAllGIC}
-coordinates.  The water and hydrogen-peroxide tests are deliberately small:
-their role is to verify solver consumption and input portability, not to rank
-coordinate strategies statistically.}
+coordinates.  Failed/non-completed runs are marked at the baseline.  The
+water and hydrogen-peroxide tests verify solver consumption and input
+portability; camphor probes a larger bridged-ring case where a naive Z matrix
+is much less efficient.}
 \label{fig:gaussian-coordinate-comparison}
 \end{figure}
 
