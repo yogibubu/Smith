@@ -21,18 +21,19 @@ MATRIX_ROOT = Path("/Users/vincenzobarone/Documents/git/software/matrix")
 RUN_DIR = ROOT / "calculations" / "coordinate_comparison"
 DATA = ROOT / "data" / "gaussian_coordinate_comparison.json"
 FIGURE = ROOT / "figures" / "gaussian_coordinate_comparison.png"
-DEFAULT_GAUSSIAN = "gdv"
+DEFAULT_GAUSSIAN = "g16"
 SYSTEMS = (
     ("water", "h2ocart.inp", None),
     ("hydrogen_peroxide", "h2o2zmat.inp", "h2o2.inp"),
     ("camphor", "camphor.inp", None),
+    ("norbornane", "norbornane.inp", None),
 )
 MODES = ("default", "cartesian", "zmatrix", "sonic")
 ROUTES = {
-    "default": "#p hf/sto-3g opt=(redundant,maxcycle=80) nosymm",
-    "cartesian": "#p hf/sto-3g opt=(cartesian,maxcycle=80) nosymm",
-    "zmatrix": "#p hf/sto-3g opt=(z-matrix,maxcycle=80) nosymm",
-    "sonic": "#p hf/sto-3g opt=(readallgic,maxcycle=80) nosymm",
+    "default": "#p hf/sto-3g opt=(redundant,maxcycle=80)",
+    "cartesian": "#p hf/sto-3g opt=(cartesian,maxcycle=80)",
+    "zmatrix": "#p hf/sto-3g opt=(z-matrix,maxcycle=80)",
+    "sonic": "#p hf/sto-3g opt=(readallgic,maxcycle=80)",
 }
 SCF_RE = re.compile(r"SCF Done:\s+E\([^)]+\)\s+=\s+([-+0-9.Ee]+)")
 STEP_RE = re.compile(r"Step number\s+(\d+)\s+out of a maximum")
@@ -49,6 +50,8 @@ def main() -> None:
 
     if args.prepare or args.run:
         prepare_inputs()
+    if args.prepare and not args.run:
+        return
     if args.run:
         run_gaussian(args.gaussian)
     results = summarize_results()
@@ -79,7 +82,7 @@ def prepare_inputs() -> None:
         xyzin = target_dir / f"{name}.xyzin"
         preprocess_to_enriched_xyz(source, xyzin)
         write_validation_section(xyzin)
-        write_gicforge_build_sections(xyzin, symmetrize=False)
+        write_gicforge_build_sections(xyzin, symmetrize=False, improper_dihedrals=True)
         geometry = read_enriched_xyz(xyzin)
         write_cartesian_input(target_dir / f"{name}_default.gjf", geometry, ROUTES["default"])
         write_cartesian_input(target_dir / f"{name}_cartesian.gjf", geometry, ROUTES["cartesian"])
@@ -216,7 +219,7 @@ def summarize_results() -> dict[str, object]:
         )
     return {
         "method": "Gaussian coordinate-system optimization comparison",
-        "electronic_structure": "HF/STO-3G",
+        "electronic_structure": "Gaussian 16 HF/STO-3G",
         "systems": systems,
     }
 

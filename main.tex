@@ -14,7 +14,7 @@
 
 \newcommand{\SONIC}{SONIC}
 \newcommand{\NEO}{\SONIC}
-\newcommand{\TheONE}{\textsc{The\_ONE}}
+\newcommand{\SMITH}{\textsc{SMITH}}
 \newcommand{\ORACLE}{ORACLE}
 \newcommand{\GIC}{GIC}
 \newcommand{\Bmat}{\mathbf{B}}
@@ -56,7 +56,7 @@ fragments.
 
 We present \SONIC\ (Symmetry-Oriented Natural Internal Coordinates) as a general
 construction of non-redundant, symmetry-adapted generalized internal
-coordinates.  \TheONE\ starts
+coordinates.  \SMITH\ starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
 point-group operations, fragments and optional interaction centers.  It then
 builds chemically typed primitive families, protects special coordinates for
@@ -101,7 +101,7 @@ metal or high-coordination environments.
 
 \SONIC\ is designed to make this choice explicit and reproducible.  Table~\ref{tab:framework-roles}
 defines the workflow names used below.  The essential separation is that
-\TheONE\ is the standalone tool that constructs \SONIC\ contracts, while
+\SMITH\ is the standalone tool that constructs \SONIC\ contracts, while
 \SONIC\ is the coordinate family: the non-redundant generalized
 internal-coordinate basis, analytic
 Wilson matrix and symmetry labels; downstream modules choose how those
@@ -120,7 +120,7 @@ symmetry and synthon sections from the \texttt{xyzin} file or constructs them
 from Cartesian coordinates with bundled perception tools.  The
 continuous molecular perception follows the ideas introduced in Proxima and in
 previous templating-synthon work.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
-\TheONE{}--\SONIC & Coordinate-construction tool and its coordinate
+\SMITH{}--\SONIC & Coordinate-construction tool and its coordinate
 contract: \GIC\ construction, symmetry-adapted
 Cartesian reference spaces, analytic \(\Bmat\) rows, symmetry labels and
 provenance. \\
@@ -175,7 +175,7 @@ coordinate persistence but is not validated in this paper. \\
 \foreach \target in {gf,opt,dvr,refine,ff}
   \draw[arrow] (contract.south) |- (\target.north);
 \end{tikzpicture}
-\caption{Constructive workflow implemented by \TheONE\ for \SONIC\ coordinates.
+\caption{Constructive workflow implemented by \SMITH\ for \SONIC\ coordinates.
 The model-building stage
 ends at the frozen coordinate contract; downstream modules reuse that object
 and update only the numerical quantities required for their task, such as
@@ -204,7 +204,7 @@ Gaussian-readable GICs or consumed directly by downstream modules.
 established nuclear-electronic-orbital usage of that acronym.  The new name
 also states the intended object more directly: natural internal-coordinate
 families made usable in symmetry-adapted, automatically constructed GIC
-contracts.  The standalone command-line tool is named \TheONE; legacy
+contracts.  The standalone command-line tool is named \SMITH\ (Symmetry-Mapped Internal-coordinate Template Handler); legacy
 \texttt{neo} and \texttt{gicforge} command aliases are kept only for
 reproducibility of older inputs.  Symmetry is used in the classical molecular sense: point-group
 operations map coordinate rows into the same space with the corresponding atom
@@ -334,13 +334,14 @@ reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
 they do not rebuild topology, ring sets or coordinate rows.
 
 For standalone use the same information can be supplied in a single
-\TheONE\ TOML input file with schema \texttt{matrix.the\_one.input.v1}.  The file
-contains one \texttt{[geometry]} table, either as an external coordinate path or
-as inline Cartesian coordinates, and one options table controlling
-symmetrization, \texttt{SYCART} export, fragment treatment, X--H policies,
-improper-dihedral compatibility and an optional reduced working subgroup.
-Thus a distributable input is one file with coordinates and construction
-options, while the generated \texttt{xyzin} remains the frozen audited state.
+\SMITH\ extended-XYZ input file with schema \texttt{matrix.smith.input.v1}.  The file begins as a standard XYZ block: atom count, comment line and Cartesian
+coordinates.  Optional SMITH directives follow after the atom list, so the same
+file can still be opened by ordinary XYZ viewers while carrying construction
+options such as symmetrization, \texttt{SYCART} export, fragment treatment,
+X--H policies, improper-dihedral compatibility and an optional reduced working
+subgroup.  Thus a distributable input is one text file with coordinates and
+construction options, while the generated \texttt{xyzin} remains the frozen
+audited state.
 
 The ORACLE name is used in the broader development environment, but the present
 coordinate engine is not tied to an ORACLE executable.  The perception layer
@@ -1289,7 +1290,7 @@ The preceding tests establish rank closure and
 preserves its symmetry labels.  The compact application probes ask a different
 question: whether the same frozen coordinate object gives a physically useful
 representation for force constants and ring deformation.  They are deliberately
-small Gaussian DV calculations, because their role is to test the coordinate
+small Gaussian calculations, because their role is to test the coordinate
 representation under external electronic-structure consumption.
 
 \subsection{Gaussian ReadAllGIC Optimization}
@@ -1303,60 +1304,72 @@ systems in Table~\ref{tab:readallgic-opt} were chosen because their
 \NEO\ definitions contain only stretches, bends, dihedrals and linear
 combinations of those primitives, with no out-of-plane coordinates.  The same
 inputs are therefore compatible with standard Gaussian \texttt{ReadAllGIC}
-usage; the calculations reported here used Gaussian DV at HF/STO-3G.
+usage; the calculations reported here used Gaussian 16 at HF/STO-3G.
 
 The relevant observations are that Gaussian accepts the
 automatically generated coordinate block, reports \(NTRed=NRank\) equal to the
 \NEO\ rank at every optimization step, and reaches a stationary point in three
-to five steps for saturated ring and cage systems with different symmetry and
+three to nine steps for saturated ring and cage systems with different symmetry and
 rank.
 
 \begin{table}[htbp]
 \centering
 \caption{Gaussian \texttt{ReadAllGIC} optimizations using \NEO{}-generated
 coordinate definitions.  The route was HF/STO-3G
-\texttt{Opt=(ReadAllGIC,MaxCycle=80) NoSymm}.  The equality
-\(NTRed=NRank\) is the Gaussian-side rank reported for the GIC coordinate
-space.}
+\texttt{Opt=(ReadAllGIC,MaxCycle=80) NoSymm}.  Gaussian 16 does not print the
+same \(NTRed/NRank\) diagnostic in these logs, so the Gaussian-rank column is
+left blank.}
 \label{tab:readallgic-opt}
 \begin{tabular}{lccccc}
 \toprule
 System & PG & \NEO\ rank & Gaussian \(NTRed/NRank\) & Steps & \(E_\mathrm{final}\) / \(E_h\) \\
 \midrule
-Cyclohexane & \(D_{3d}\) & 48/48 & 48/48 & 4 & \(-231.482671557\) \\
-Norbornane & \(C_{2v}\) & 51/51 & 51/51 & 5 & \(-268.893823835\) \\
-Cubane & \(O_h\) & 42/42 & 42/42 & 3 & \(-303.781399977\) \\
+Cyclohexane & \(D_{3d}\) & 48/48 & -- & 5 & \(-231.482671171\) \\
+Norbornane & \(C_{2v}\) & 51/51 & -- & 9 & \(-268.893823819\) \\
+Cubane & \(O_h\) & 42/42 & -- & 3 & \(-303.781399977\) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+A symmetry-enabled variant was run for norbornane without \texttt{NoSymm}.  The
+Gaussian input contains the full rank-complete \SONIC\ block required by
+\texttt{ReadAllGIC}, but all non-totally symmetric rows are marked
+\texttt{Frozen}.  Thus only the 15 \(A_1\) coordinates are active while the
+remaining rows define the redundant-to-nonredundant transformation.  Gaussian
+16 accepts this input and reaches a \(C_{2v}\)-preserving stationary point in
+eight steps.
+
 The same export path was then compared directly with three standard Gaussian
 optimization choices.  Two very small systems verify that no special handling
-is needed when the coordinate problem is simple; camphor adds a larger
-bridged-ring case with 75 vibrational degrees of freedom.  These calculations
+is needed when the coordinate problem is simple; norbornane and camphor add
+larger bridged-ring cases, with camphor reaching 75 vibrational degrees of
+freedom.  These calculations
 are not a benchmark of electronic
 structure theory or a claim that one coordinate choice always minimizes the
-iteration count.  They test the narrower point that \TheONE\ can generate a
+iteration count.  They test the narrower point that \SMITH\ can generate a
 Gaussian-readable \SONIC\ coordinate model without manual GIC transcription and
 that Gaussian can use it with the same convergence behavior as built-in
-coordinate choices.  At HF/STO-3G, water converges in four steps with default,
-Cartesian, hand Z-matrix and \SONIC\ \texttt{ReadAllGIC} coordinates.  Hydrogen
-peroxide converges in six steps with Gaussian default, Cartesian and \SONIC\
-coordinates and in five steps with the hand Z matrix.  For camphor the
-automatically generated \SONIC\ block converges in eight steps, compared with
-14 Cartesian steps and 30 steps for a sequential Z matrix; the Gaussian DV
-redundant-internal default did not complete from this generated Cartesian input
-in the present run.
+coordinate choices.  At HF/STO-3G, water and hydrogen peroxide give essentially
+the same iteration counts across the tested coordinate choices.  Norbornane
+converges in four steps with Gaussian redundant internals and Cartesians, six
+steps with a sequential Z matrix and nine steps with the automatically
+generated \SONIC\ block.  Camphor converges in eight steps with Gaussian
+redundant internals, 14 Cartesian steps, 20 \SONIC\ steps and 33 steps for a
+sequential Z matrix.  The point of this diagnostic is therefore not that
+\SONIC\ is always the shortest optimizer path in Gaussian, but that the
+automatic generated GIC block is accepted by the commercial Gaussian
+\texttt{ReadAllGIC} parser and remains competitive while carrying a much more
+explicit coordinate contract.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.72\linewidth]{figures/gaussian_coordinate_comparison.png}
-\caption{Gaussian DV HF/STO-3G optimization-step comparison for built-in
+\caption{Gaussian 16 HF/STO-3G optimization-step comparison for built-in
 Gaussian coordinates and automatically generated \SONIC\ \texttt{ReadAllGIC}
 coordinates.  Failed/non-completed runs are marked at the baseline.  The
 water and hydrogen-peroxide tests verify solver consumption and input
-portability; camphor probes a larger bridged-ring case where a naive Z matrix
-is much less efficient.}
+portability; norbornane and camphor probe bridged-ring cases where a naive
+sequential Z matrix is less efficient.}
 \label{fig:gaussian-coordinate-comparison}
 \end{figure}
 
@@ -1396,7 +1409,7 @@ normal-mode diagonalization is applied.
 \centering
 \includegraphics[width=\linewidth]{figures/neo_hessian_heatmap.png}
 \caption{Normalized off-diagonal Hessian coupling for cyclobutane
-(Gaussian DV HF/STO-3G).  The same Cartesian Hessian is represented in an
+(Gaussian 16 HF/STO-3G).  The same Cartesian Hessian is represented in an
 orthonormal Cartesian vibrational basis, in the frozen \NEO\ basis and in the
 symmetry-adapted \NEO\ basis.  The diagonal is suppressed so that residual
 coordinate coupling is visible.}
@@ -1459,7 +1472,7 @@ or \texttt{RDef0026}, not to handwritten normal-mode descriptions.
 This probe uses the same cyclobutane definition to define a one-dimensional
 ring-puckering branch.  The coordinate is the alternating carbon-ring puckering
 amplitude associated with the \(D_{2d}\) ring source block.  Single-point
-Gaussian DV HF/STO-3G energies were evaluated along a fixed substituent-frame
+Gaussian 16 HF/STO-3G energies were evaluated along a fixed substituent-frame
 branch.  This is intentionally not a relaxed conformational profile; it is a
 test that a named puckering coordinate can be used as a reproducible sampling
 axis while the basis retains the same ring-source identity.
@@ -1475,7 +1488,7 @@ chain-rule row would still descend from the frozen \NEO\ \(\Bmat\).
 \centering
 \includegraphics[width=0.68\linewidth]{figures/neo_puckering_scan.png}
 \caption{Fixed-frame cyclobutane puckering branch generated from the frozen
-\NEO\ ring coordinate and evaluated with Gaussian DV HF/STO-3G single-point
+\NEO\ ring coordinate and evaluated with Gaussian 16 HF/STO-3G single-point
 energies.  The branch is a coordinate diagnostic, not a relaxed conformational
 energy profile.}
 \label{fig:puckering-scan}
@@ -1714,10 +1727,11 @@ energies.
 \section*{Reproducibility}
 
 The calculations reported in the validation and application sections were
-generated with the \TheONE\ development tree for \SONIC\ coordinates and
+generated with the \SMITH\ development tree for \SONIC\ coordinates and
 Python 3.13.11.  Gaussian
-jobs used the local Gaussian DV executable documented in the accompanying
-scripts; the method and basis set are stated with each probe.  The reported
+optimization jobs used Gaussian 16; other Gaussian-family probes use the local
+executable documented in the accompanying scripts.  The method and basis set
+are stated with each probe.  The reported
 construction tests use fixed inputs and no stochastic seeds.  The
 Python implementation is checked against a separate Fortran control
 implementation for the corpus rows where that comparison is applicable.
@@ -1725,7 +1739,7 @@ implementation for the corpus rows where that comparison is applicable.
 \section*{Data and Code Availability}
 
 The manuscript repository contains the scripts, JSON data files and figures
-used to generate the tables and application plots.  The \TheONE\ source
+used to generate the tables and application plots.  The \SMITH\ source
 code is under active development as an independently usable package;
 until public release, the code and frozen input/output data are
 available from the author upon reasonable request.

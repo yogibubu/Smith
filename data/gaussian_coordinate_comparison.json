@@ -1,6 +1,6 @@
 {
   "method": "Gaussian coordinate-system optimization comparison",
-  "electronic_structure": "HF/STO-3G",
+  "electronic_structure": "Gaussian 16 HF/STO-3G",
   "systems": [
     {
       "name": "water",
@@ -42,9 +42,9 @@
           "normal_termination": true,
           "stationary_point": true,
           "optimization_completed": true,
-          "steps": 4,
-          "scf_cycles": 4,
-          "final_energy_hartree": -74.96590113
+          "steps": 5,
+          "scf_cycles": 5,
+          "final_energy_hartree": -74.9659012093
         }
       ]
     },
@@ -104,12 +104,12 @@
       "modes": [
         {
           "mode": "default",
-          "normal_termination": false,
-          "stationary_point": false,
-          "optimization_completed": false,
-          "steps": null,
-          "scf_cycles": 0,
-          "final_energy_hartree": null
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 8,
+          "scf_cycles": 8,
+          "final_energy_hartree": -457.283643051
         },
         {
           "mode": "cartesian",
@@ -125,18 +125,64 @@
           "normal_termination": true,
           "stationary_point": true,
           "optimization_completed": true,
-          "steps": 30,
-          "scf_cycles": 30,
-          "final_energy_hartree": -457.283642908
+          "steps": 33,
+          "scf_cycles": 33,
+          "final_energy_hartree": -457.283642925
         },
         {
           "mode": "sonic",
           "normal_termination": true,
           "stationary_point": true,
           "optimization_completed": true,
-          "steps": 8,
-          "scf_cycles": 8,
-          "final_energy_hartree": -457.283643058
+          "steps": 20,
+          "scf_cycles": 20,
+          "final_energy_hartree": -457.283636718
+        }
+      ]
+    },
+    {
+      "name": "norbornane",
+      "source": "norbornane.inp",
+      "zmatrix_source": null,
+      "point_group": "C2v",
+      "sonic_rank": 51,
+      "target_rank": 51,
+      "modes": [
+        {
+          "mode": "default",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 4,
+          "scf_cycles": 4,
+          "final_energy_hartree": -268.893822036
+        },
+        {
+          "mode": "cartesian",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 4,
+          "scf_cycles": 4,
+          "final_energy_hartree": -268.893822909
+        },
+        {
+          "mode": "zmatrix",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 6,
+          "scf_cycles": 6,
+          "final_energy_hartree": -268.893823652
+        },
+        {
+          "mode": "sonic",
+          "normal_termination": true,
+          "stationary_point": true,
+          "optimization_completed": true,
+          "steps": 9,
+          "scf_cycles": 9,
+          "final_energy_hartree": -268.89382382
         }
       ]
     }

@@ -1,5 +1,5 @@
 {
-  "method": "Gaussian ReadAllGIC optimization with NEO-generated coordinates",
+  "method": "Gaussian 16 ReadAllGIC optimization with SONIC-generated coordinates",
   "electronic_structure": "HF/STO-3G",
   "route": "#p hf/sto-3g opt=(readallgic,maxcycle=80) nosymm output=pickett",
   "out_of_plane_gics": false,
@@ -8,100 +8,83 @@
       "name": "cyclohexane",
       "source": "cyclohexane.inp",
       "point_group": "D3d",
-      "neo_rank": 48,
+      "sonic_rank": 48,
       "target_rank": 48,
       "gaussian_gic_count": 48,
+      "active_total_symmetric_gic_count": null,
       "contains_out_of_plane": false,
+      "total_symmetric_only": false,
+      "symmetry_enabled": false,
+      "route": null,
       "normal_termination": true,
       "stationary_point": true,
       "optimization_completed": true,
-      "steps": 4,
-      "final_energy_hartree": -231.482671557,
-      "rank_pairs": [
-        [
-          48,
-          48
-        ],
-        [
-          48,
-          48
-        ],
-        [
-          48,
-          48
-        ],
-        [
-          48,
-          48
-        ]
-      ],
-      "minimum_eig_small": 0.050588
+      "steps": 5,
+      "final_energy_hartree": -231.482671171,
+      "rank_pairs": [],
+      "minimum_eig_small": null
     },
     {
       "name": "norbornane",
       "source": "norbornane.inp",
       "point_group": "C2v",
-      "neo_rank": 51,
+      "sonic_rank": 51,
       "target_rank": 51,
       "gaussian_gic_count": 51,
+      "active_total_symmetric_gic_count": null,
       "contains_out_of_plane": false,
+      "total_symmetric_only": false,
+      "symmetry_enabled": false,
+      "route": null,
       "normal_termination": true,
       "stationary_point": true,
       "optimization_completed": true,
-      "steps": 5,
-      "final_energy_hartree": -268.893823835,
-      "rank_pairs": [
-        [
-          51,
-          51
-        ],
-        [
-          51,
-          51
-        ],
-        [
-          51,
-          51
-        ],
-        [
-          51,
-          51
-        ],
-        [
-          51,
-          51
-        ]
-      ],
-      "minimum_eig_small": 0.00087637
+      "steps": 9,
+      "final_energy_hartree": -268.893823819,
+      "rank_pairs": [],
+      "minimum_eig_small": null
     },
     {
       "name": "cubane",
       "source": "cubane.inp",
       "point_group": "Oh",
-      "neo_rank": 42,
+      "sonic_rank": 42,
       "target_rank": 42,
       "gaussian_gic_count": 42,
+      "active_total_symmetric_gic_count": null,
       "contains_out_of_plane": false,
+      "total_symmetric_only": false,
+      "symmetry_enabled": false,
+      "route": null,
       "normal_termination": true,
       "stationary_point": true,
       "optimization_completed": true,
       "steps": 3,
       "final_energy_hartree": -303.781399977,
-      "rank_pairs": [
-        [
-          42,
-          42
-        ],
-        [
-          42,
-          42
-        ],
-        [
-          42,
-          42
-        ]
-      ],
-      "minimum_eig_small": 0.019093
+      "rank_pairs": [],
+      "minimum_eig_small": null
+    }
+  ],
+  "total_symmetric_probe": [
+    {
+      "name": "norbornane",
+      "source": "norbornane.inp",
+      "point_group": "C2v",
+      "sonic_rank": 51,
+      "target_rank": 51,
+      "gaussian_gic_count": 51,
+      "active_total_symmetric_gic_count": 15,
+      "contains_out_of_plane": false,
+      "total_symmetric_only": true,
+      "symmetry_enabled": true,
+      "route": "#p hf/sto-3g opt=(readallgic,maxcycle=80) output=pickett",
+      "normal_termination": true,
+      "stationary_point": true,
+      "optimization_completed": true,
+      "steps": 8,
+      "final_energy_hartree": -268.893823423,
+      "rank_pairs": [],
+      "minimum_eig_small": null
     }
   ]
 }
