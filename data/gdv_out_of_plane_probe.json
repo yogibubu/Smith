@@ -1,0 +1,29 @@
+{
+  "method": "Gaussian DV ReadAllGIC optimization with SONIC U out-of-plane coordinates",
+  "systems": [
+    {
+      "system": "camphor",
+      "program": "Gaussian DV",
+      "electronic_structure": "HF/STO-3G",
+      "out_of_plane_mode": "U",
+      "symmetry_enabled": false,
+      "frozen_lines": 0,
+      "u_lines": 1,
+      "normal_termination": true,
+      "steps": 8,
+      "final_energy_hartree": -457.283643058
+    },
+    {
+      "system": "norbornane",
+      "program": "Gaussian DV",
+      "electronic_structure": "HF/STO-3G",
+      "out_of_plane_mode": "U",
+      "symmetry_enabled": true,
+      "frozen_lines": 36,
+      "u_lines": 0,
+      "normal_termination": true,
+      "steps": 5,
+      "final_energy_hartree": -268.893823806
+    }
+  ]
+}

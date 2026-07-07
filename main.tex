@@ -1346,20 +1346,33 @@ larger bridged-ring cases, with camphor reaching 75 vibrational degrees of
 freedom.  These calculations
 are not a benchmark of electronic
 structure theory or a claim that one coordinate choice always minimizes the
-    iteration count.  They test the narrower point that \SMITH\ can generate a
-    Gaussian-readable \SONIC\ coordinate model without manual GIC transcription and
-    that Gaussian can optimize from it using the commercial \texttt{ReadAllGIC}
-    parser.  At HF/STO-3G, water and hydrogen peroxide give essentially
+iteration count.  They test the narrower point that \SMITH\ can generate a
+Gaussian-readable \SONIC\ coordinate model without manual GIC transcription and
+that Gaussian can optimize from it using the commercial \texttt{ReadAllGIC}
+parser.  At HF/STO-3G, water and hydrogen peroxide give essentially
 the same iteration counts across the tested coordinate choices.  Norbornane
 converges in four steps with Gaussian redundant internals and Cartesians, six
 steps with a sequential Z matrix and nine steps with the automatically
-    generated \SONIC\ block.  Camphor converges in eight steps with Gaussian
-    redundant internals, 14 Cartesian steps, 21 \SONIC\ steps and 33 steps for a
+generated \SONIC\ block.  Camphor converges in eight steps with Gaussian
+redundant internals, 14 Cartesian steps, 20 \SONIC\ steps and 33 steps for a
 sequential Z matrix.  The point of this diagnostic is therefore not that
 \SONIC\ is always the shortest optimizer path in Gaussian, but that the
 automatic generated GIC block is accepted by the commercial Gaussian
 \texttt{ReadAllGIC} parser and remains competitive while carrying a much more
 explicit coordinate contract.
+
+A separate Gaussian DV check was carried out with the native \(U\)
+out-of-plane export enabled, rather than replacing \(U\) rows by
+Gaussian-compatible improper dihedrals.  In this mode camphor contains one
+native \(U(6,4,7,8)\) row and converges in eight HF/STO-3G optimization steps.
+The commercial Gaussian 16 compatibility input uses the Fortran/G16 improper
+dihedral convention \(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving
+\(D(4,6,8,7)\) for the same local non-planarity.
+The symmetry-enabled norbornane input, run without \texttt{NoSymm}, contains
+51 generated rows of which 36 non-totally symmetric rows are marked
+\texttt{Frozen}; it converges in five steps.  These runs isolate the
+out-of-plane and frozen-irrep handling from the commercial Gaussian 16 parser
+limitations.
 
 \begin{figure}[htbp]
 \centering
