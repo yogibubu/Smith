@@ -3,7 +3,7 @@
   "repeats": 5,
   "python": "3.13.11",
   "notes": [
-    "Median wall times from one local macOS run; values are implementation diagnostics, not hardware-independent constants.",
+    "Median wall times from single-process Python runs on oracle.sns.it (2 x AMD EPYC 7543, 128 logical CPUs, 1.0 TiB RAM); values are implementation diagnostics, not hardware-independent constants.",
     "Build time includes coordinate construction, rank reduction, optional symmetry projection and writing the xyzin GIC sections.",
     "B time is one analytic Wilson B evaluation from an already frozen contract.",
     "Peak memory is tracemalloc peak during build plus B evaluation for a single trial.",
@@ -565,5 +565,16 @@
         2.5933494567871094
       ]
     }
-  ]
+  ],
+  "hardware": {
+    "host": "oracle.sns.it",
+    "os": "Linux 4.18.0-553.69.1.el8_10.x86_64",
+    "cpu_model": "AMD EPYC 7543 32-Core Processor",
+    "sockets": 2,
+    "cores_per_socket": 32,
+    "threads_per_core": 2,
+    "logical_cpus": 128,
+    "memory": "1.0 TiB",
+    "timing_mode": "single-process Python jobs"
+  }
 }

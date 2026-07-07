@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a compact molecule panel for the SONIC manuscript."""
+"""Build a compact 3D molecule panel for the SONIC manuscript."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,7 +19,7 @@ ATOM_COLORS = {
     "O": "#d94738",
     "Fe": "#d08a20",
 }
-ATOM_SIZES = {"H": 12, "C": 28, "O": 34, "Fe": 56}
+ATOM_SIZES = {"H": 18, "C": 44, "O": 54, "Fe": 90}
 COVALENT_RADII = {"H": 0.31, "C": 0.76, "O": 0.66, "Fe": 1.32}
 
 
@@ -63,16 +64,16 @@ def infer_bonds(symbols: list[str], coords: np.ndarray) -> list[tuple[int, int]]
     return bonds
 
 
-def project(coords: np.ndarray, mode: str = "pca") -> np.ndarray:
+def orient(coords: np.ndarray, mode: str = "pca") -> np.ndarray:
     centered = coords - coords.mean(axis=0)
-    if mode == "xz":
-        xy = centered[:, [0, 2]]
+    if mode == "cyclohexane":
+        oriented = centered[:, [0, 2, 1]]
     else:
         _, _, vt = np.linalg.svd(centered, full_matrices=False)
-        xy = centered @ vt[:2].T
-    span = np.ptp(xy, axis=0)
+        oriented = centered @ vt.T
+    span = np.ptp(oriented, axis=0)
     scale = max(float(span.max()), 1e-6)
-    return xy / scale
+    return oriented / scale
 
 
 def draw_molecule(
@@ -82,46 +83,44 @@ def draw_molecule(
     bonds: list[tuple[int, int]],
     title: str,
     subtitle: str = "",
-    projection: str = "pca",
+    orientation: str = "pca",
 ) -> None:
-    xy = project(coords, projection)
+    xyz = orient(coords, orientation)
     for i, j in bonds:
         ax.plot(
-            [xy[i, 0], xy[j, 0]],
-            [xy[i, 1], xy[j, 1]],
-            color="#6c6c6c",
-            lw=1.15,
+            [xyz[i, 0], xyz[j, 0]],
+            [xyz[i, 1], xyz[j, 1]],
+            [xyz[i, 2], xyz[j, 2]],
+            color="#626262",
+            lw=1.35,
             solid_capstyle="round",
             zorder=1,
         )
     for symbol in sorted(set(symbols), key=lambda s: {"Fe": 0, "O": 1, "C": 2, "H": 3}.get(s, 9)):
         idx = [i for i, atom in enumerate(symbols) if atom == symbol]
         ax.scatter(
-            xy[idx, 0],
-            xy[idx, 1],
+            xyz[idx, 0],
+            xyz[idx, 1],
+            xyz[idx, 2],
             s=ATOM_SIZES.get(symbol, 26),
             c=ATOM_COLORS.get(symbol, "#7a7a7a"),
             edgecolors="#1e1e1e" if symbol != "H" else "#aaaaaa",
             linewidths=0.35,
+            depthshade=True,
             zorder=2,
         )
-    ax.set_aspect("equal")
+    ax.set_box_aspect((1, 1, 0.72))
     ax.axis("off")
-    ax.set_title(title, fontsize=9.0, fontweight="bold", pad=2.5)
-    if subtitle:
-        ax.text(
-            0.5,
-            -0.03,
-            subtitle,
-            transform=ax.transAxes,
-            ha="center",
-            va="top",
-            fontsize=7.2,
-            color="#333333",
-        )
+    title_text = f"{title}\n{subtitle}" if subtitle else title
+    ax.set_title(title_text, fontsize=8.8, fontweight="bold", pad=2.0, linespacing=1.35)
     pad = 0.12
-    ax.set_xlim(xy[:, 0].min() - pad, xy[:, 0].max() + pad)
-    ax.set_ylim(xy[:, 1].min() - pad, xy[:, 1].max() + pad)
+    for setter, values in (
+        (ax.set_xlim, xyz[:, 0]),
+        (ax.set_ylim, xyz[:, 1]),
+        (ax.set_zlim, xyz[:, 2]),
+    ):
+        setter(values.min() - pad, values.max() + pad)
+    ax.view_init(elev=22, azim=-58)
 
 
 def main() -> None:
@@ -149,34 +148,35 @@ def main() -> None:
             "Cyclohexane",
             "$\\lambda=0.00$ chair",
             ROOT / "calculations/cyclohexane_puckering_equivalence/p00/cyclohexane_p00.xyz",
-            "xz",
+            "cyclohexane",
         ),
         (
             "Cyclohexane",
             "$\\lambda=0.50$ path",
             ROOT / "calculations/cyclohexane_puckering_equivalence/p02/cyclohexane_p02.xyz",
-            "xz",
+            "cyclohexane",
         ),
         (
             "Cyclohexane",
             "$\\lambda=1.00$ boat",
             ROOT / "calculations/cyclohexane_puckering_equivalence/p04/cyclohexane_p04.xyz",
-            "xz",
+            "cyclohexane",
         ),
     ]
-    fig, axes = plt.subplots(2, 3, figsize=(7.2, 5.15), dpi=320)
-    for ax, (title, subtitle, path, projection) in zip(axes.flat, panels, strict=True):
+    fig = plt.figure(figsize=(7.45, 5.95), dpi=320)
+    axes = [fig.add_subplot(2, 3, index + 1, projection="3d") for index in range(6)]
+    for ax, (title, subtitle, path, projection) in zip(axes, panels, strict=True):
         symbols, coords = read_xyz_like(path)
-        bonds = infer_bonds(symbols, coords) if projection == "xz" else read_bonds(path)
+        bonds = infer_bonds(symbols, coords) if projection == "cyclohexane" else read_bonds(path)
         draw_molecule(ax, symbols, coords, bonds, title, subtitle, projection)
 
     fig.suptitle(
-        "Representative molecular systems used in the validation probes",
+        "Representative molecular validation systems",
         fontsize=10.5,
         fontweight="bold",
         y=0.985,
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.955), h_pad=1.55, w_pad=0.1)
+    fig.tight_layout(rect=(0, 0, 1, 0.94), h_pad=2.25, w_pad=0.15)
     fig.savefig(FIGURES / "validation_molecule_panel.png", bbox_inches="tight", pad_inches=0.03)
 
 

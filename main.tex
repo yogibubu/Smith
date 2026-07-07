@@ -80,8 +80,12 @@ therefore provides a constructive counterpart to natural internal coordinates:
 it preserves their locality and interpretability while extending them to the
 topological and symmetry cases that usually require manual intervention.
 The numerical evidence reported here validates the construction invariants,
-sparse derivative machinery and Gaussian export path.  We also discuss the
-intended scope of the method and its current limitations.
+sparse derivative machinery and Gaussian export path.  The Gaussian tests are
+serialization and solver-consumption tests: \SONIC\ generates the coordinate
+contract automatically and Gaussian reads the exported \GIC\ definitions; they
+are not presented as a competitive coordinate-generation benchmark against
+Gaussian's internal coordinate builder.  We also discuss the intended scope of
+the method and its current limitations.
 \end{abstract}
 
 \begin{tocentry}
@@ -1152,6 +1156,53 @@ remains rank-complete at \(18/18\), and the pseudo-cycle rows remain labelled
 separately from covalent ring coordinates so that downstream analyses can keep
 or suppress them explicitly.
 
+Additional pseudo-bond and intermolecular fixtures were added to keep this
+baseline close to the weak-complex cases used by geomeTRIC-style
+translation--rotation coordinates (Table~\ref{tab:pseudo-cycle-fixtures}).
+The point of the table is deliberately modest: these systems verify that typed
+contacts, fragment-center variables and pseudo-cycle rows can be constructed
+and labelled without collapsing the fragment model into a covalent molecule.
+They do not yet establish full generality for arbitrary non-covalent networks.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.95}
+\caption{Additional weak-complex and pseudo-cycle fixtures used to define the
+current validated baseline.  Nontrivial symmetry cases are included to test
+that fragment and pseudo-bond rows can coexist with point-group perception.}
+\label{tab:pseudo-cycle-fixtures}
+\begin{tabular}{@{}p{0.20\linewidth}p{0.10\linewidth}p{0.24\linewidth}p{0.36\linewidth}@{}}
+\toprule
+System & PG & Coordinate mode & Diagnostic role \\
+\midrule
+Formic acid--water & \(C_s\) & typed H-bond pseudo-edges and fragment centers &
+two weak contacts close a hydrogen-bonded pseudo-cycle while preserving the
+monomer fragments. \\
+\midrule
+Water dimer & \(C_s\) & protected fragment translations, orientations and
+center distances & geomeTRIC-like weak-complex rotor proxy; tests that
+orientation rows have nonzero sparse derivatives in a non-covalent dimer. \\
+\midrule
+Li\(_2\)--Ar & linear/axial & protected interfragment axes plus polar and
+elliptic functions & Gaussian-\GIC\ scan motif generated from fragment
+translation axes rather than hand-written coordinate expressions. \\
+\midrule
+Borane--ammonia & \(C_{3v}\) & fragment-center distance and axial relative
+orientation & nontrivial symmetric donor--acceptor complex; tests vector and
+axial-vector transformation of fragment variables. \\
+\midrule
+Glycine I & \(C_1\) & intramolecular H-bond pseudo-edge & single internal
+weak bridge; tests pseudo-cycle construction without intermolecular fragments. \\
+\midrule
+Glycine II & \(C_1\) & bifurcated intramolecular H-bond pseudo-edges &
+multi-contact weak bridge; tests deterministic contact ordering and labelled
+pseudo-cycle rows. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Validated Construction Scope}
 
 Table~\ref{tab:status} records the status of the present \SONIC\
@@ -1280,7 +1331,8 @@ tests portable puckering paths.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/validation_molecule_panel.png}
-\caption{Representative systems used in the validation and application probes.
+\caption{Three-dimensional views of representative systems used in the
+validation and application probes.
 Norbornane and camphor test bridged-ring coordinate construction and
 Gaussian-compatible improper-coordinate export; ferrocene tests center-based
 special coordinates; the cyclohexane panels show three points along the
@@ -1344,7 +1396,10 @@ Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\ma
 Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 11 protected & direct \(\Bmat\)-rank \(=18\); \(\epsilon_\mathrm{SALC}=0\) \\
-Glycine I/II & Intramolecular pseudo-bond contacts & \(C_1\) & 24/24 & one-bridge and bifurcated-contact pseudo-bond modes close analytic \(\Bmat\) rank \\
+Weak-complex pseudo-cycles & Intermolecular and intramolecular pseudo-bond
+contacts & \(C_s\), \(C_{3v}\), \(C_1\) & rank closed & formic acid--water,
+water dimer, Li\(_2\)--Ar, borane--ammonia and glycine I/II fixtures validate
+the current pseudo-cycle/interfragment baseline \\
 Semantic layer & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probes & duplicate protected row rejected; row-equivalent substitution recorded; protected rank excess fails fast \\
 \bottomrule
 \end{tabular}
@@ -1779,11 +1834,14 @@ keeps coordinate construction and \(\Bmat\) evaluation as distinct services.
 
 Table~\ref{tab:construction-cost} and Figure~\ref{fig:construction-scaling}
 give a first scaling study for the present implementation.  The values are
-median wall times from five local Python runs on the same machine used for this
-draft, measured with \texttt{tracemalloc}; they are therefore engineering
-diagnostics rather than hardware-independent constants.  The test set contains
-three slices: a controlled fused-PAH series from benzene to coronene, a
-ring/cage topology set, and two metallocene special-coordinate cases.  The
+median wall times from five Python runs on a Linux workstation
+(\texttt{oracle.sns.it}; two AMD EPYC 7543 32-core processors, 128 logical
+CPUs with simultaneous multithreading, and 1.0~TiB RAM), measured with
+\texttt{tracemalloc}; they are therefore engineering diagnostics rather than
+hardware-independent constants.  The timings were collected as single-process
+Python construction jobs, not as parallel throughput benchmarks.  The test set
+contains three slices: a controlled fused-PAH series from benzene to coronene,
+a ring/cage topology set, and two metallocene special-coordinate cases.  The
 intended split is visible.  Once the coordinate contract exists, one analytic
 Wilson-\(\Bmat\) evaluation costs milliseconds to a few \(10^{-2}\)~s for the
 tested covalent and ring systems.  Construction is larger because it includes
@@ -1963,10 +2021,12 @@ implementation for the corpus rows where that comparison is applicable.
 \section*{Data and Code Availability}
 
 The manuscript repository contains the scripts, JSON data files and figures
-used to generate the tables and application plots.  The \SMITH\ source
-code is under active development as an independently usable package;
-until public release, the code and frozen input/output data are
-available from the author upon reasonable request.
+used to generate the tables and application plots.  The \SMITH\ source code is
+being prepared as a standalone distributable package that reads a single
+extended-XYZ input file, constructs missing topology and symmetry descriptors
+when they are absent, and writes the \SONIC\ contract plus optional Gaussian
+\texttt{ReadAllGIC} input.  Until public release, the code and frozen
+input/output data are available from the author upon reasonable request.
 
 \section*{Author Contributions}
 

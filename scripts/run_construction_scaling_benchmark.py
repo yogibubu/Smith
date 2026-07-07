@@ -255,7 +255,7 @@ def main() -> None:
         "repeats": REPEATS,
         "python": sys.version.split()[0],
         "notes": [
-            "Median wall times from one local macOS run; values are implementation diagnostics, not hardware-independent constants.",
+            "Median wall times from single-process Python runs on oracle.sns.it (2 x AMD EPYC 7543, 128 logical CPUs, 1.0 TiB RAM); values are implementation diagnostics, not hardware-independent constants.",
             "Build time includes coordinate construction, rank reduction, optional symmetry projection and writing the xyzin GIC sections.",
             "B time is one analytic Wilson B evaluation from an already frozen contract.",
             "Peak memory is tracemalloc peak during build plus B evaluation for a single trial.",
