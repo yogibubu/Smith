@@ -29,7 +29,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
 
-\title{Automatic Construction and Validation of Non-Redundant Symmetry-Oriented Natural Internal Coordinates}
+\title{\SONIC: Symmetry-Oriented Non-redundant Internal Coordinates}
 \author{Vincenzo Barone\\
 INSTM, National Interuniversity Consortium for Materials Science and Technology\\
 via G. Giusti 9, 50121 Firenze, Italy\\
@@ -54,7 +54,7 @@ particular bonding patterns and do not provide a general, reproducible treatment
 of fused rings, high coordination, point-group symmetry and weakly bound
 fragments.
 
-We present \SONIC\ (Symmetry-Oriented Natural Internal Coordinates) as a general
+We present \SONIC\ (Symmetry-Oriented Non-redundant Internal Coordinates) as a general
 construction of non-redundant, symmetry-adapted generalized internal
 coordinates.  The \SMITH\ (Symmetry-Mapped Internal-coordinate Template
 Handler) implementation starts
@@ -203,7 +203,7 @@ Gaussian-readable GICs or consumed directly by downstream modules.
 
 \SONIC\ replaces the earlier draft name NEO to avoid conflict with the
 established nuclear-electronic-orbital usage of that acronym.  The new name
-also states the intended object more directly: natural internal-coordinate
+also states the intended object more directly: non-redundant internal-coordinate
 families made usable in symmetry-adapted, automatically constructed GIC
 contracts.  The standalone command-line tool is named \SMITH\ (Symmetry-Mapped Internal-coordinate Template Handler); legacy
 \texttt{neo} and \texttt{gicforge} command aliases are kept only for
@@ -1831,7 +1831,7 @@ provenance rather than hidden in an implementation choice.
 \section{Conclusions}
 
 \SONIC\ provides a general, frozen and symmetry-aware construction of
-generalized internal coordinates.  Its main contribution is a
+non-redundant internal coordinates.  Its main contribution is a
 reproducible coordinate object that integrates ingredients usually treated
 separately: natural-coordinate locality, analytic Wilson-\(\Bmat\) rank control,
 block-local point-group symmetrization and special coordinates for
