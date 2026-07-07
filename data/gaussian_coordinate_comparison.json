@@ -134,9 +134,9 @@
           "normal_termination": true,
           "stationary_point": true,
           "optimization_completed": true,
-          "steps": 20,
-          "scf_cycles": 20,
-          "final_energy_hartree": -457.283636718
+          "steps": 21,
+          "scf_cycles": 21,
+          "final_energy_hartree": -457.283638259
         }
       ]
     },
