@@ -12,7 +12,8 @@
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 
-\newcommand{\NEO}{NEO}
+\newcommand{\SONIC}{SONIC}
+\newcommand{\NEO}{\SONIC}
 \newcommand{\ORACLE}{ORACLE}
 \newcommand{\GIC}{GIC}
 \newcommand{\Bmat}{\mathbf{B}}
@@ -27,7 +28,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
 
-\title{\NEO\ (Nonredundant Equivariant Orthogonalizer): Block-Local, Symmetry-Consistent Generalized Internal Coordinates for Molecular and Intermolecular Coordinate Spaces}
+\title{\SONIC\ (Symmetry-Oriented Natural Internal Coordinates): Block-Local, Symmetry-Consistent Generalized Internal Coordinates for Molecular and Intermolecular Coordinate Spaces}
 \author{Vincenzo Barone\\
 INSTM, National Interuniversity Consortium for Materials Science and Technology\\
 via G. Giusti 9, 50121 Firenze, Italy\\
@@ -52,7 +53,7 @@ particular bonding patterns and do not provide a general, reproducible treatment
 of fused rings, high coordination, point-group symmetry and weakly bound
 fragments.
 
-We present \NEO\ (Nonredundant Equivariant Orthogonalizer) as a general
+We present \SONIC\ (Symmetry-Oriented Natural Internal Coordinates) as a general
 construction of non-redundant, symmetry-adapted generalized internal
 coordinates.  \NEO\ starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
@@ -97,9 +98,9 @@ coordinate model is expected to support symmetry-constrained optimization,
 semi-experimental structural refinement, ring puckering, weak complexes and
 metal or high-coordination environments.
 
-\NEO\ is designed to make this choice explicit and reproducible.  Table~\ref{tab:framework-roles}
+\SONIC\ is designed to make this choice explicit and reproducible.  Table~\ref{tab:framework-roles}
 defines the workflow names used below.  The essential separation is that
-\NEO\ defines the non-redundant generalized internal-coordinate basis, analytic
+\SONIC\ defines the non-redundant generalized internal-coordinate basis, analytic
 Wilson matrix and symmetry labels; downstream modules choose how those
 coordinates enter a fit, force field, scan or surface model.
 
@@ -111,11 +112,12 @@ coordinates enter a fit, force field, scan or surface model.
 \toprule
 Name & Role \\
 \midrule
-\ORACLE & Operator for Routing, Analysis, Control, Launch and Exploration; here,
-the unpublished state layer used by \NEO.  It is a new implementation of the
-continuous molecular perception ideas introduced in Proxima and of the synthon
-descriptors used in previous templating-synthon work.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
-\NEO & Coordinate-generation engine: \GIC\ construction, symmetry-adapted
+Molecular-state tools & Input layer that either reads saved topology,
+symmetry and synthon sections from the \texttt{xyzin} file or constructs them
+from Cartesian coordinates with the bundled MATRIX perception tools.  The
+continuous molecular perception follows the ideas introduced in Proxima and in
+previous templating-synthon work.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
+\SONIC & Coordinate-generation engine: \GIC\ construction, symmetry-adapted
 Cartesian reference spaces, analytic \(\Bmat\) rows, symmetry labels and
 provenance. \\
 GF/PED, DVR & Wilson GF/potential-energy-distribution analysis and discrete
@@ -193,13 +195,16 @@ deterministic generator that converts a frozen molecular state into a
 rank-complete, symmetry-consistent coordinate basis that can be serialized as
 Gaussian-readable GICs or consumed directly by downstream modules.
 
-The name \NEO\ uses ``equivariant'' in the classical molecular-symmetry sense:
-point-group operations map coordinate rows into the same space with the
-corresponding atom permutation and vector or pseudovector signs.  It does not
-denote a machine-learning model, nor a nuclear-electronic-orbital method.
-``Orthogonalizer'' refers to normalized Wilson-row rank selection and
-orthonormal SALC coefficient vectors inside homogeneous blocks, not to global
-orthogonality in the kinetic \(\Gmat\) metric.
+\SONIC\ replaces the earlier draft name NEO to avoid conflict with the
+established nuclear-electronic-orbital usage of that acronym.  The new name
+also states the intended object more directly: natural internal-coordinate
+families made usable in symmetry-adapted, automatically constructed GIC
+contracts.  Symmetry is used in the classical molecular sense: point-group
+operations map coordinate rows into the same space with the corresponding atom
+permutation and vector or pseudovector signs.  Orthogonality enters through
+normalized Wilson-row rank selection and orthonormal SALC coefficient vectors
+inside homogeneous blocks, not through global orthogonality in the kinetic
+\(\Gmat\) metric.
 
 \section{Relationship to Existing Coordinate Models}
 
@@ -307,30 +312,35 @@ semantic coordinate rather than as an opaque handwritten expression.
 
 \section{Molecular State and Atom Equivalence}
 
-\NEO\ does not rediscover the molecule at every downstream step.  Its input is a
-validated \ORACLE\ molecular state containing Cartesian geometry,
-covalent bonds, rings, point-group operations, optional fragments, optional
-interaction centers and the continuous chemical perception produced upstream.
+\SONIC\ does not rediscover the molecule at every downstream step.  Its input is
+a validated molecular state containing Cartesian geometry, covalent bonds,
+rings, point-group operations, optional fragments, optional interaction centers
+and continuous chemical perception descriptors.  If those data are already
+present in the \texttt{xyzin} file, \SONIC\ consumes them as part of the frozen
+state; otherwise the standalone builder constructs the missing topology,
+synthon and symmetry sections from Cartesian coordinates using the bundled
+MATRIX tools.
 The output is a frozen \(\#\)GIC definition: primitive coordinate records,
 final generalized coordinates, coefficients, family labels, irreducible
 representations, total-symmetric subsets and the metadata required to
 reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
 they do not rebuild topology, ring sets or coordinate rows.
 
-ORACLE is not yet a published program.  In the present manuscript it should be
-read as the new molecular-state implementation used to provide \NEO\ with
-published chemical descriptors: continuous molecular perception in the spirit
-of Proxima,\cite{Lazzari2020Proxima} and molecular/spectral synthons developed
-for accurate structural templating.\cite{Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141}
+The ORACLE name is used in the broader development environment, but the present
+coordinate engine is not tied to an ORACLE executable.  The perception layer
+used here is a new implementation of published chemical descriptors:
+continuous molecular perception in the spirit of Proxima,\cite{Lazzari2020Proxima}
+and molecular/spectral synthons developed for accurate structural
+templating.\cite{Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141}
 Initial local equivalence is therefore not based only on element symbols.  The
-\ORACLE\ molecular-state layer supplies continuous atom perception and
-synthon descriptors, and \NEO\ uses them to make reproducible local choices.
+molecular-state layer supplies continuous atom perception and synthon
+descriptors, and \SONIC\ uses them to make reproducible local choices.
 The present construction uses effective atomic numbers
 that combine nuclear charge with local coordination, distance-derived
 bond-order information, angular rigidity and delocalization-like terms.  These
 continuous descriptors order atoms and ligands in cases where a pure graph
-label would be ambiguous.  The broader \ORACLE\ topology layer also exposes
-synthon descriptors--charge, covalency, delocalization, strain and effective
+label would be ambiguous.  The topology layer also exposes synthon
+descriptors--charge, covalency, delocalization, strain and effective
 nuclear charge--which provide a natural route to more refined equivalence
 classes.  In the present contract, this continuous perception enters ring
 orientation, ligand grouping, local stretch equivalence, high-coordination
@@ -686,7 +696,7 @@ analytic \(\Bmat\) row is expanded back to the real atoms by the chain rule,
 with the bond-center derivative distributed over \(i\) and \(j\).  This
 contraction is attractive for genuine double bonds, conjugated fragments and
 locally stiff fused-ring units, but it must be applied to complete symmetry
-orbits and only when the \ORACLE\ continuous bond-order and synthon
+orbits and only when the molecular-state continuous bond-order and synthon
 descriptors mark a hard local constraint.  The present bond-order flexibility factors are
 therefore the conservative default; rigid-source contraction is the planned
 extension for cases where the chemically intended model removes, rather than
@@ -722,7 +732,7 @@ The family set \(\mathfrak{F}\) carries a priority preorder
 interaction-center distances, ring-puckering sources and related special
 objects--are minimal elements in this preorder; ordinary stretches, bends and
 torsions fill the rank only after those rows have been tested.  Ties inside
-a family are resolved by topology, \ORACLE\ equivalence and
+a family are resolved by topology, continuous-perception equivalence and
 CIP-like priority keys stored in \(\mathcal{M}\).  Thus the construction works on a
 fixed total order that extends a chemically motivated partial order.
 
@@ -733,7 +743,7 @@ all possible internal-coordinate bases.
 \paragraph{Property: relabelling covariance.}
 \label{thm:relabel}
 Let two frozen molecular states be related by an atom relabelling \(\pi\) that
-preserves element identities, geometry, topology, \ORACLE\ descriptors, fragments,
+preserves element identities, geometry, topology, perception descriptors, fragments,
 interaction centers, point-group operations, priority keys and tolerances.  Let
 \(Q_\pi\) be the induced orthogonal permutation of Cartesian displacement
 coordinates and \(U_\pi\) the induced permutation/sign map on primitive
@@ -760,7 +770,7 @@ constructing the contract first and then transporting it by the relabelling.
 
 \paragraph{Construction principle: reproducible contract.}
 \label{prop:determinism}
-For a fixed molecular state--geometry, topology, \ORACLE\ descriptors, point-group
+For a fixed molecular state--geometry, topology, perception descriptors, point-group
 operations and fragment data--and for fixed primitive generators, family
 priority order, tie-breaking keys, row-normalization rule and numerical
 tolerances, \NEO\ returns a unique contract, or a unique
@@ -847,7 +857,7 @@ diagonalization changes their relative weights.
 \paragraph{Property: local stability.}
 \label{thm:local-stability}
 Let \(S_0\) be a nonsingular frozen molecular state.  Assume that, in a
-neighbourhood of \(S_0\), topology, fragment decomposition, \ORACLE\ equivalence
+neighbourhood of \(S_0\), topology, fragment decomposition, perception equivalence
 classes, point-group representation, priority prefix, typed block
 membership and priority order remain fixed in a ball of radius
 \(\delta_{\mathrm{str}}\) around \(S_0\).  Let
@@ -908,14 +918,18 @@ model, then uses ordinary coordinates for completeness.
 Symmetry is applied only after a non-redundant coordinate basis has been
 selected.  Let \(G_{\mathrm{pt}}\) be the molecular point group stored in the
 source state.  The point group is not guessed from idealized element labels
-alone: \ORACLE\ first clusters atoms by continuous element, coordination,
-bond-order and synthon descriptors, then tests candidate rotations, reflections
-and inversion operations against the Cartesian geometry within the stored
-tolerances.  An operation is accepted only when it maps each atom onto an atom
-of the same continuous equivalence class and preserves the stored topology and
-local descriptor signatures.  The accepted operations, atom permutation table,
-tolerances and perception version are frozen before \NEO\ constructs
-coordinates.  Each operation \(h\in G_{\mathrm{pt}}\) is represented by a
+alone: the molecular-state builder first clusters atoms by continuous element,
+coordination, bond-order and synthon descriptors, then tests candidate
+rotations, reflections and inversion operations against the Cartesian geometry
+within the stored tolerances.  An operation is accepted only when it maps each
+atom onto an atom of the same continuous equivalence class and preserves the
+stored topology and local descriptor signatures.  The accepted operations, atom
+permutation table, tolerances and perception version are frozen before
+\SONIC\ constructs coordinates.  For a path whose symmetry changes, the user
+may request a reduced working subgroup, for example \(C_1\), \(C_s\), \(C_i\)
+or \(C_2\).  \SONIC\ then filters the stored operations to that subgroup and
+uses the reduced group consistently for labels, projectors and totally
+symmetric coordinate export.  Each operation \(h\in G_{\mathrm{pt}}\) is represented by a
 Cartesian rotation matrix, an atom permutation and the signs required for
 oriented coordinates such as torsions, out-of-plane bends and axial fragment
 rotations.  For a homogeneous accepted coordinate block \(H\), with coefficient
@@ -1079,7 +1093,7 @@ coordinates and are regression-tested on hydrogen-bonded weak complexes and
 glycine I/II contact fixtures. \\
 Point-group projector & Active & Applied to homogeneous blocks after
 non-redundant reduction; local SALC fallback is recorded explicitly. \\
-NEO symmetry-adapted Cartesian reference basis & Active in \NEO & Symmetry-adapted Cartesian
+\SONIC\ symmetry-adapted Cartesian reference basis & Active in \NEO & Symmetry-adapted Cartesian
 nullspace coordinates provide a Cartesian reference active space for
 downstream validation, without changing the \GIC\ construction. \\
 Sparse Wilson-\(\Bmat\) representation & Validated baseline & Sparse derivative
@@ -1504,8 +1518,8 @@ generator choice.
 
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
 symmetry-projector normalization and Python--Fortran row-space equivalence for
-representative cases.  This is an implementation-level cross-check inside the
-\ORACLE\ development lineage, not a comparison with an external published
+representative cases.  This is an implementation-level cross-check inside
+the same development lineage, not a comparison with an external published
 natural-coordinate program.  Table~\ref{tab:frisch-si} addresses the more
 external-facing question raised by the Gaussian GIC Supporting Information: can
 the same kinds of chemically specialized variables be generated without
@@ -1592,7 +1606,7 @@ claim made here is that the priority order is explicit, versioned and
 diagnosed, and that special coordinates are not silently displaced by
 ordinary coordinates when they are compatible with the target rank.
 
-Finally, determinism is conditional on the frozen \ORACLE\ state:
+Finally, determinism is conditional on the frozen molecular state:
 geometry, topology, symmetry operations, continuous atom perception, synthon
 descriptors, tolerances, semantic grammar version and contract schema version.
 A different perception model or tolerance policy may produce a different
@@ -1601,8 +1615,8 @@ provenance rather than hidden in an implementation choice.
 
 \section{Conclusions}
 
-\NEO\ provides a general, frozen and symmetry-aware construction of
-generalized internal coordinates for \ORACLE.  Its main contribution is a
+\SONIC\ provides a general, frozen and symmetry-aware construction of
+generalized internal coordinates.  Its main contribution is a
 reproducible coordinate object that integrates ingredients usually treated
 separately: natural-coordinate locality, analytic Wilson-\(\Bmat\) rank control,
 block-local point-group symmetrization and special coordinates for
@@ -1619,21 +1633,23 @@ acyclic, cyclic, fused, bridged, spiro and high-symmetry molecules, together
 with special-coordinate and pseudo-bond models for weak complexes within the
 validated baseline described above.  The next methodological step is to enlarge
 the pseudo-cycle validation corpus for intermolecular systems, using the same
-rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of \NEO.
+rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of \SONIC.
 The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
-contract is already usable as an external solver coordinate set.  The Hessian,
+contract is already usable as an external solver coordinate set; the next
+iteration-count comparison will place \SONIC\ against Gaussian defaults,
+Cartesians and hand-built Z matrices on the same systems.  The Hessian,
 puckering, GF/PED scaling and portable chair-to-boat export probes illustrate
 why the same stored definition is relevant to force-field and large-amplitude work
 within the scope defined above.  Full DVR and refinement application benchmarks
 remain the next validation layer.  The cyclohexane export check further shows
-that a \NEO{}-generated puckering path can be represented either as ordinary
+that a \SONIC{}-generated puckering path can be represented either as ordinary
 Cartesians or as Gaussian \texttt{ReadAllGIC} input with numerically identical
 energies.
 
 \section*{Reproducibility}
 
 The calculations reported in the validation and application sections were
-generated with the \NEO\ development tree and Python 3.13.11.  Gaussian
+generated with the \SONIC\ development tree and Python 3.13.11.  Gaussian
 jobs used the local Gaussian DV executable documented in the accompanying
 scripts; the method and basis set are stated with each probe.  The reported
 construction tests use fixed inputs and no stochastic seeds.  The
@@ -1643,14 +1659,14 @@ implementation for the corpus rows where that comparison is applicable.
 \section*{Data and Code Availability}
 
 The manuscript repository contains the scripts, JSON data files and figures
-used to generate the tables and application plots.  The \NEO\ source
-code is under active development and will be released with the \ORACLE\
-distribution; until public release, the code and frozen input/output data are
+used to generate the tables and application plots.  The \SONIC\ source
+code is under active development as an independently usable MATRIX package;
+until public release, the code and frozen input/output data are
 available from the author upon reasonable request.
 
 \section*{Author Contributions}
 
-Vincenzo Barone conceived the method, designed the \NEO\ coordinate
+Vincenzo Barone conceived the method, designed the \SONIC\ coordinate
 contract, implemented the active code paths used here, performed the
 calculations and wrote the manuscript.  External refinement and PES-fitting
 consumers are discussed only as downstream uses of the coordinate definition.
