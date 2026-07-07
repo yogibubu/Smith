@@ -1103,7 +1103,8 @@ One-dihedral exocyclic torsions & Active default & The intramolecular path uses
 \texttt{ONEDIH} by default; a legacy alternative is kept for diagnostics. \\
 Ring deformation and puckering & Active & Endocyclic angle and torsional source
 spaces generate \(RDef\) and \(RPck\) components; \(Q/\phi\)-like descriptors
-are post-processing and DVR variables. \\
+are GDV/post-processing and DVR variables, not commercial Gaussian 16
+\texttt{ReadAllGIC} rows. \\
 Butterfly and condensed rings & Active & Fused-ring butterfly and condensed
 torsion families are kept as separate homogeneous source blocks. \\
 Out-of-plane/improper coordinates & Active & \(U\) out-of-plane coordinates are
@@ -1365,9 +1366,11 @@ A separate Gaussian DV check was carried out with the native \(U\)
 out-of-plane export enabled, rather than replacing \(U\) rows by
 Gaussian-compatible improper dihedrals.  In this mode camphor contains one
 native \(U(6,4,7,8)\) row and converges in eight HF/STO-3G optimization steps.
-The commercial Gaussian 16 compatibility input uses the Fortran/G16 improper
-dihedral convention \(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving
-\(D(4,6,8,7)\) for the same local non-planarity.
+The commercial Gaussian 16 compatibility input uses active linear \(RPck\)
+rows for ring puckering and the Fortran/G16 improper-dihedral convention
+\(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving \(D(4,6,8,7)\) for the same local
+non-planarity.  Polar \(Q/\phi\) puckering functions and native \(U\) rows are
+therefore reserved for the Gaussian DV profile.
 The symmetry-enabled norbornane input, run without \texttt{NoSymm}, contains
 51 generated rows of which 36 non-totally symmetric rows are marked
 \texttt{Frozen}; it converges in five steps.  These runs isolate the
