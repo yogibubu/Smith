@@ -8,7 +8,7 @@
 \usepackage{longtable}
 \usepackage{microtype}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning}
+\usetikzlibrary{arrows.meta,calc,positioning}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=black]{hyperref}
 
@@ -135,18 +135,18 @@ coordinate persistence but is not validated in this paper. \\
 
 \begin{figure}[htbp]
 \centering
-\resizebox{\linewidth}{!}{%
+\resizebox{0.99\linewidth}{!}{%
 \begin{tikzpicture}[
-  node distance=0.36cm and 0.42cm,
-  every node/.style={font=\small},
+  node distance=0.46cm and 0.56cm,
+  every node/.style={font=\normalsize},
   stage/.style={
     draw=black!65,
     line width=0.45pt,
     rounded corners=2.2pt,
     align=center,
-    text width=0.145\linewidth,
-    minimum height=0.80cm,
-    inner sep=3.5pt,
+    text width=0.155\linewidth,
+    minimum height=1.16cm,
+    inner sep=4.8pt,
     fill=#1
   },
   contract/.style={
@@ -155,8 +155,8 @@ coordinate persistence but is not validated in this paper. \\
     rounded corners=2.4pt,
     align=center,
     text width=0.18\linewidth,
-    minimum height=0.92cm,
-    inner sep=4pt,
+    minimum height=1.26cm,
+    inner sep=5.0pt,
     fill=black!6
   },
   app/.style={
@@ -165,10 +165,10 @@ coordinate persistence but is not validated in this paper. \\
     rounded corners=2pt,
     align=center,
     text width=0.14\linewidth,
-    minimum height=0.58cm,
-    inner sep=2.5pt,
+    minimum height=0.74cm,
+    inner sep=3.4pt,
     fill=black!2,
-    font=\footnotesize
+    font=\small
   },
   arrow/.style={-{Latex[length=2.2mm]}, line width=0.45pt, draw=black!70}
 ]
@@ -178,7 +178,7 @@ coordinate persistence but is not validated in this paper. \\
 \node[stage=purple!8, right=of semantic] (reduction) {Block-local\\rank reduction\\and symmetry};
 \node[contract, right=of reduction] (contract) {Frozen\\coordinate\\contract};
 
-\node[app, below=0.62cm of contract, xshift=-0.32\linewidth] (opt) {Optimization};
+\node[app, below=1.00cm of contract, xshift=-0.32\linewidth] (opt) {Optimization};
 \node[app, right=0.14cm of opt] (gf) {GF/PED};
 \node[app, right=0.14cm of gf] (dvr) {DVR};
 \node[app, right=0.14cm of dvr] (pes) {PES fitting};
@@ -188,8 +188,11 @@ coordinate persistence but is not validated in this paper. \\
 \draw[arrow] (families) -- (semantic);
 \draw[arrow] (semantic) -- (reduction);
 \draw[arrow] (reduction) -- (contract);
+\coordinate (bus) at ($(contract.south)+(0,-0.42cm)$);
+\draw[arrow] (contract.south) -- (bus);
+\draw[draw=black!55, line width=0.35pt] (opt.north |- bus) -- (refine.north |- bus);
 \foreach \target in {opt,gf,dvr,pes,refine}
-  \draw[arrow] (contract.south) |- (\target.north);
+  \draw[arrow] (\target.north |- bus) -- (\target.north);
 \end{tikzpicture}
 }
 \caption{Constructive workflow implemented by \SMITH\ for \SONIC\ coordinates.
@@ -1135,6 +1138,21 @@ and the glycine I/II hydrogen-bond fixtures as regression probes: a single
 intramolecular bridge and a bifurcated bridge both close the expected rank
 without converting the underlying covalent topology into a different molecule.
 
+A concrete non-covalent example is the formic-acid--water dimer used in the
+regression suite.  In pseudo-bond mode, the validated weak contacts
+\((3,8)\) and \((5,6)\) are inserted as typed \texttt{HBOND} pseudo-edges.
+They are stored in the contract as
+\[
+  \texttt{PSEUDO\_BOND\_COUNT 2}, \qquad
+  \texttt{1 3 8 KIND=HBOND}, \qquad
+  \texttt{2 5 6 KIND=HBOND}.
+\]
+The augmented graph then produces ordinary stretch, bend and torsion candidates
+plus protected pseudo-cycle bend and torsion families.  The final object
+remains rank-complete at \(18/18\), and the pseudo-cycle rows remain labelled
+separately from covalent ring coordinates so that downstream analyses can keep
+or suppress them explicitly.
+
 \section{Validated Construction Scope}
 
 Table~\ref{tab:status} records the status of the present \NEO\
@@ -1144,68 +1162,51 @@ objects remain methodological extensions.  This separation is important because
 downstream validation is meaningful only for coordinates that are part of the
 frozen contract.
 
-\begin{longtable}{p{0.27\linewidth}p{0.18\linewidth}p{0.45\linewidth}}
+\begin{table}[p]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2.6pt}
+\renewcommand{\arraystretch}{0.88}
 \caption{Validated scope of the main \NEO\ coordinate families.}
-\label{tab:status}\\
+\label{tab:status}
+\begin{tabular}{@{}p{0.24\linewidth}p{0.17\linewidth}p{0.50\linewidth}@{}}
 \toprule
 Feature & Status & Notes \\
 \midrule
-\endfirsthead
-\toprule
-Feature & Status & Notes \\
+Covalent stretches & Active & All topology bonds; local equivalence grouping available. \\
 \midrule
-\endhead
-Covalent stretches & Active & Generated for all topology bonds; local
-equivalence grouping is available. \\
-Exocyclic bends & Active & Generated around bonded centers; local symmetric
-combinations exist for common three- and four-coordinate motifs. \\
-High coordination & Active/refactor boundary & Coordination numbers 5--9 use
-template recognition where possible, otherwise ligand-equivalence blocks and
-local SVD. Metal-specific extensions remain under development. \\
-One-dihedral exocyclic torsions & Active default & The intramolecular path uses
-\texttt{ONEDIH} by default; a legacy alternative is kept for diagnostics. \\
-Ring deformation and puckering & Active & Endocyclic angle and torsional source
-spaces generate \(RDef\) and \(RPck\) components; \(Q/\phi\)-like descriptors
-are post-processing and DVR variables, not commercial Gaussian 16
-\texttt{ReadAllGIC} optimizer rows. \\
-Butterfly and condensed rings & Active & Fused-ring butterfly and condensed
-torsion families are kept as separate homogeneous source blocks. \\
-Out-of-plane/improper coordinates & Active & \(U\) out-of-plane coordinates are
-default; Gaussian-style improper dihedrals are available as a compatibility
-mode. \\
-Special fragment coordinates & Active & Fragment-center distances,
-center-atom distances, translations and orientations are prioritized before
-ordinary rank completion. \\
-Interaction centers & Active baseline & Ring centers, bond centers and related
-virtual centers can enter center-atom coordinates. \\
-Semantic \texttt{PROTECT}/\texttt{OBSERVABLE} layer & Active baseline &
-Protected user rows are deduplicated, substituted when row-equivalent to an
-automatic primitive and rejected when they exceed the target rank; observables
-use sparse chain-rule propagation. \\
-Pseudo-bond/pseudo-cycle mode & Validated baseline & Within the current
-validated scope, typed weak contacts can be inserted as pseudo-edges;
-pseudo-cycle bend and torsion families remain separate from covalent
-coordinates and are regression-tested on hydrogen-bonded weak complexes and
-glycine I/II contact fixtures. \\
-Point-group projector & Active & Applied to homogeneous blocks after
-non-redundant reduction; local SALC fallback is recorded explicitly. \\
-\SONIC\ symmetry-adapted Cartesian reference basis & Active in \NEO & Symmetry-adapted Cartesian
-nullspace coordinates provide a Cartesian reference active space for
-downstream validation, without changing the \GIC\ construction. \\
-Sparse Wilson-\(\Bmat\) representation & Validated baseline & Sparse derivative
-rows are stored.  Dense matrices remain available only as
-compact representations for rank and projector audits. \\
-Canonical primitive/function registry & Validated baseline & The Gaussian
-Supporting Information uses search trees to avoid duplicate primitive records
-in large GIC expressions.  \NEO\ uses a canonical semantic registry for
-generated primitives and \(\y=f(\q)\) functions, preserving the coordinate
-state while preventing duplicated coordinate objects. \\
-Coordinate-function layer & Validated baseline & Inverse and exponential
-distances, trigonometric functions, linear combinations, polar radii and
-elliptic quadratic functions are evaluated by sparse chain-rule propagation
-from the frozen base \(\Bmat\) rows. \\
+Exocyclic bends & Active & Bonded-center bends; local symmetric combinations for common motifs. \\
+\midrule
+High coordination & Active/refactor boundary & Coordination 5--9 by templates or ligand-equivalence blocks with local SVD. \\
+\midrule
+One-dihedral exocyclic torsions & Active default & \texttt{ONEDIH} is the default intramolecular path; legacy alternatives are diagnostic. \\
+\midrule
+Ring deformation/puckering & Active & Endocyclic angle and torsion sources generate \(RDef\) and \(RPck\); \(Q/\phi\) are derived descriptors. \\
+\midrule
+Butterfly/condensed rings & Active & Fused-ring butterfly and condensed torsion families remain separate homogeneous source blocks. \\
+\midrule
+Out-of-plane/improper rows & Active & Native \(U\) rows are default; Gaussian-style improper dihedrals are a compatibility mode. \\
+\midrule
+Special fragment coordinates & Active & Fragment-center distances, center-atom distances, translations and orientations are protected first. \\
+\midrule
+Interaction centers & Active baseline & Ring, bond and related virtual centers can enter center-atom coordinates. \\
+\midrule
+Semantic \texttt{PROTECT}/\texttt{OBSERVABLE} layer & Active baseline & Deduplication, row-equivalent substitution, rank-excess rejection and sparse observable propagation. \\
+\midrule
+Pseudo-bond/pseudo-cycle mode & Validated baseline & Typed weak contacts become pseudo-edges; pseudo-cycle bends/torsions stay labelled separately. \\
+\midrule
+Point-group projector & Active & Applied after non-redundant reduction inside homogeneous blocks; fallback is recorded. \\
+\midrule
+\SONIC\ symmetry-adapted Cartesian reference & Active & Cartesian active-space reference for validation; does not change \GIC\ construction. \\
+\midrule
+Sparse Wilson-\(\Bmat\) representation & Validated baseline & Sparse derivative rows are stored; dense matrices are only audit representations. \\
+\midrule
+Primitive/function registry & Validated baseline & Canonical primitive and \(\y=f(\q)\) records prevent duplicate coordinate objects. \\
+\midrule
+Coordinate-function layer & Validated baseline & Inverse/exponential distances, trigonometric functions, polar radii and quadratic functions use sparse chain rules. \\
 \bottomrule
-\end{longtable}
+\end{tabular}
+\end{table}
 
 \section{Validation Strategy}
 
