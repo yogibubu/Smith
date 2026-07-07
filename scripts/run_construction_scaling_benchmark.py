@@ -165,7 +165,17 @@ def _plot_results(results: list[dict], fits: dict[str, dict]) -> None:
         "ring/cage topology": "s",
         "special centers": "^",
     }
-    fig, axes = plt.subplots(1, 3, figsize=(12.0, 3.35))
+    plt.rcParams.update(
+        {
+            "font.size": 10,
+            "axes.titlesize": 11,
+            "axes.labelsize": 10,
+            "xtick.labelsize": 9,
+            "ytick.labelsize": 9,
+            "legend.fontsize": 9,
+        }
+    )
+    fig, axes = plt.subplots(1, 3, figsize=(14.2, 4.25))
     panels = (
         ("candidates", "build_time_median_s", "Build time / s"),
         ("b_nnz", "b_time_median_s", r"$\mathbf{B}$ time / s"),
@@ -180,7 +190,7 @@ def _plot_results(results: list[dict], fits: dict[str, dict]) -> None:
                 label=series,
                 color=colors[series],
                 marker=markers[series],
-                s=34,
+                s=48,
                 edgecolor="white",
                 linewidth=0.5,
                 zorder=3,
@@ -203,9 +213,9 @@ def _plot_results(results: list[dict], fits: dict[str, dict]) -> None:
     axes[2].set_title(
         f"Memory slope {fits['regular_memory_vs_primitives']['slope']:.2f}"
     )
-    axes[0].legend(frameon=False, fontsize=8, loc="upper left")
-    fig.tight_layout()
-    fig.savefig(FIGURE, dpi=240)
+    axes[0].legend(frameon=False, loc="upper left")
+    fig.tight_layout(w_pad=2.0)
+    fig.savefig(FIGURE, dpi=300)
 
 
 def main() -> None:
