@@ -54,8 +54,11 @@ def main() -> None:
         return
     if args.run:
         run_gaussian(args.gaussian)
-    results = summarize_results()
-    DATA.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
+    if args.prepare or args.run:
+        results = summarize_results()
+        DATA.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
+    else:
+        results = json.loads(DATA.read_text(encoding="utf-8"))
     plot_results(results)
 
 
@@ -243,13 +246,18 @@ def summarize_log(mode: str, path: Path) -> dict[str, object]:
 def plot_results(results: dict[str, object]) -> None:
     systems = results["systems"]
     labels = [str(system["name"]).replace("_", " ") for system in systems]
-    values = {
-        mode: [
-            next(row for row in system["modes"] if row["mode"] == mode)["steps"] or 0
-            for system in systems
-        ]
-        for mode in MODES
-    }
+    values = {}
+    failures = {}
+    for mode in MODES:
+        mode_values = []
+        mode_failures = []
+        for system in systems:
+            row = next(row for row in system["modes"] if row["mode"] == mode)
+            failed = not row["normal_termination"]
+            mode_values.append(np.nan if failed else row["steps"])
+            mode_failures.append(failed)
+        values[mode] = mode_values
+        failures[mode] = mode_failures
     fig, ax = plt.subplots(figsize=(7.0, 3.8))
     x = np.arange(len(labels), dtype=float)
     width = 0.18
@@ -262,10 +270,17 @@ def plot_results(results: dict[str, object]) -> None:
     for offset, mode in enumerate(MODES):
         xpos = x + (offset - 1.5) * width
         ax.bar(xpos, values[mode], width, label=mode, color=colors[mode])
-        for xi, system in zip(xpos, systems):
-            row = next(row for row in system["modes"] if row["mode"] == mode)
-            if not row["normal_termination"]:
-                ax.text(xi, 0.7, "fail", ha="center", va="bottom", rotation=90, fontsize=7)
+        for xi, failed in zip(xpos, failures[mode]):
+            if failed:
+                ax.scatter(
+                    [xi],
+                    [0.6],
+                    marker="x",
+                    s=38,
+                    linewidths=1.2,
+                    color=colors[mode],
+                    zorder=4,
+                )
     ax.set_xticks(x, labels)
     ax.set_ylabel("optimization steps")
     ax.set_title("Gaussian optimization coordinate-system comparison")

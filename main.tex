@@ -679,10 +679,11 @@ because their \(\Bmat\) rows are analytic linear combinations of dihedral
 derivatives.\cite{CremerPople1975}
 For every selected cosine--sine puckering pair, \SMITH\ can also emit the
 derived observables
-\[
+\begin{equation}
+\label{eq:puckering-polar-observables}
   QPck_m=\sqrt{(RPck_m^c)^2+(RPck_m^s)^2},\qquad
   \Phi P_m=\operatorname{atan2}(RPck_m^s,RPck_m^c).
-\]
+\end{equation}
 These \(QPck/\Phi P\) variables are functions of the stored linear rows rather
 than additional rank-carrying coordinates.
 
@@ -691,10 +692,11 @@ to cyclic source lists rather than a direct quotation of a published
 molecule-specific formula.  If \(s_j\) denotes such a list, for example the
 endocyclic valence angles or a torsional puckering list, the stored rows are
 real Fourier-like combinations
-\[
+\begin{equation}
+\label{eq:ring-fourier-combinations}
   Q_m^c = N_m\sum_{j=1}^{n} s_j\cos\frac{2\pi m(j-1)}{n},\qquad
   Q_m^s = N_m\sum_{j=1}^{n} s_j\sin\frac{2\pi m(j-1)}{n},
-\]
+\end{equation}
 with the alternating row \(Q_{n/2}=n^{-1/2}\sum_j(-1)^{j-1}s_j\) for even
 \(n\).  The normalization \(N_m\) is chosen so that coefficient vectors are
 unit length before the symmetry projection.  Thus the same cyclic algebra is
@@ -703,13 +705,14 @@ rows; only the source primitive list changes.
 
 For a six-membered ring segment \(1\cdots6\), a typical generated angle row has
 the explicit form
-\[
+\begin{equation}
+\label{eq:explicit-ring-rdef}
 \begin{aligned}
 RDef &=
  0.57735\,A(6,1,2)-0.28868\,A(1,2,3)-0.28868\,A(2,3,4) \\
 &\quad +0.57735\,A(3,4,5)-0.28868\,A(4,5,6)-0.28868\,A(5,6,1),
 \end{aligned}
-\]
+\end{equation}
 and the analogous puckering row is built from the corresponding cyclic
 dihedrals with the same normalized coefficient pattern.  In the frozen
 contract these rows carry family labels, source primitive identifiers and
@@ -1531,29 +1534,52 @@ evaluation, as is common for difficult non-redundant coordinate optimizations.
 They test the narrower point that \SMITH\ can generate a
 Gaussian-readable \SONIC\ coordinate model without manual GIC transcription and
 that Gaussian can optimize from it using the commercial \texttt{ReadAllGIC}
-parser.  At HF/STO-3G, water and hydrogen peroxide give essentially
-the same iteration counts across the tested coordinate choices.  Norbornane
+parser.  At HF/STO-3G, water and hydrogen peroxide give the same or nearly the
+same iteration counts across the tested coordinate choices.  Norbornane
 converges in four steps with Gaussian redundant internals and Cartesians, six
 steps with a sequential Z matrix and nine steps with the automatically
 generated \SONIC\ block.  Camphor converges in eight steps with Gaussian
 redundant internals, 14 Cartesian steps, nine \SONIC\ steps and 33 steps for a
-sequential Z matrix.  The point of this diagnostic is therefore not that
+sequential Z matrix.  Table~\ref{tab:gaussian-coordinate-comparison} gives the
+numerical values plotted in Fig.~\ref{fig:gaussian-coordinate-comparison}, so
+the prose, table and figure refer to the same diagnostic set.  The point of this
+diagnostic is therefore not that
 \SONIC\ is always the shortest optimizer path in Gaussian, but that the
 automatic generated GIC block is accepted by the commercial Gaussian
 \texttt{ReadAllGIC} parser and remains competitive while carrying a much more
 explicit coordinate contract.
 
+\begin{table}[htbp]
+\centering
+\caption{Gaussian 16 HF/STO-3G optimization-step comparison shown in
+Fig.~\ref{fig:gaussian-coordinate-comparison}.  The default column is Gaussian's
+built-in redundant internal-coordinate optimizer.  The \SONIC{} column uses the
+automatically generated Gaussian \texttt{ReadAllGIC} block.}
+\label{tab:gaussian-coordinate-comparison}
+\begin{tabular}{lccrrrr}
+\toprule
+System & PG & \SONIC\ rank & Default & Cartesian & Z matrix & \SONIC \\
+\midrule
+Water & \(C_{2v}\) & 3/3 & 4 & 4 & 4 & 5 \\
+Hydrogen peroxide & \(D_{2h}\) & 6/6 & 6 & 6 & 5 & 6 \\
+Norbornane & \(C_{2v}\) & 51/51 & 4 & 4 & 6 & 9 \\
+Camphor & \(C_1\) & 75/75 & 8 & 14 & 33 & 9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 A separate native-coordinate check was carried out with the \(U\)
 out-of-plane export enabled, rather than replacing \(U\) rows by
 Gaussian-compatible improper dihedrals.  For a three-coordinate center \(j\)
 with ligands \(a,b,c\), the signed coordinate is
-\[
+\begin{equation}
+\label{eq:native-out-of-plane-u}
   U(j;a,b,c)=
   \arcsin\!\left[
   \frac{\hat r_{ja}\cdot(\hat r_{jb}\times\hat r_{jc})}
        {|\hat r_{jb}\times\hat r_{jc}|}
   \right],
-\]
+\end{equation}
 with the stored atom ordering fixing the sign convention.  In this mode
 camphor contains one native \(U(6,4,7,8)\) row and converges in eight
 HF/STO-3G optimization steps.  The commercial Gaussian 16 compatibility input
@@ -1574,8 +1600,9 @@ before export through the commercial Gaussian parser.
 \includegraphics[width=0.72\linewidth]{figures/gaussian_coordinate_comparison.png}
 \caption{Gaussian 16 HF/STO-3G optimization-step comparison for built-in
 Gaussian coordinates and automatically generated \SONIC\ \texttt{ReadAllGIC}
-coordinates.  Failed/non-completed runs are marked at the baseline.  The
-water and hydrogen-peroxide tests verify solver consumption and input
+coordinates.  The dataset shown here contains only completed runs; the plotting
+script marks any future non-completed run with a cross rather than a zero-height
+bar.  The water and hydrogen-peroxide tests verify solver consumption and input
 portability; norbornane and camphor probe bridged-ring cases where a naive
 sequential Z matrix is less efficient.}
 \label{fig:gaussian-coordinate-comparison}
@@ -1586,21 +1613,24 @@ sequential Z matrix is less efficient.}
 Let \(\Fmat_x\) be a Cartesian Hessian at the reference geometry.  For a
 full-rank \SONIC\ Wilson matrix \(\Bmat\), the minimum-norm Cartesian
 displacement associated with an internal displacement is
-\[
+\begin{equation}
+\label{eq:minimum-norm-cartesian-displacement}
   \Delta \x = \Bmat^T(\Bmat\Bmat^T)^{-1}\Delta\q ,
-\]
+\end{equation}
 and the corresponding first-order internal-coordinate Hessian is
-\[
+\begin{equation}
+\label{eq:internal-hessian-transform}
   \Fmat_q =
   \left[\Bmat^T(\Bmat\Bmat^T)^{-1}\right]^T
   \Fmat_x
   \left[\Bmat^T(\Bmat\Bmat^T)^{-1}\right].
-\]
+\end{equation}
 This construction is not a new force-field definition; it is a coordinate-space
 diagnostic.  The dimensionless coupling
-\[
+\begin{equation}
+\label{eq:hessian-coupling}
   C_{ij}=\frac{|F_{ij}|}{\sqrt{|F_{ii}F_{jj}|}}
-\]
+\end{equation}
 then compares off-diagonal structure without mixing units.
 
 Figure~\ref{fig:hessian-heatmap} shows an illustrative result for cyclobutane.  In an
@@ -1762,7 +1792,10 @@ independent of the electronic-structure implementation.
 \caption{Portable cyclohexane puckering coordinates evaluated by non-Gaussian
 codes on a local workstation.  Energies are PBE0/def2-SVP single points on the same
 \SONIC{}-generated Cartesian geometries; relative energies are in kJ mol\(^{-1}\)
-with respect to \(p00\).}
+with respect to \(p00\).  The labels are the same interpolation points used in
+Fig.~\ref{fig:cyclohexane-puckering-equivalence}: \(p00\) corresponds to
+\(\lambda=0.00\), \(p02\) to \(\lambda=0.50\), and \(p04\) to
+\(\lambda=1.00\).}
 \label{tab:external-codes}
 \begin{tabular}{lrrrr}
 \toprule
