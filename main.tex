@@ -9,6 +9,7 @@
 \usetikzlibrary{arrows.meta,calc,positioning}
 
 \providecommand{\href}[2]{#2}
+\providecommand{\url}[1]{#1}
 \providecommand{\keywords}[1]{\par\noindent\textbf{Keywords: }#1\par}
 \makeatletter
 \@ifundefined{tocentry}{%
@@ -1489,18 +1490,22 @@ ring and cage coordinates while remaining small enough for repeated external
 checks.  The native \SONIC\ contract uses signed out-of-plane rows and
 block-local multi-dihedral \(RPck\) puckering rows.  Those rows have been
 validated with a development Gaussian implementation that supports them as
-active variables.  Commercial Gaussian 16 has a documented limitation for
-active generic GICs that combine multiple periodic dihedrals, and it has no
-native \(U\) out-of-plane primitive.  The commercial \texttt{ReadAllGIC}
-export therefore uses a compatibility profile: \(U\) rows are replaced by the
-corresponding Gaussian improper dihedrals, multi-dihedral \SONIC\ rows are kept
-as inactive diagnostics, and all component \(D(\cdots)\) terms are added as
-active redundant periodic coordinates.  After the Gaussian optimization, the
-optimized geometry is evaluated again in the frozen non-redundant \SONIC\
-contract.  The calculations reported here used Gaussian 16 at HF/STO-3G.
+active variables.  Commercial Gaussian 16 has no native \(U\) out-of-plane
+primitive, and the official Gaussian GIC documentation warns that active
+generic coordinates combining multiple periodic dihedrals can behave poorly
+because the periodicity of the component torsions is not applied inside the
+composite expression.\cite{GaussianGICManual}  The commercial
+\texttt{ReadAllGIC} export therefore uses a compatibility profile only when the
+\texttt{g16} option is requested: \(U\) rows are replaced by the corresponding
+Gaussian improper dihedrals, multi-dihedral \SONIC\ rows are not written to the
+Gaussian input, and all component \(D(\cdots)\) terms are added as active
+redundant periodic coordinates.  After the Gaussian optimization, \SMITH\ reads
+the optimized Cartesian structure and evaluates it again in the frozen
+non-redundant \SONIC\ contract.  The calculations reported here used Gaussian
+16 at HF/STO-3G.
 
 The relevant observations are that Gaussian 16 accepts the automatically
-generated coordinate block and reaches a stationary point in three to nine
+generated coordinate block and reaches a stationary point in two to five
 steps for saturated ring and cage systems with different symmetry and rank.
 
 \begin{table}[htbp]
@@ -1516,7 +1521,7 @@ left blank.}
 System & PG & \SONIC\ rank & Gaussian \(NTRed/NRank\) & Steps & \(E_\mathrm{final}\) / \(E_h\) \\
 \midrule
 Cyclohexane & \(D_{3d}\) & 48/48 & -- & 5 & \(-231.482671171\) \\
-Norbornane & \(C_{2v}\) & 51/51 & -- & 9 & \(-268.893823819\) \\
+Norbornane & \(C_{2v}\) & 51/51 & -- & 2 & \(-268.893823525\) \\
 Cubane & \(O_h\) & 42/42 & -- & 3 & \(-303.781399977\) \\
 \bottomrule
 \end{tabular}
@@ -1546,9 +1551,9 @@ that Gaussian can optimize from it using the commercial \texttt{ReadAllGIC}
 parser.  At HF/STO-3G, water and hydrogen peroxide give the same or nearly the
 same iteration counts across the tested coordinate choices.  Norbornane
 converges in four steps with Gaussian redundant internals and Cartesians, six
-steps with a sequential Z matrix and nine steps with the automatically
+steps with a sequential Z matrix and two steps with the automatically
 generated \SONIC\ block.  Camphor converges in eight steps with Gaussian
-redundant internals, 14 Cartesian steps, nine \SONIC\ compatibility steps and 33 steps for a
+redundant internals, 14 Cartesian steps, four \SONIC\ compatibility steps and 33 steps for a
 sequential Z matrix.  Table~\ref{tab:gaussian-coordinate-comparison} gives the
 numerical values plotted in Fig.~\ref{fig:gaussian-coordinate-comparison}, so
 the prose, table and figure refer to the same diagnostic set.  The point of this
@@ -1573,8 +1578,8 @@ System & PG & \SONIC\ rank & Default & Cartesian & Z matrix & \SONIC \\
 \midrule
 Water & \(C_{2v}\) & 3/3 & 4 & 4 & 4 & 5 \\
 Hydrogen peroxide & \(D_{2h}\) & 6/6 & 6 & 6 & 5 & 6 \\
-Norbornane & \(C_{2v}\) & 51/51 & 4 & 4 & 6 & 9 \\
-Camphor & \(C_1\) & 75/75 & 8 & 14 & 33 & 9 \\
+Norbornane & \(C_{2v}\) & 51/51 & 4 & 4 & 6 & 2 \\
+Camphor & \(C_1\) & 75/75 & 8 & 14 & 33 & 4 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1598,12 +1603,16 @@ uses the Fortran/G16 improper-dihedral convention
 \(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving \(D(4,6,8,7)\) for the same local
 non-planarity.  For ring puckering, commercial Gaussian 16 receives the
 individual periodic dihedrals that enter each \(RPck\) row as active redundant
-coordinates, while the original \(RPck\) combinations are written as inactive
-diagnostics.  The optimized structure is then projected back onto the native
-\SONIC\ contract.  This compatibility export is less compact than the native
+coordinates; the original \(RPck\) combinations are retained only in the
+\SMITH\ contract and do not appear in the commercial Gaussian 16 input.  The
+optimized structure is then projected back onto the native \SONIC\ contract.
+This compatibility export is less compact than the native
 form, but it allows standard Gaussian 16 to be used without relying on
 development-only primitives.  The native \SONIC\ contract still defines \(U\),
 multi-dihedral \(RPck\), \(QPck\) and \(\Phi P\).
+In the development Gaussian build, the default internal-coordinate model for
+camphor is sensitive to the automatic \(CX_3\) methyl treatment; adding
+\texttt{Geom=(GIC,NoXY3)} restores the stable standard-coordinate reference.
 The corresponding native-coordinate norbornane check, also run with the same
 total-symmetric active subset, contains 51 generated rows of which 36
 non-totally symmetric rows are marked \texttt{Frozen}; it converges in five

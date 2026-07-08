@@ -1,30 +1,8 @@
-477: SCF Done:  E(RHF) =  -268.892840294     A.U. after    9 cycles
-688: Step number   1 out of a maximum of   80
-766: Maximum Force            0.012837     0.000450     NO 
-1025: SCF Done:  E(RHF) =  -268.893215556     A.U. after    9 cycles
-1084: Step number   2 out of a maximum of   80
-1176: Maximum Force            0.071271     0.000450     NO 
-1460: SCF Done:  E(RHF) =  -268.865876306     A.U. after   11 cycles
-1519: Step number   3 out of a maximum of   80
-1601: Maximum Force            0.333926     0.000450     NO 
-1853: SCF Done:  E(RHF) =  -268.893281046     A.U. after    9 cycles
-1912: Step number   4 out of a maximum of   80
-1992: Maximum Force            0.049528     0.000450     NO 
-2238: SCF Done:  E(RHF) =  -268.893796372     A.U. after    8 cycles
-2297: Step number   5 out of a maximum of   80
-2378: Maximum Force            0.007360     0.000450     NO 
-2598: SCF Done:  E(RHF) =  -268.893819268     A.U. after    7 cycles
-2657: Step number   6 out of a maximum of   80
-2739: Maximum Force            0.000819     0.000450     NO 
-2945: SCF Done:  E(RHF) =  -268.893822438     A.U. after    6 cycles
-3004: Step number   7 out of a maximum of   80
-3092: Maximum Force            0.000934     0.000450     NO 
-3298: SCF Done:  E(RHF) =  -268.893823730     A.U. after    6 cycles
-3357: Step number   8 out of a maximum of   80
-3445: Maximum Force            0.000508     0.000450     NO 
-3640: SCF Done:  E(RHF) =  -268.893823819     A.U. after    5 cycles
-3699: Step number   9 out of a maximum of   80
-3786: Maximum Force            0.000079     0.000450     YES
-3791: Optimization completed.
-3792:    -- Stationary point found.
-4176: Normal termination of Gaussian 16 at Tue Jul  7 07:37:03 2026.
+138:  CrdQ2X: Updating Cartesian coordinates based on modified values of the internal ones.
+590:  SCF Done:  E(RHF) =  -268.892840294     A.U. after    9 cycles
+913:  Step number   1 out of a maximum of   80
+1272:  SCF Done:  E(RHF) =  -268.893823525     A.U. after    7 cycles
+1332:  Step number   2 out of a maximum of   80
+1425:  Optimization completed.
+1426:     -- Stationary point found.
+1853:  Normal termination of Gaussian 16 at Wed Jul  8 13:46:24 2026.

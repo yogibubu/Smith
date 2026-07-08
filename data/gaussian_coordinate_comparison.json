@@ -134,11 +134,9 @@
           "normal_termination": true,
           "stationary_point": true,
           "optimization_completed": true,
-          "steps": 9,
-          "scf_cycles": 9,
-          "final_energy_hartree": -457.283638781,
-          "g16_improper_expression": "D(4,6,8,7)",
-          "route": "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80) output=pickett"
+          "steps": 4,
+          "scf_cycles": 4,
+          "final_energy_hartree": -457.283643076
         }
       ]
     },
@@ -182,9 +180,9 @@
           "normal_termination": true,
           "stationary_point": true,
           "optimization_completed": true,
-          "steps": 9,
-          "scf_cycles": 9,
-          "final_energy_hartree": -268.89382382
+          "steps": 2,
+          "scf_cycles": 2,
+          "final_energy_hartree": -268.893823525
         }
       ]
     }

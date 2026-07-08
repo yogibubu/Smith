@@ -104,6 +104,7 @@ def prepare_inputs() -> None:
             route=ROUTES["sonic"],
             title=f"{name} SONIC ReadAllGIC optimization",
             link0=(f"%chk={name}_sonic.chk", "%nprocshared=4", "%mem=2GB"),
+            g16_compatibility=True,
         )
 
 
@@ -221,7 +222,7 @@ def summarize_results() -> dict[str, object]:
             }
         )
     return {
-        "method": "Gaussian coordinate-system optimization comparison",
+        "method": "Gaussian 16 coordinate-system optimization comparison",
         "electronic_structure": "Gaussian 16 HF/STO-3G",
         "systems": systems,
     }
