@@ -246,7 +246,13 @@ def summarize_log(mode: str, path: Path) -> dict[str, object]:
 
 def plot_results(results: dict[str, object]) -> None:
     systems = results["systems"]
-    labels = [str(system["name"]).replace("_", " ") for system in systems]
+    labels = [str(system["name"]).replace("_", "\n") for system in systems]
+    mode_labels = {
+        "default": "Gaussian redundant",
+        "cartesian": "Cartesian",
+        "zmatrix": "Z-matrix",
+        "sonic": "SONIC ReadAllGIC",
+    }
     values = {}
     failures = {}
     for mode in MODES:
@@ -259,9 +265,9 @@ def plot_results(results: dict[str, object]) -> None:
             mode_failures.append(failed)
         values[mode] = mode_values
         failures[mode] = mode_failures
-    fig, ax = plt.subplots(figsize=(7.0, 3.8))
+    fig, ax = plt.subplots(figsize=(7.6, 4.25))
     x = np.arange(len(labels), dtype=float)
-    width = 0.18
+    width = 0.19
     colors = {
         "default": "#5b6670",
         "cartesian": "#b7534c",
@@ -270,11 +276,19 @@ def plot_results(results: dict[str, object]) -> None:
     }
     for offset, mode in enumerate(MODES):
         xpos = x + (offset - 1.5) * width
-        ax.bar(xpos, values[mode], width, label=mode, color=colors[mode])
-        for xi, failed in zip(xpos, failures[mode]):
+        bars = ax.bar(
+            xpos,
+            values[mode],
+            width,
+            label=mode_labels[mode],
+            color=colors[mode],
+            edgecolor="white",
+            linewidth=0.45,
+        )
+        for bar, value, failed in zip(bars, values[mode], failures[mode]):
             if failed:
                 ax.scatter(
-                    [xi],
+                    [bar.get_x() + bar.get_width() / 2.0],
                     [0.6],
                     marker="x",
                     s=38,
@@ -282,10 +296,26 @@ def plot_results(results: dict[str, object]) -> None:
                     color=colors[mode],
                     zorder=4,
                 )
+            elif np.isfinite(value):
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2.0,
+                    float(value) + 0.35,
+                    f"{int(value)}",
+                    ha="center",
+                    va="bottom",
+                    fontsize=8,
+                    color="#24272a",
+                )
     ax.set_xticks(x, labels)
     ax.set_ylabel("optimization steps")
-    ax.set_title("Gaussian optimization coordinate-system comparison")
-    ax.legend(frameon=False, ncol=4, loc="upper center", bbox_to_anchor=(0.5, 1.18))
+    ymax = max(
+        float(value)
+        for mode_values in values.values()
+        for value in mode_values
+        if np.isfinite(value)
+    )
+    ax.set_ylim(0, ymax + 5.0)
+    ax.legend(frameon=False, ncol=4, loc="upper center", bbox_to_anchor=(0.5, 1.14))
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="y", color="#d7d9dc", linewidth=0.7)
     FIGURE.parent.mkdir(parents=True, exist_ok=True)
