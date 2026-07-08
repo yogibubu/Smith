@@ -1484,11 +1484,20 @@ optimization coordinate system.  In this probe \SONIC\ generates the
 Gaussian-readable \texttt{ReadAllGIC} block, and Gaussian reads that block,
 evaluates the GIC derivatives with its own machinery and performs the
 optimization.  No hand-written surrogate coordinates are introduced.  The three
-systems in Table~\ref{tab:readallgic-opt} were chosen because their
-\SONIC\ definitions contain only stretches, bends, dihedrals and linear
-combinations of those primitives, with no out-of-plane coordinates.  The same
-inputs are therefore compatible with standard Gaussian \texttt{ReadAllGIC}
-usage; the calculations reported here used Gaussian 16 at HF/STO-3G.
+systems in Table~\ref{tab:readallgic-opt} were chosen because they exercise
+ring and cage coordinates while remaining small enough for repeated external
+checks.  The native \SONIC\ contract uses signed out-of-plane rows and
+block-local multi-dihedral \(RPck\) puckering rows.  Those rows have been
+validated with a development Gaussian implementation that supports them as
+active variables.  Commercial Gaussian 16 has a documented limitation for
+active generic GICs that combine multiple periodic dihedrals, and it has no
+native \(U\) out-of-plane primitive.  The commercial \texttt{ReadAllGIC}
+export therefore uses a compatibility profile: \(U\) rows are replaced by the
+corresponding Gaussian improper dihedrals, multi-dihedral \SONIC\ rows are kept
+as inactive diagnostics, and all component \(D(\cdots)\) terms are added as
+active redundant periodic coordinates.  After the Gaussian optimization, the
+optimized geometry is evaluated again in the frozen non-redundant \SONIC\
+contract.  The calculations reported here used Gaussian 16 at HF/STO-3G.
 
 The relevant observations are that Gaussian 16 accepts the automatically
 generated coordinate block and reaches a stationary point in three to nine
@@ -1539,15 +1548,17 @@ same iteration counts across the tested coordinate choices.  Norbornane
 converges in four steps with Gaussian redundant internals and Cartesians, six
 steps with a sequential Z matrix and nine steps with the automatically
 generated \SONIC\ block.  Camphor converges in eight steps with Gaussian
-redundant internals, 14 Cartesian steps, nine \SONIC\ steps and 33 steps for a
+redundant internals, 14 Cartesian steps, nine \SONIC\ compatibility steps and 33 steps for a
 sequential Z matrix.  Table~\ref{tab:gaussian-coordinate-comparison} gives the
 numerical values plotted in Fig.~\ref{fig:gaussian-coordinate-comparison}, so
 the prose, table and figure refer to the same diagnostic set.  The point of this
 diagnostic is therefore not that
 \SONIC\ is always the shortest optimizer path in Gaussian, but that the
 automatic generated GIC block is accepted by the commercial Gaussian
-\texttt{ReadAllGIC} parser and remains competitive while carrying a much more
-explicit coordinate contract.
+\texttt{ReadAllGIC} parser and remains competitive.  The commercial run is a
+parser/optimizer compatibility probe, not a change in the scientific coordinate
+contract: the non-redundant \SONIC\ rows remain the reference used to interpret
+and compare output geometries.
 
 \begin{table}[htbp]
 \centering
@@ -1583,11 +1594,16 @@ with ligands \(a,b,c\), the signed coordinate is
 with the stored atom ordering fixing the sign convention.  In this mode
 camphor contains one native \(U(6,4,7,8)\) row and converges in eight
 HF/STO-3G optimization steps.  The commercial Gaussian 16 compatibility input
-uses active linear \(RPck\) rows for ring puckering and the Fortran/G16
-improper-dihedral convention \(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving
-\(D(4,6,8,7)\) for the same local non-planarity.  The improper-dihedral and
-linear-\(RPck\) export is therefore a compatibility layer; the native \SONIC\
-contract still defines \(U\), \(QPck\) and \(\Phi P\).
+uses the Fortran/G16 improper-dihedral convention
+\(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving \(D(4,6,8,7)\) for the same local
+non-planarity.  For ring puckering, commercial Gaussian 16 receives the
+individual periodic dihedrals that enter each \(RPck\) row as active redundant
+coordinates, while the original \(RPck\) combinations are written as inactive
+diagnostics.  The optimized structure is then projected back onto the native
+\SONIC\ contract.  This compatibility export is less compact than the native
+form, but it allows standard Gaussian 16 to be used without relying on
+development-only primitives.  The native \SONIC\ contract still defines \(U\),
+multi-dihedral \(RPck\), \(QPck\) and \(\Phi P\).
 The corresponding native-coordinate norbornane check, also run with the same
 total-symmetric active subset, contains 51 generated rows of which 36
 non-totally symmetric rows are marked \texttt{Frozen}; it converges in five
