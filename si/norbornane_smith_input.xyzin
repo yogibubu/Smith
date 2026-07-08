@@ -22,6 +22,5 @@ H      -0.00000000     -2.15523000      0.73149700
 
 #SMITH
 schema = matrix.smith.input.v1
-source_kind = gaussian_cartesian_input
 symmetrize = false
-improper_dihedrals = true
+g16 = true

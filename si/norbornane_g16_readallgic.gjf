@@ -1,6 +1,3 @@
-%chk=norbornane_sonic.chk
-%nprocshared=4
-%mem=2GB
 #p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80) output=pickett
 
 norbornane SONIC ReadAllGIC optimization

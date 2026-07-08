@@ -33,13 +33,27 @@ SONIC: Symmetry-Oriented Non-redundant Internal Coordinates}
 
 This Supporting Information records the minimal standalone input required to
 generate the norbornane \SONIC\ coordinate contract and the corresponding
-Gaussian 16 \texttt{ReadAllGIC} input.  The first listing is intentionally not
-the enriched \texttt{xyzin} container written after molecular perception and
-coordinate construction.  It contains only a standard XYZ geometry followed by
-the SMITH directives needed for this Gaussian-compatible export.
-The Gaussian file in the second listing is then produced from that contract
-with the commercial Gaussian 16 compatibility switch, for example
-\texttt{smith gicforge gaussian-input norbornane.xyzin norbornane.gjf --g16}.
+commercial Gaussian 16 \texttt{ReadAllGIC} input used in the compatibility
+test.  The first listing is intentionally not the enriched \texttt{xyzin}
+container written after molecular perception and coordinate construction.  It
+contains only a standard XYZ geometry followed by the minimum SMITH directives
+needed for this Gaussian-compatible export.  In particular, \texttt{g16 = true}
+selects the Gaussian-style improper-dihedral construction in place of native
+\SONIC\ out-of-plane rows.
+
+The exact standalone workflow is:
+\begin{lstlisting}
+python -m matrix smith standalone norbornane_smith_input.xyzin norbornane.xyzin
+python -m matrix smith gaussian-input norbornane.xyzin norbornane_g16_readallgic.gjf \
+  --g16 --title "norbornane SONIC ReadAllGIC optimization" \
+  --route "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
+\end{lstlisting}
+Equivalently, after installation the console-script shorthand is
+\texttt{smith standalone ...} followed by \texttt{smith gaussian-input ... --g16}.
+The \texttt{--g16} export switch is what suppresses active multi-dihedral
+\SONIC\ rows in the Gaussian file and writes their component periodic
+\texttt{D(...)} coordinates instead; the non-redundant \SONIC\ rows remain in
+the \texttt{xyzin} contract used for post-processing.
 
 \subsection*{SMITH/SONIC input}
 
@@ -47,7 +61,7 @@ with the commercial Gaussian 16 compatibility switch, for example
 
 \subsection*{Generated Gaussian 16 input}
 
-\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input generated automatically from the SMITH/SONIC contract.}]{si/norbornane_g16_readallgic.gjf}
+\lstinputlisting[caption={Commercial Gaussian 16-compatible \texttt{ReadAllGIC} input generated automatically from the SMITH/SONIC contract.  Multi-dihedral \SONIC\ ring-puckering rows are absent by construction; their component periodic dihedrals appear as \texttt{V0001}, \texttt{V0002}, \ldots.}]{si/norbornane_g16_readallgic.gjf}
 
 \subsection*{Gaussian 16 output excerpt}
 
