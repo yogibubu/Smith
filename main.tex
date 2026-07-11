@@ -1097,6 +1097,29 @@ coordinates used in geomeTRIC-like optimization methods,\cite{WangSong2016GeomeT
 but stores the result as a frozen, symmetry-labelled \(\GIC\) definition with
 analytic \(\Bmat\) rows.
 
+The Cartesian gauge is fixed consistently across all MATRIX tools.  By default
+the weighted center is placed at the origin and the axes are ordered principal
+axes of inertia; atomic masses are the default weights, while atomic numbers
+may be selected to make the gauge invariant under isotopic substitution.  At
+each electronic-structure call the Cartesian geometry returned by the backend
+is aligned to the current MATRIX geometry by a proper Kabsch rotation, and the
+gradient (and Cartesian Hessian, when present) is transported by the same
+rotation.  Point-group symmetry can therefore remain enabled in the backend:
+no assumption is made that its standard orientation agrees with the optimizer
+frame.
+
+Relative fragment orientations use a local exponential-map chart on
+\(\mathrm{SO}(3)\).  When a rotation approaches the branch boundary, the chart
+is rebased and both coordinate values and analytic Wilson rows are transported
+with the composition Jacobian.  This atlas construction removes artificial
+large angular steps without changing the frozen \SONIC\ coordinate semantics.
+For the water-dimer regression, the original intermolecular construction
+required 28 macroiterations and differed from the Gaussian 16 endpoint by
+0.07459~\AA{} RMSD; the transported exponential-map implementation requires 20
+macroiterations and gives 0.00346~\AA{} RMSD.  A more aggressive chart reset
+reaches 0.000246~\AA{} but takes 24 iterations and is therefore retained as a
+diagnostic rather than the default.
+
 Interaction centers extend the same idea to non-atomic reference objects.  A
 center may be a ring centroid, a bond midpoint or a contact center.  Distances
 from atoms or fragments to such centers are special coordinates and
@@ -2025,12 +2048,12 @@ coordination rearrangements require separate contracts or a future
 state-interpolation model.  An EVB-like or subspace-interpolation layer may be
 possible, but it is not part of the present theory.
 
-The Wilson rows used here are first-order derivatives at the frozen geometry.
-Large distortions along scans, optimizations or refinement trajectories may
-require recomputing the \(\Bmat\) rows or decomposing a large transformation
-into smaller steps.  A future adaptive update could preserve the semantic
-contract while refreshing local derivative information, but the present draft
-does not validate such an update scheme.
+The coordinate definitions remain frozen, whereas their Wilson rows are
+evaluated at the current geometry.  For fragment rotations, local-chart
+rebasing also transports values and rows covariantly.  Large transformations
+that change topology, fragment membership or symmetry stratum still require a
+new contract; adaptive interpolation between such discrete molecular states is
+outside the present scope.
 
 The priority-first rule is a chemically motivated modelling principle, not a
 mathematical uniqueness result over all possible coordinate bases.  Alternative
