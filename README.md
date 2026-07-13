@@ -48,12 +48,13 @@ PYTHONPATH=$(find /Users/vincenzobarone/Documents/git/software/matrix/packages -
   python -m matrix smith standalone si/norbornane_smith_input.xyzin /tmp/norbornane.xyzin
 PYTHONPATH=$(find /Users/vincenzobarone/Documents/git/software/matrix/packages -maxdepth 2 -type d -name src | paste -sd: -) \
   python -m matrix smith gaussian-input /tmp/norbornane.xyzin si/norbornane_g16_readallgic.gjf \
-  --g16 --title "norbornane SONIC ReadAllGIC optimization" \
+  --title "norbornane SONIC ReadAllGIC optimization" \
   --route "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 ```
 
 After installation the shorter commands are `smith standalone ...` and
-`smith gaussian-input ... --g16`.
+`smith gaussian-input ...`.  The commercial Gaussian 16 profile is enabled by
+default.
 
 ## Reduced standalone package
 
@@ -76,6 +77,10 @@ smith-sonic example norbornane /tmp/norbornane.xyzin
 smith-sonic example formic-acid-water /tmp/formic-acid-water.xyzin
 smith-sonic example eta3-allyl-palladium /tmp/eta3-allyl-palladium.xyzin
 ```
+
+Each standalone command also writes a readable `.smith.out` coordinate report
+and a Gaussian 16 `.g16.gjf` input.  The two advanced `xyzin` contracts are
+regression-tested as direct MORPHEUS inputs and LINK SONIC coordinate models.
 
 Plain extended XYZ input uses the labelled `REDUCED_ORACLE` convenience
 profile.  To require a complete, separately validated ORACLE state, use:

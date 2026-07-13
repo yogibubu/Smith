@@ -12,6 +12,7 @@ from matrix_fragments import (
     write_fragment_build_section,
     write_interaction_center_section,
 )
+from matrix_neo import write_gic_report, write_gicforge_gaussian_input
 from matrix_neo.definition import write_sonic_build_sections_from_cartesian
 from matrix_neo.standalone import (
     _normalized_source_kind,
@@ -27,7 +28,8 @@ from . import __version__
 
 REQUIRED_ORACLE_SECTIONS = ("VALIDATION", "TOPOLOGY", "SYNTHONS", "SYMMETRY")
 PROVENANCE_SCHEMA = "matrix.smith.standalone.v1"
-MATRIX_REVISION = "f943523dd5468d35c7ebdc5bfa9f7bb305afda7f"
+MATRIX_REVISION = "43840113209dce1a66699965f9232cb7fad42572"
+DEFAULT_G16_ROUTE = "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 EXAMPLES = {
     "water": ("water.smith.xyz", False),
     "norbornane": ("norbornane.smith.xyz", False),
@@ -57,7 +59,11 @@ def _build(args: argparse.Namespace) -> int:
         )
 
     if has_oracle_state:
-        definition = write_sonic_build_sections_from_cartesian(source, target)
+        definition = write_sonic_build_sections_from_cartesian(
+            source,
+            target,
+            improper_dihedrals=True,
+        )
         profile = "ORACLE_STATE"
         fragment_profile = (
             "ORACLE_SUPPLIED"
@@ -81,10 +87,13 @@ def _build(args: argparse.Namespace) -> int:
             "ORACLE_RELATION CONTINUOUS_PERCEPTION_DEVELOPED_FROM_PROXIMA",
         ],
     )
+    report_path, gaussian_path = _write_sidecars(target)
     print(
         f"Wrote {target} (profile={profile}, GICs={len(definition.gics)}, "
         f"rank={definition.rank})"
     )
+    print(f"Wrote coordinate report {report_path}")
+    print(f"Wrote Gaussian 16 input {gaussian_path}")
     if profile == "REDUCED_ORACLE":
         print(
             "Note: the Cartesian input used the reduced bundled ORACLE perception profile. "
@@ -112,8 +121,9 @@ def _build_from_reduced_input(source: Path, target: Path):
         write_fragment_build_section(target)
         write_interaction_center_section(target)
 
+    g16_compatibility = bool(options.get("g16", True))
     improper_dihedrals = _optional_bool(options.get("improper_dihedrals"))
-    if bool(options.get("g16", False)):
+    if g16_compatibility:
         improper_dihedrals = True
     fragment_mode = _optional_string(options.get("fragment_mode"))
     if len(fragments.fragments) > 1 and fragment_mode is None:
@@ -131,6 +141,20 @@ def _build_from_reduced_input(source: Path, target: Path):
         local_xh_classes=_strings(options.get("local_xh_classes")),
     )
     return definition, len(fragments.fragments)
+
+
+def _write_sidecars(target: Path) -> tuple[Path, Path]:
+    report_path = target.with_suffix(".smith.out")
+    gaussian_path = target.with_suffix(".g16.gjf")
+    write_gic_report(target, report_path)
+    write_gicforge_gaussian_input(
+        target,
+        gaussian_path,
+        route=DEFAULT_G16_ROUTE,
+        title=f"{target.stem} SMITH/SONIC Gaussian 16 optimization",
+        g16_compatibility=True,
+    )
+    return report_path, gaussian_path
 
 
 def _inspect(args: argparse.Namespace) -> int:

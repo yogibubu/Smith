@@ -1,0 +1,125 @@
+MATRIX SMITH/SONIC Report
+=============================
+
+Backend: oracle-native-primitive.v1
+Point group: C1
+Symmetry group: C1
+Totally symmetric GICs: Str0001, Str0002, Str0003, Str0004, Str0005, Str0006, Bend0001, Bend0002, ImpD0001, Bend0004, Bend0005, Tors0001, FTrn0001, FTrn0002, FTrn0003, FRot0001, FRot0002, FRot0003
+Symmetrize requested: False
+Target rank: 18
+Target rank rationale: 3N-6 non-linear vibrational rank for N=8
+Final rank: 18
+Candidate count: 23
+Selected primitive count: 18
+Frozen GIC count: 18
+Protected selected count: 6
+Rank method: analytic_b_matrix_mgs_greedy
+Reduction policy: SPECIAL_PROTECTED_FIRST_THEN_ORDINARY_ANALYTIC_RANK
+Skipped singular/zero rows: 0
+Skipped dependent rows: 3
+
+Closure Summary
+---------------
+Closed: YES
+Rank complete: YES (18/18)
+Symmetry method: NONE
+Symmetry status: NOT_REQUESTED
+Total-symmetric irrep/count: A/0
+Protected special coordinates: 6
+Protected special families: FRAG_ORIENTATION, FRAG_TRANSLATION
+Ring diagnostics: 0
+SALC coefficient vectors: 0
+Max SALC norm error: 0
+Skipped singular rows: 0
+Skipped dependent rows: 3
+
+Fragment Mode Policy
+--------------------
+Mode: SPECIAL_COORDINATES
+Policy: automatic weak-complex default; keep fragments as protected bodies.
+Coordinates: fragment-center distances, center-atom distances, translations and orientations.
+Rationale: preserve inter-fragment rigid-body motion before ordinary valence pruning.
+
+Selected Families
+-----------------
+BEND: 4 (ORDINARY)
+FRAG_ORIENTATION: 3 (SPECIAL_PROTECTED)
+FRAG_TRANSLATION: 3 (SPECIAL_PROTECTED)
+IMPROPER_DIHEDRAL: 1 (ORDINARY)
+STRETCH: 6 (ORDINARY)
+TORSION: 1 (ORDINARY)
+
+Protected Coordinates
+---------------------
+P008 FTrn0001 family=FRAG_TRANSLATION class=SPECIAL_PROTECTED atoms=6,7,8 refs=F002,F001
+P009 FTrn0002 family=FRAG_TRANSLATION class=SPECIAL_PROTECTED atoms=6,7,8 refs=F002,F001
+P010 FTrn0003 family=FRAG_TRANSLATION class=SPECIAL_PROTECTED atoms=6,7,8 refs=F002,F001
+P011 FRot0001 family=FRAG_ORIENTATION class=SPECIAL_PROTECTED atoms=6,7,8 refs=F002,F001
+P012 FRot0002 family=FRAG_ORIENTATION class=SPECIAL_PROTECTED atoms=6,7,8 refs=F002,F001
+P013 FRot0003 family=FRAG_ORIENTATION class=SPECIAL_PROTECTED atoms=6,7,8 refs=F002,F001
+
+Symmetry Source Blocks
+----------------------
+STRETCH: family=STRETCH class=ORDINARY count=6
+BEND: family=BEND class=ORDINARY count=4
+OUT_OF_PLANE: family=IMPROPER_DIHEDRAL class=ORDINARY count=1
+TORSION: family=TORSION class=ORDINARY count=1
+SPECIAL_FRAGMENT_TRANSLATION: family=FRAG_TRANSLATION class=SPECIAL_PROTECTED count=3
+SPECIAL_FRAGMENT_ORIENTATION: family=FRAG_ORIENTATION class=SPECIAL_PROTECTED count=3
+
+Local Equivalence Diagnostics
+-----------------------------
+NONE
+
+Ring Puckering Diagnostics
+--------------------------
+NONE
+
+Symmetrization Diagnostics
+---------------------------
+Method: NONE
+Policy: ORACLE_TYPE_BLOCK_SUM_AND_DIFFERENCE
+Status: NOT_REQUESTED
+Symmetry group: C1
+Total irrep: A
+Total GICs: NONE
+Sign gauge policy: largest_abs_coefficient_pivot
+Path gauge policy: subspace_overlap_procrustes
+Operation residual max (Angstrom): 0
+Operation margin min (Angstrom): 0
+Near-threshold operations: NONE
+Groups: 0
+
+SALC Coefficients
+-----------------
+NONE
+
+Reduction Diagnostics
+---------------------
+Selected: P001, P002, P003, P004, P005, P006, P016, P017, P023, P019, P020, P021, P008, P009, P010, P011, P012, P013
+Selected by family: BEND:4, FRAG_ORIENTATION:3, FRAG_TRANSLATION:3, IMPROPER_DIHEDRAL:1, STRETCH:6, TORSION:1
+Skipped singular: NONE
+Skipped dependent: P018, P022, P007
+Skipped singular details: NONE
+Skipped dependent details: P018:BEND:Bend0003, P022:TORSION:Tors0002, P007:FRAG_DISTANCE:FCDi0001
+
+Coordinate Definitions
+----------------------
+   1 GIC001 Str0001 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=1.095460024 unit=angstrom components=P001:+1
+   2 GIC002 Str0002 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=1.211503996 unit=angstrom components=P002:+1
+   3 GIC003 Str0003 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=1.325944816 unit=angstrom components=P003:+1
+   4 GIC004 Str0004 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=0.985874998 unit=angstrom components=P004:+1
+   5 GIC005 Str0005 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=0.9603233822 unit=angstrom components=P005:+1
+   6 GIC006 Str0006 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=0.9705527871 unit=angstrom components=P006:+1
+   7 GIC007 Bend0001 family=BEND class=ORDINARY irrep=A state=ACTIVE value=2.151557636 unit=radian components=P016:+1
+   8 GIC008 Bend0002 family=BEND class=ORDINARY irrep=A state=ACTIVE value=1.936214312 unit=radian components=P017:+1
+   9 GIC009 ImpD0001 family=IMPROPER_DIHEDRAL class=ORDINARY irrep=A state=ACTIVE value=3.141106217 unit=radian components=P023:+1
+  10 GIC010 Bend0004 family=BEND class=ORDINARY irrep=A state=ACTIVE value=1.886705122 unit=radian components=P019:+1
+  11 GIC011 Bend0005 family=BEND class=ORDINARY irrep=A state=ACTIVE value=1.856621311 unit=radian components=P020:+1
+  12 GIC012 Tors0001 family=TORSION class=ORDINARY irrep=A state=ACTIVE value=-3.141071603 unit=radian components=P021:+1
+  13 GIC013 FTrn0001 family=FRAG_TRANSLATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=2.794364267 unit=angstrom components=P008:+1
+  14 GIC014 FTrn0002 family=FRAG_TRANSLATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=-0.5396128667 unit=angstrom components=P009:+1
+  15 GIC015 FTrn0003 family=FRAG_TRANSLATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=0.1935490667 unit=angstrom components=P010:+1
+  16 GIC016 FRot0001 family=FRAG_ORIENTATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=0 unit=radian components=P011:+1
+  17 GIC017 FRot0002 family=FRAG_ORIENTATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=0 unit=radian components=P012:+1
+  18 GIC018 FRot0003 family=FRAG_ORIENTATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=0 unit=radian components=P013:+1

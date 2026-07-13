@@ -18,8 +18,9 @@ contract.
 
 ## 2. Requirements and installation
 
-Use Python 3.11 or newer and Git.  For the private test repository, first accept
-the GitHub invitation and authenticate Git on the command line:
+Use Python 3.11 or newer and Git.  Both SMITH and its pinned MATRIX dependency
+are private during the collaborator test.  First accept both GitHub invitations
+and authenticate Git on the command line:
 
 ```bash
 gh auth login
@@ -49,6 +50,18 @@ smith-sonic inspect FILE
 `example` runs an input installed with the package.  `build` accepts either a
 plain extended XYZ input or an ORACLE-enriched `xyzin`.  `inspect` reports the
 presence of the frozen state, GIC section, and provenance profile.
+
+Every `build` or `example` command writes three files with the same stem:
+
+- `.xyzin`: frozen ORACLE/SMITH/SONIC contract;
+- `.smith.out`: readable coordinate report with rank, families, protected
+  rows, values, units, irreps, active/frozen status, and primitive coefficients;
+- `.g16.gjf`: commercial Gaussian 16 `ReadAllGIC` optimization input.
+
+The Gaussian 16 profile is enabled by default.  It uses Gaussian-compatible
+improper dihedrals and marks every non-totally symmetric coordinate as
+`Frozen`; totally symmetric coordinates remain active.  Fragment and
+interaction-center helper functions are serialized as `Inactive` definitions.
 
 For a production state prepared and validated by ORACLE, require the boundary
 explicitly:
@@ -121,6 +134,11 @@ chemical benchmark.  Its interaction centre is supplied explicitly in a
 frozen ORACLE-state fixture.  It tests whether SMITH consumes the correct
 contract; it does not claim that the reduced profile can perceive η3 bonding.
 
+The advanced generated artifacts are retained under `standalone/examples/`:
+
+- `formic_acid_water.xyzin`, `.smith.out`, and `.g16.gjf`;
+- `eta3_allyl_palladium.xyzin`, `.smith.out`, and `.g16.gjf`.
+
 ## 6. Reading an output
 
 The most relevant sections are:
@@ -144,12 +162,17 @@ From the repository root, run:
 python -m unittest discover -s standalone/tests -v
 ```
 
+With the full MATRIX checkout on `PYTHONPATH`, the same suite also runs the
+MORPHEUS/LINK consumer test.  It requires direct MORPHEUS parsing of each
+`xyzin` and construction of LINK SONIC direction matrices with shapes
+`18 x 24` and `24 x 30`.
+
 When reporting a problem, include the operating system and architecture,
 Python version, exact command, complete terminal output, input file, and
 generated `xyzin` if one was produced.  Do not include credentials or private
 tokens.  During this test phase, open an issue in the private repository or
 send the report directly to the project owner.
 
-Gaussian export, optimization workflows, and the full ORACLE validation
-surface remain outside this reduced package and are available only in the
-corresponding MATRIX development environment.
+Execution of Gaussian jobs, full optimization workflows, and the full ORACLE
+validation surface remain outside this reduced package.  The package generates
+the Gaussian 16 input but does not launch the external executable.

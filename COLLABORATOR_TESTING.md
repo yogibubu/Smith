@@ -7,11 +7,14 @@ final testing and is not part of this test.
 
 ## 1. Give the collaborator access
 
-Keep `yogibubu/Smith` private.  In GitHub open:
+Keep `yogibubu/Smith` and `yogibubu/MATRIX` private.  Federico needs read
+access to both repositories because the standalone wheel pins its MATRIX
+components to an exact private commit.  In GitHub open:
 
 `Settings` -> `Collaborators` -> `Add people`
 
-Invite Federico Lazzari (`federico.lazzari@sns.it`).  If GitHub cannot resolve
+Repeat the invitation in both repositories.  Invite Federico Lazzari
+(`federico.lazzari@sns.it`).  If GitHub cannot resolve
 the email address, ask him for his GitHub username.  He must accept the
 invitation before cloning or installing the private repository.
 
@@ -52,6 +55,10 @@ smith-sonic inspect formic-acid-water.xyzin
 smith-sonic example eta3-allyl-palladium eta3-allyl-palladium.xyzin
 smith-sonic inspect eta3-allyl-palladium.xyzin
 ```
+
+Each example must also create a `.smith.out` report and `.g16.gjf` input beside
+the requested `.xyzin` file.  The water report must contain both `state=ACTIVE`
+and `state=FROZEN`, and the Gaussian input must contain `(Frozen)` rows.
 
 Expected summaries are:
 

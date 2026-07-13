@@ -1,0 +1,122 @@
+MATRIX SMITH/SONIC Report
+=============================
+
+Backend: oracle-native-primitive.v1
+Point group: D2
+Symmetry group: D2
+Totally symmetric GICs: NONE
+Symmetrize requested: False
+Target rank: 24
+Target rank rationale: 3N-6 non-linear vibrational rank for N=10
+Final rank: 24
+Candidate count: 90
+Selected primitive count: 24
+Frozen GIC count: 24
+Protected selected count: 1
+Rank method: analytic_b_matrix_mgs_greedy
+Reduction policy: SPECIAL_PROTECTED_FIRST_THEN_ORDINARY_ANALYTIC_RANK
+Skipped singular/zero rows: 1
+Skipped dependent rows: 20
+
+Closure Summary
+---------------
+Closed: NO
+Rank complete: YES (24/24)
+Symmetry method: NONE
+Symmetry status: NOT_REQUESTED
+Total-symmetric irrep/count: A/0
+Protected special coordinates: 1
+Protected special families: CENTER_ATOM_DISTANCE
+Ring diagnostics: 0
+SALC coefficient vectors: 0
+Max SALC norm error: 0
+Skipped singular rows: 1
+Skipped dependent rows: 20
+
+Fragment Mode Policy
+--------------------
+Mode: NONE
+Policy: no built fragments were consumed by this GIC definition.
+
+Selected Families
+-----------------
+BEND: 5 (ORDINARY)
+CENTER_ATOM_DISTANCE: 1 (SPECIAL_PROTECTED)
+LINEAR_BEND: 7 (ORDINARY)
+STRETCH: 10 (ORDINARY)
+TORSION: 1 (ORDINARY)
+
+Protected Coordinates
+---------------------
+P012 CnAt0001 family=CENTER_ATOM_DISTANCE class=SPECIAL_PROTECTED atoms=3,4,5 refs=C001,A1
+
+Symmetry Source Blocks
+----------------------
+SPECIAL_CENTER_ATOM: family=CENTER_ATOM_DISTANCE class=SPECIAL_PROTECTED count=1
+STRETCH: family=STRETCH class=ORDINARY count=10
+BEND: family=BEND class=ORDINARY count=5
+LINEAR_BEND: family=LINEAR_BEND class=ORDINARY count=7
+TORSION: family=TORSION class=ORDINARY count=1
+
+Local Equivalence Diagnostics
+-----------------------------
+NONE
+
+Ring Puckering Diagnostics
+--------------------------
+NONE
+
+Symmetrization Diagnostics
+---------------------------
+Method: NONE
+Policy: ORACLE_TYPE_BLOCK_SUM_AND_DIFFERENCE
+Status: NOT_REQUESTED
+Symmetry group: D2
+Total irrep: A
+Total GICs: NONE
+Sign gauge policy: largest_abs_coefficient_pivot
+Path gauge policy: subspace_overlap_procrustes
+Operation residual max (Angstrom): 0
+Operation margin min (Angstrom): 0
+Near-threshold operations: NONE
+Groups: 0
+
+SALC Coefficients
+-----------------
+NONE
+
+Reduction Diagnostics
+---------------------
+Selected: P012, P001, P002, P003, P004, P005, P006, P007, P009, P010, P011, P013, P014, P021, P022, P023, P025, P029, P030, P035, P036, P037, P039, P045
+Selected by family: BEND:5, CENTER_ATOM_DISTANCE:1, LINEAR_BEND:7, STRETCH:10, TORSION:1
+Skipped singular: P043
+Skipped dependent: P008, P015, P016, P017, P018, P019, P020, P024, P026, P027, P028, P031, P032, P033, P034, P038, P040, P041, P042, P044
+Skipped singular details: P043:TORSION:Tors0003
+Skipped dependent details: P008:STRETCH:Str0008, P015:LINEAR_BEND:LinB0002, P016:BEND:Bend0002, P017:BEND:Bend0003, P018:BEND:Bend0004, P019:BEND:Bend0005, P020:BEND:Bend0006, P024:BEND:Bend0008, P026:BEND:Bend0010, P027:BEND:Bend0011, P028:BEND:Bend0012, P031:BEND:Bend0013, P032:BEND:Bend0014, P033:BEND:Bend0015, P034:BEND:Bend0016, P038:BEND:Bend0018, P040:BEND:Bend0020, P041:TORSION:Tors0001, P042:TORSION:Tors0002, P044:TORSION:Tors0004
+
+Coordinate Definitions
+----------------------
+   1 GIC001 CnAt0001 family=CENTER_ATOM_DISTANCE class=SPECIAL_PROTECTED irrep=UNASSIGNED state=ACTIVE value=1.8 unit=angstrom components=P012:+1
+   2 GIC002 Str0001 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.3 unit=angstrom components=P001:+1
+   3 GIC003 Str0002 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.140093456 unit=angstrom components=P002:+1
+   4 GIC004 Str0003 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2 unit=angstrom components=P003:+1
+   5 GIC005 Str0004 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.140093456 unit=angstrom components=P004:+1
+   6 GIC006 Str0005 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.334166406 unit=angstrom components=P005:+1
+   7 GIC007 Str0006 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.070046728 unit=angstrom components=P006:+1
+   8 GIC008 Str0007 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.087428159 unit=angstrom components=P007:+1
+   9 GIC009 Str0009 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.09 unit=angstrom components=P009:+1
+  10 GIC010 Str0010 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.070046728 unit=angstrom components=P010:+1
+  11 GIC011 Str0011 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.087428159 unit=angstrom components=P011:+1
+  12 GIC012 Bend0001 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.488746022 unit=radian components=P013:+1
+  13 GIC013 LinB0001 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P014:+1
+  14 GIC014 LinB0003 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P021:+1
+  15 GIC015 LinB0004 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P022:+1
+  16 GIC016 Bend0007 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.400238589 unit=radian components=P023:+1
+  17 GIC017 Bend0009 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.000947705 unit=radian components=P025:+1
+  18 GIC018 LinB0005 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P029:+1
+  19 GIC019 LinB0006 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P030:+1
+  20 GIC020 LinB0007 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P035:+1
+  21 GIC021 LinB0008 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P036:+1
+  22 GIC022 Bend0017 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.400238589 unit=radian components=P037:+1
+  23 GIC023 Bend0019 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.000947705 unit=radian components=P039:+1
+  24 GIC024 Tors0005 family=TORSION class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P045:+1

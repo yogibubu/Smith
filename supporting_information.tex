@@ -37,9 +37,10 @@ commercial Gaussian 16 \texttt{ReadAllGIC} input used in the compatibility
 test.  The first listing is intentionally not the enriched \texttt{xyzin}
 container written after molecular perception and coordinate construction.  It
 contains only a standard XYZ geometry followed by the minimum SMITH directives
-needed for this Gaussian-compatible export.  In particular, \texttt{g16 = true}
-selects the Gaussian-style improper-dihedral construction in place of native
-\SONIC\ out-of-plane rows.  For this one-file example, the standalone package
+needed for this Gaussian-compatible export.  The standalone workflow selects
+the commercial Gaussian 16 profile by default, including Gaussian-style
+improper-dihedral construction in place of native \SONIC\ out-of-plane rows.
+For this one-file example, the standalone package
 uses its pinned reduced ORACLE profile to supply the graph, cycles, symmetry and
 continuous atom descriptors needed by \SMITH.  This convenience profile is
 recorded in the generated provenance and is distinct from the full ORACLE
@@ -51,16 +52,16 @@ The exact standalone workflow is:
 \begin{lstlisting}
 python -m matrix smith standalone norbornane_smith_input.xyzin norbornane.xyzin
 python -m matrix smith gaussian-input norbornane.xyzin norbornane_g16_readallgic.gjf \
-  --g16 --title "norbornane SONIC ReadAllGIC optimization" \
+  --title "norbornane SONIC ReadAllGIC optimization" \
   --route "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 \end{lstlisting}
 Equivalently, after installation of MATRIX the console-script shorthand is
-\texttt{smith standalone ...} followed by \texttt{smith gaussian-input ... --g16}.
+\texttt{smith standalone ...} followed by \texttt{smith gaussian-input ...}.
 The reduced package distributed with the manuscript constructs the same
-contract with \texttt{smith-sonic build norbornane.smith.xyz norbornane.xyzin};
-Gaussian export remains part of the complete MATRIX installation.
-The \texttt{--g16} export switch is what suppresses active multi-dihedral
-\SONIC\ rows in the Gaussian file and writes their component periodic
+contract with \texttt{smith-sonic build norbornane.smith.xyz norbornane.xyzin}
+and automatically writes both \texttt{norbornane.smith.out} and
+\texttt{norbornane.g16.gjf}.  The default Gaussian 16 profile suppresses active
+multi-dihedral \SONIC\ rows in the Gaussian file and writes their component periodic
 \texttt{D(...)} coordinates instead; the non-redundant \SONIC\ rows remain in
 the \texttt{xyzin} contract used for post-processing.
 
@@ -78,5 +79,50 @@ The complete Gaussian log is retained in the reproducibility archive.  The
 excerpt below records the optimization progress and termination diagnostics.
 
 \lstinputlisting[caption={Selected Gaussian 16 output lines for the norbornane \texttt{ReadAllGIC} run.}]{si/norbornane_g16_output_excerpt.txt}
+
+\section*{Advanced Standalone Interface Probes}
+
+The standalone distribution also contains two examples that exercise the
+interfaces not covered by a single covalent molecule.  Every build writes
+three coordinated artifacts: the frozen \texttt{xyzin} contract, a readable
+\texttt{.smith.out} report modeled on the essential coordinate section of the
+former Merlino output, and a commercial Gaussian 16 \texttt{ReadAllGIC} input.
+The report records the family, reduction class, irrep, active/frozen status,
+reference value, native unit, and primitive coefficients of each selected
+coordinate.  Non-totally symmetric coordinates are present in the Gaussian
+file with the \texttt{Frozen} option; helper center and fragment definitions are
+written as inactive Gaussian functions.
+
+\subsection*{Formic-acid--water non-covalent complex}
+
+The eight-atom complex is processed with the reduced perception profile and an
+automatic connected-component fragment definition.  It closes at rank
+\(18/18\).  The final six protected rows are three relative fragment
+translations and three relative fragment orientations; the other twelve rows
+span the intramolecular motions.  The excerpt below is generated, not manually
+transcribed.
+
+\lstinputlisting[firstline=106,lastline=125,caption={Coordinate-definition excerpt for the formic-acid--water complex.  The complete report is supplied as \texttt{si/formic\_acid\_water\_smith\_report.txt}.}]{si/formic_acid_water_smith_report.txt}
+
+\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input generated for the formic-acid--water fragment contract.  Fragment objects and body-frame helpers are declared before the 18 active rows.}]{si/formic_acid_water_g16.gjf}
+
+\subsection*{Eta3 allyl--palladium interaction center}
+
+The ten-atom idealized allyl--PdCl probe consumes a frozen ORACLE-state fixture.
+Its center record has identifier \texttt{C001}, kind
+\texttt{ETA3\_CENTER}, and atoms 3--5.  \SMITH\ retains the
+Pd--center distance as a protected \texttt{CENTER\_ATOM\_DISTANCE}; the
+contract closes at rank \(24/24\) and gives a reference value of
+1.8000~\AA.  This is a perception/coordinate interface test rather than an
+optimized transition-metal benchmark.
+
+\lstinputlisting[firstline=97,lastline=122,caption={Coordinate-definition excerpt for the eta3 allyl--palladium probe.  The complete report is supplied as \texttt{si/eta3\_allyl\_palladium\_smith\_report.txt}.}]{si/eta3_allyl_palladium_smith_report.txt}
+
+\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input for the eta3 probe.  The Cartesian components of the ligand center are inactive helper functions and the Pd--center distance is the first active GIC.}]{si/eta3_allyl_palladium_g16.gjf}
+
+Both generated \texttt{xyzin} files were read directly by MORPHEUS without
+format translation.  LINK constructed SONIC optimizer direction matrices of
+dimensions \(18\times24\) and \(24\times30\), respectively, confirming that
+the serialized contracts are consumable by the two downstream workflows.
 
 \end{document}

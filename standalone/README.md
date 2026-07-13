@@ -69,7 +69,10 @@ Every output receives a `#SMITH_PROVENANCE` section recording whether SMITH
 consumed a complete `ORACLE_STATE` or invoked the `REDUCED_ORACLE` convenience
 profile.  Gaussian export and the wider validation/optimizer commands remain
 available in the full MATRIX distribution; the standalone package deliberately
-limits its surface to SONIC contract construction and inspection.
+limits its surface to SONIC contract construction and inspection.  Each build
+also writes a `.smith.out` coordinate report and a `.g16.gjf` Gaussian 16 input.
+The G16 profile is the default, and non-totally symmetric coordinates are
+written as `Frozen`.
 
 The formic-acid–water example exercises all six intermolecular fragment
 coordinates.  The eta3 allyl–palladium example consumes an explicit, frozen

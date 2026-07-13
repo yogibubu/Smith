@@ -23,5 +23,3 @@ H      -0.00000000     -2.15523000      0.73149700
 #SMITH
 schema = matrix.smith.input.v1
 symmetrize = false
-g16 = true
-

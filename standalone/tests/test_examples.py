@@ -63,6 +63,22 @@ class PackagedExampleTests(unittest.TestCase):
         self.assertTrue(packaged.is_file())
         self.assertIn("SOURCE=ORACLE_EXPLICIT_TEST_FIXTURE", packaged.read_text(encoding="utf-8"))
 
+    def test_build_writes_merlino_style_report_and_g16_input_by_default(self) -> None:
+        output, _, scratch = self._run_example("water")
+        self.addCleanup(scratch.cleanup)
+        report = output.with_suffix(".smith.out")
+        gaussian = output.with_suffix(".g16.gjf")
+
+        report_text = report.read_text(encoding="utf-8")
+        gaussian_text = gaussian.read_text(encoding="utf-8")
+        self.assertIn("Coordinate Definitions", report_text)
+        self.assertIn("state=ACTIVE", report_text)
+        self.assertIn("state=FROZEN", report_text)
+        self.assertIn("value=", report_text)
+        self.assertIn("components=", report_text)
+        self.assertIn("opt=(readallgic,calcfc,maxcycle=80)", gaussian_text.lower())
+        self.assertIn("(Frozen) =", gaussian_text)
+
 
 if __name__ == "__main__":
     unittest.main()

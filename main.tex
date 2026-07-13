@@ -85,8 +85,11 @@ sparse derivative machinery and Gaussian export path.  The Gaussian tests are
 serialization and solver-consumption tests: \SONIC\ generates the coordinate
 contract automatically and Gaussian reads the exported \GIC\ definitions; they
 are not presented as a competitive coordinate-generation benchmark against
-Gaussian's internal coordinate builder.  We also discuss the intended scope of
-the method and its current limitations.
+Gaussian's internal coordinate builder.  Standalone probes include a
+formic-acid--water complex with six protected intermolecular degrees of freedom
+and an eta3 allyl--palladium complex in which an ORACLE-supplied ligand center
+is retained as a protected metal--center coordinate.  We also discuss the
+intended scope of the method and its current limitations.
 \end{abstract}
 
 \begin{tocentry}
@@ -812,11 +815,12 @@ local ring role.
 \subsection{Out-of-Plane and Improper Coordinates}
 
 Three-coordinate centers generate out-of-plane coordinates unless all four
-atoms involved are cyclic.  Gaussian-compatible improper dihedrals can be
-emitted in a compatibility mode, but the default analytic coordinate is the
-out-of-plane \(U\) coordinate.  This distinction is an output convention, not a
-change in the reduction policy: both forms occupy the same local
-non-planarity role and are treated as their own coordinate family.
+atoms involved are cyclic.  The standalone and command-line workflows default
+to the commercial Gaussian 16 profile and therefore emit Gaussian-compatible
+improper dihedrals.  The native analytic \(U\) coordinate remains part of the
+internal function registry and validation layer.  This distinction is an
+output convention, not a change in the reduction policy: both forms occupy the
+same local non-planarity role and are treated as their own coordinate family.
 
 \section{Rank Reduction}
 
@@ -1184,6 +1188,23 @@ function of the center coordinates and the iron Cartesian coordinates.  The
 special coordinate is therefore generated from the molecular model, not
 hand-entered as an extra atom.
 
+The eta3 allyl--palladium standalone probe exercises the same interface with a
+non-ring ligand center.  For allyl carbon atoms 3--5, ORACLE supplies
+\[
+ C_{001}=\frac{\mathbf{x}_3+\mathbf{x}_4+\mathbf{x}_5}{3}
+\]
+with center kind \texttt{ETA3\_CENTER}; \SMITH\ then protects
+\[
+ q_{\eta^3}=|C_{001}-\mathbf{x}_{\rm Pd}|.
+\]
+The idealized ten-atom fixture closes at rank \(24/24\), and the reference
+value is \(q_{\eta^3}=1.8000\)~\AA.  Its Gaussian 16 export writes the three
+center components as inactive Cartesian functions and the metal--center
+distance as an active square-root expression.  This is deliberately an
+interface and rank-closure test rather than an optimized electronic-structure
+benchmark: perception of the eta3 center belongs to ORACLE, whereas its
+retention, differentiation and serialization belong to \SMITH.
+
 In the current validated \texttt{PSEUDO\_BONDS} baseline, selected
 non-covalent contacts are inserted into the construction graph as typed
 pseudo-edges, and the resulting pseudo-cycles generate angular and torsional
@@ -1289,7 +1310,7 @@ Ring deformation/puckering & Active & Endocyclic angle and torsion sources gener
 \midrule
 Butterfly/condensed rings & Active & Fused-ring butterfly and condensed torsion families remain separate homogeneous source blocks. \\
 \midrule
-Out-of-plane/improper rows & Active & Native \(U\) rows are default; Gaussian-style improper dihedrals are a compatibility mode. \\
+Out-of-plane/improper rows & Active & Gaussian 16-compatible improper dihedrals are the standalone default; native \(U\) rows remain analytically available. \\
 \midrule
 Special fragment coordinates & Active & Fragment-center distances, center-atom distances, translations and orientations are protected first. \\
 \midrule
@@ -1397,11 +1418,13 @@ chair-to-boat puckering path used for the portable Cartesian/Gaussian
 
 The regression corpus contains acyclic and cyclic molecules, fused and
 non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
-molecules, ferrocene in \(D_{5h}\) and \(D_{5d}\) forms, and a formic-acid--water
-weak-complex probe.  The ring subset protects the \(RDef/RPck\) source spaces,
+molecules, ferrocene in \(D_{5h}\) and \(D_{5d}\) forms, a formic-acid--water
+weak-complex probe, and an eta3 allyl--palladium interaction-center probe.  The
+ring subset protects the \(RDef/RPck\) source spaces,
 butterfly coordinates and the use of linear \(RPck\) rows rather than polar
 active coordinates.  Ferrocene protects center-based special coordinates and
-high-symmetry point-group projectors.  Weak-complex tests protect the
+high-symmetry point-group projectors; the eta3 case protects consumption of an
+explicit multi-atom ligand center.  Weak-complex tests protect the
 fragment-coordinate policy and the analytic \(\Bmat\) rows of interfragment
 translation and orientation coordinates.
 
@@ -1450,7 +1473,8 @@ Cubane & High-symmetry cage & \(O_h\) & 42/42; cyclic bends & \(\Delta_\mathrm{P
 Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\mathrm{PF}=6.71\times10^{-9}\); \(\epsilon_\mathrm{SALC}=3.33\times10^{-16}\) \\
 Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
-Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 11 protected & direct \(\Bmat\)-rank \(=18\); \(\epsilon_\mathrm{SALC}=0\) \\
+Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 6 protected & three translations plus three orientations; direct \(\Bmat\)-rank \(=18\) \\
+Eta3 allyl--PdCl & ORACLE-supplied eta3 ligand center & \(C_1\) & 24/24; 1 protected & \(q_{\eta^3}=1.8000\)~\AA; analytic center--atom row retained \\
 Weak-complex pseudo-cycles & Intermolecular and intramolecular pseudo-bond
 contacts & \(C_s\), \(C_{3v}\), \(C_1\) & rank closed & formic acid--water,
 water dimer, Li\(_2\)--Ar, borane--ammonia and glycine I/II fixtures validate
@@ -1538,16 +1562,14 @@ evaluates the GIC derivatives with its own machinery and performs the
 optimization.  No hand-written surrogate coordinates are introduced.  The three
 systems in Table~\ref{tab:readallgic-opt} were chosen because they exercise
 ring and cage coordinates while remaining small enough for repeated external
-checks.  The native \SONIC\ contract uses signed out-of-plane rows and
-block-local multi-dihedral \(RPck\) puckering rows.  Those rows have been
-validated with a development Gaussian implementation that supports them as
-active variables.  Commercial Gaussian 16 has no native \(U\) out-of-plane
+checks.  The native \SONIC\ contract can represent signed out-of-plane rows and
+block-local multi-dihedral \(RPck\) puckering rows.  Commercial Gaussian 16 has no native \(U\) out-of-plane
 primitive, and the official Gaussian GIC documentation warns that active
 generic coordinates combining multiple periodic dihedrals can behave poorly
 because the periodicity of the component torsions is not applied inside the
 composite expression.\cite{GaussianGICManual}  The commercial
-\texttt{ReadAllGIC} export therefore uses a compatibility profile only when the
-\texttt{g16} option is requested: \(U\) rows are replaced by the corresponding
+\texttt{ReadAllGIC} export therefore uses the Gaussian 16 profile by default:
+\(U\) rows are replaced by the corresponding
 Gaussian improper dihedrals, multi-dihedral \SONIC\ rows are not written to the
 Gaussian input, and all component \(D(\cdots)\) terms are added as active
 redundant periodic coordinates.  After the Gaussian optimization, \SMITH\ reads
@@ -1665,15 +1687,10 @@ This compatibility export is less compact than the native
 form, but it allows standard Gaussian 16 to be used without relying on
 development-only primitives.  The native \SONIC\ contract still defines \(U\),
 multi-dihedral \(RPck\), \(QPck\) and \(\Phi P\).
-In the development Gaussian build, the default internal-coordinate model for
-camphor is sensitive to the automatic \(CX_3\) methyl treatment; adding
-\texttt{Geom=(GIC,NoXY3)} restores the stable standard-coordinate reference.
-The corresponding native-coordinate norbornane check, also run with the same
-total-symmetric active subset, contains 51 generated rows of which 36
-non-totally symmetric rows are marked \texttt{Frozen}; it converges in five
-steps.  This is a distinct input from the Gaussian 16 \texttt{ReadAllGIC}
-compatibility run above and isolates the out-of-plane and frozen-irrep handling
-before export through the commercial Gaussian parser.
+For the symmetry-enabled norbornane export, the full rank-complete contract
+contains 51 generated rows, of which 36 non-totally symmetric rows are marked
+\texttt{Frozen}.  This directly tests frozen-irrep handling through the
+commercial Gaussian 16 parser without requiring a nonstandard executable.
 
 \begin{figure}[htbp]
 \centering
