@@ -287,8 +287,9 @@ coordination, fragments, interaction centers and arbitrary point groups. \\
 TRIC/geomeTRIC coordinates & Explicitly represents collective fragment
 translations and rotations, with the rotations described by an exponential map
 of quaternions.\cite{WangSong2016GeomeTRIC} & \SONIC\ adopts this
-exponential-map parametrization and retains the relative rigid-body directions
-as a protected, typed and symmetry-labelled source family. \\
+exponential-map parametrization, but not the complete TRIC construction: it
+defines the rigid-body directions relative to a reference fragment and retains
+them as a protected, typed and symmetry-labelled source family. \\
 \midrule
 Gaussian GIC syntax & Very general symbolic coordinate expressions, including
 nontraditional geometric parameters, sparse derivative rows and automatic
@@ -1124,15 +1125,21 @@ represented by an exponential map of quaternions.\cite{WangSong2016GeomeTRIC}
 The use of this exponential mapping in \SONIC\ should therefore be credited to
 the geomeTRIC work.
 
-Within the \SONIC\ contract, one fragment is selected deterministically as the
-reference; three relative translations and, for non-linear partners, three
-relative exponential-map orientations are generated for every other fragment.
-These rows remain a protected semantic block during rank reduction, transform
-explicitly as polar and axial vectors under the stored point-group operations,
-and are serialized together with their centers, body frames, gauge choices,
-symmetry labels and analytic \(\Bmat\) rows.  Thus the TRIC exponential-map
-idea is retained inside the same frozen coordinate definition used by the
-other MATRIX modules.
+This shared parametrization does not make the two coordinate constructions
+identical.  In TRIC/geomeTRIC, three translations and three rotations are added
+for each fragment and are subsequently combined with the intrafragment
+primitives in a delocalized coordinate space.\cite{WangSong2016GeomeTRIC}
+Within the \SONIC\ contract, one fragment is instead selected deterministically
+as the reference; three relative translations and, for non-linear partners,
+three relative exponential-map orientations are generated for every other
+fragment, so that the overall rigid translation and rotation of the complete
+complex do not enter the molecular vibrational contract.  These rows remain a
+protected semantic block during rank reduction rather than being delocalized
+with stretches, bends and torsions.  They transform explicitly as polar and
+axial vectors under the stored point-group operations and are serialized
+together with their centers, body frames, gauge choices, symmetry labels and
+analytic \(\Bmat\) rows.  Thus \SONIC\ adopts and credits the TRIC exponential
+map while embedding it in a distinct, frozen coordinate construction.
 
 The Cartesian gauge is fixed consistently across all MATRIX tools.  By default
 the weighted center is placed at the origin and the axes are ordered principal
