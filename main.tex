@@ -289,7 +289,9 @@ translations and rotations, with the rotations described by an exponential map
 of quaternions.\cite{WangSong2016GeomeTRIC} & \SONIC\ adopts this
 exponential-map parametrization, but not the complete TRIC construction: it
 defines the rigid-body directions relative to a reference fragment and retains
-them as a protected, typed and symmetry-labelled source family. \\
+them as a protected, typed and symmetry-labelled source family; alternatively,
+the intermolecular model may be constructed from typed pseudo-bonds and
+pseudo-cycles. \\
 \midrule
 Gaussian GIC syntax & Very general symbolic coordinate expressions, including
 nontraditional geometric parameters, sparse derivative rows and automatic
@@ -1140,6 +1142,17 @@ axial vectors under the stored point-group operations and are serialized
 together with their centers, body frames, gauge choices, symmetry labels and
 analytic \(\Bmat\) rows.  Thus \SONIC\ adopts and credits the TRIC exponential
 map while embedding it in a distinct, frozen coordinate construction.
+
+Fragment coordinates are not the only intermolecular representation available
+in \SONIC.  For a weak complex, the coordinate contract can select either the
+\texttt{SPECIAL\_COORDINATES} fragment construction just described or the
+\texttt{PSEUDO\_BONDS} construction.  The former preserves the disconnected
+monomers and represents their relative rigid-body motion explicitly; the latter
+inserts selected weak contacts as typed pseudo-edges and generates the
+associated pseudo-cycle coordinates without reclassifying those contacts as
+covalent bonds.  The selected construction is recorded in the contract, so the
+two descriptions remain explicit alternatives rather than indistinguishable
+members of one primitive pool.
 
 The Cartesian gauge is fixed consistently across all MATRIX tools.  By default
 the weighted center is placed at the origin and the axes are ordered principal
