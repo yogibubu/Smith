@@ -28,7 +28,7 @@ from . import __version__
 
 REQUIRED_ORACLE_SECTIONS = ("VALIDATION", "TOPOLOGY", "SYNTHONS", "SYMMETRY")
 PROVENANCE_SCHEMA = "matrix.smith.standalone.v1"
-MATRIX_REVISION = "43840113209dce1a66699965f9232cb7fad42572"
+MATRIX_REVISION = "711a8283ba50a064ae36a438f8c6e5a24e1fe0e7"
 DEFAULT_G16_ROUTE = "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 EXAMPLES = {
     "water": ("water.smith.xyz", False),

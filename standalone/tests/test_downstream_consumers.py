@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import os
 import tempfile
 import unittest
 
@@ -14,12 +15,23 @@ except ImportError:
 
 from smith_sonic.cli import main
 
+REQUIRE_DOWNSTREAM = os.environ.get("SMITH_REQUIRE_DOWNSTREAM") == "1"
+DOWNSTREAM_AVAILABLE = coordinate_model_from_xyzin is not None
+
 
 @unittest.skipIf(
-    coordinate_model_from_xyzin is None,
+    not DOWNSTREAM_AVAILABLE and not REQUIRE_DOWNSTREAM,
     "full MATRIX MORPHEUS/LINK packages are not installed",
 )
 class DownstreamConsumerTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        if not DOWNSTREAM_AVAILABLE:
+            raise RuntimeError(
+                "SMITH RC verification requires the test extra: "
+                "python -m pip install './standalone[test]'"
+            )
+
     def test_advanced_examples_are_consumed_without_translation(self) -> None:
         cases = (
             ("formic-acid-water", 8, 18),

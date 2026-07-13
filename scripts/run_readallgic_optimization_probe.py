@@ -13,12 +13,12 @@ import json
 import os
 import re
 import subprocess
-import sys
 from pathlib import Path
+
+from _matrix_checkout import add_matrix_packages_to_path, matrix_root
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MATRIX_ROOT = Path("/Users/vincenzobarone/Documents/git/software/matrix")
 RUN_DIR = ROOT / "calculations" / "readallgic_opt"
 DATA = ROOT / "data" / "readallgic_optimization_results.json"
 DEFAULT_GAUSSIAN = Path("g16")
@@ -53,15 +53,6 @@ def main() -> None:
     DATA.write_text(json.dumps(summarize_results(), indent=2) + "\n", encoding="utf-8")
 
 
-def add_matrix_packages_to_path() -> None:
-    package_root = MATRIX_ROOT / "packages"
-    for path in reversed(
-        [str(item / "src") for item in sorted(package_root.iterdir()) if (item / "src").is_dir()]
-    ):
-        if path not in sys.path:
-            sys.path.insert(0, path)
-
-
 def prepare_inputs() -> None:
     add_matrix_packages_to_path()
 
@@ -69,7 +60,7 @@ def prepare_inputs() -> None:
     from matrix_gaussian import write_gicforge_gaussian_input
     from matrix_neo import gaussian_gic_lines_from_xyzin, write_gicforge_build_sections
 
-    source_root = MATRIX_ROOT / "tests" / "fixtures" / "test_molecules" / "molecules"
+    source_root = matrix_root() / "tests" / "fixtures" / "test_molecules" / "molecules"
     for name, source_name in MOLECULES:
         target_dir = RUN_DIR / name
         target_dir.mkdir(parents=True, exist_ok=True)

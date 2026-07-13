@@ -16,11 +16,11 @@ from tempfile import TemporaryDirectory
 import matplotlib.pyplot as plt
 import numpy as np
 
+from _matrix_checkout import add_matrix_packages_to_path, matrix_root
+
 ROOT = Path(__file__).resolve().parents[1]
-MATRIX_ROOT = Path("/Users/vincenzobarone/Documents/git/software/matrix")
 DATA = ROOT / "data" / "construction_scaling_benchmark.json"
 FIGURE = ROOT / "figures" / "construction_scaling_benchmark.png"
-SOURCE_ROOT = MATRIX_ROOT / "tests" / "fixtures" / "test_molecules" / "molecules"
 
 SYSTEMS = (
     ("PAH/fused rings", "benzene", "benzene.inp", True, "none"),
@@ -38,15 +38,6 @@ SYSTEMS = (
     ("special centers", "ferrocene_d5d", "ferrocene_staggered.inp", True, "special-coordinates"),
 )
 REPEATS = 5
-
-
-def add_matrix_packages_to_path() -> None:
-    package_root = MATRIX_ROOT / "packages"
-    for path in reversed(
-        [str(item / "src") for item in sorted(package_root.iterdir()) if (item / "src").is_dir()]
-    ):
-        if path not in sys.path:
-            sys.path.insert(0, path)
 
 
 @dataclass(frozen=True)
@@ -73,7 +64,8 @@ def run_trial(name: str, source_name: str, symmetrize: bool, fragment_mode: str)
     with TemporaryDirectory(prefix=f"smith-bench-{name}-") as tmp:
         tmp_path = Path(tmp)
         xyzin = tmp_path / f"{name}.xyzin"
-        preprocess_to_enriched_xyz(SOURCE_ROOT / source_name, xyzin)
+        source_root = matrix_root() / "tests" / "fixtures" / "test_molecules" / "molecules"
+        preprocess_to_enriched_xyz(source_root / source_name, xyzin)
         write_validation_section(xyzin)
         if fragment_mode == "special-coordinates":
             write_fragment_build_section(xyzin)

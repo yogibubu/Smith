@@ -11,19 +11,19 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 import tempfile
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+from _matrix_checkout import add_matrix_packages_to_path
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "application_results.json"
 FIGURES = ROOT / "figures"
 QM_DIR = ROOT / "calculations" / "quick_qm"
-MATRIX_ROOT = Path("/Users/vincenzobarone/Documents/git/software/matrix")
 BOHR_TO_ANGSTROM = 0.529177210903
 HARTREE_TO_KJMOL = 2625.499638
 
@@ -121,18 +121,6 @@ def build_data_from_qm() -> dict[str, object]:
             "points": scan,
         },
     }
-
-
-def add_matrix_packages_to_path() -> None:
-    package_root = MATRIX_ROOT / "packages"
-    src_paths = [
-        str(path / "src")
-        for path in sorted(package_root.iterdir())
-        if (path / "src").is_dir()
-    ]
-    for path in reversed(src_paths):
-        if path not in sys.path:
-            sys.path.insert(0, path)
 
 
 def parse_fchk(path: Path) -> dict[str, np.ndarray | list[int]]:

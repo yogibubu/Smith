@@ -13,6 +13,8 @@ from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
+    CondPageBreak,
+    KeepTogether,
     PageBreak,
     Paragraph,
     Preformatted,
@@ -201,13 +203,36 @@ def _story(markdown: str):
             story.append(Spacer(1, 5))
         elif stripped.startswith("## "):
             flush_paragraph()
+            story.append(CondPageBreak(45 * mm))
             story.append(Paragraph(_inline(stripped[3:]), styles["h1"]))
         elif stripped.startswith("### "):
             flush_paragraph()
             story.append(Paragraph(_inline(stripped[4:]), styles["h2"]))
         elif stripped.startswith("- "):
             flush_paragraph()
-            story.append(Paragraph(_inline(stripped[2:]), styles["bullet"], bulletText="•"))
+            bullet_lines = [stripped[2:]]
+            next_index = index + 1
+            while next_index < len(lines):
+                continuation = lines[next_index].strip()
+                if (
+                    not continuation
+                    or continuation.startswith((fence, "|", "#", "- "))
+                ):
+                    break
+                bullet_lines.append(continuation)
+                next_index += 1
+            story.append(
+                KeepTogether(
+                    [
+                        Paragraph(
+                            _inline(" ".join(bullet_lines)),
+                            styles["bullet"],
+                            bulletText="•",
+                        )
+                    ]
+                )
+            )
+            index = next_index - 1
         elif not stripped:
             flush_paragraph()
         else:

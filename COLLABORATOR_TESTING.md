@@ -1,9 +1,9 @@
-# Private collaborator test for standalone SMITH
+# Private release-candidate test for standalone SMITH
 
-The purpose of this first external test is to find installation, portability,
-command-line, and documentation problems before deciding whether the manuscript
-needs additional scientific examples.  The full ORACLE application is still in
-final testing and is not part of this test.
+The purpose of this release-candidate test is to find installation, portability,
+command-line, and documentation problems before freezing the manuscript and
+standalone package.  The full ORACLE application is still in final testing and
+is not part of this test.
 
 ## 1. Give the collaborator access
 
@@ -25,22 +25,29 @@ The collaborator should install GitHub CLI, then run:
 ```bash
 gh auth login
 gh auth setup-git
-git clone https://github.com/yogibubu/Smith.git
-cd Smith
+export SMITH_CHECKOUT=/path/to/your/Smith
+export SMITH_ENV=/path/to/your/smith-venv
+git clone https://github.com/yogibubu/Smith.git "$SMITH_CHECKOUT"
+cd "$SMITH_CHECKOUT"
 git switch agent/oracle-boundary-standalone-smith
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv "$SMITH_ENV"
+source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip
-python -m pip install ./standalone
+python -m pip install "./standalone[test]"
 ```
+
+The collaborator must replace both `/path/to/your/...` placeholders with
+directories of their choice.  SMITH does not assume the owner's directory
+layout.
 
 On Windows PowerShell, activation is:
 
 ```powershell
-.venv\Scripts\Activate.ps1
+<smith-env>\Scripts\Activate.ps1
 ```
 
-After this test branch is merged, the `git switch` line is no longer needed.
+After the release-candidate branch is merged, the `git switch` line is no
+longer needed.
 
 ## 3. Run the packaged examples
 
@@ -76,6 +83,16 @@ The source inputs are also visible under `standalone/examples/`.  Read
 is an idealized interface probe and not a computed chemical benchmark.
 
 ## 4. Information to return
+
+Before returning the report, run the complete consumer test from the repository
+root:
+
+```bash
+SMITH_REQUIRE_DOWNSTREAM=1 python -m unittest discover -s standalone/tests -v
+```
+
+This confirms that the two advanced contracts are read directly by MORPHEUS
+and converted into LINK SONIC coordinate models.
 
 Please report:
 

@@ -29,12 +29,18 @@ replacement or release of the full ORACLE application.
 Python 3.11 or newer and `git` are required.
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+export SMITH_ENV=/path/to/your/smith-venv
+python -m venv "$SMITH_ENV"
+source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip
 python -m pip install \
-  "smith-sonic @ git+https://github.com/yogibubu/Smith.git@main#subdirectory=standalone"
+  "smith-sonic @ git+https://github.com/yogibubu/Smith.git@agent/oracle-boundary-standalone-smith#subdirectory=standalone"
 ```
+
+The environment directory is selected by the installer.  The package contains
+no absolute path to the developer's machine.
+The branch name can be replaced by `main` after the release candidate is
+merged.
 
 For a local checkout:
 

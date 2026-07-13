@@ -18,25 +18,28 @@ contract.
 
 ## 2. Requirements and installation
 
-Use Python 3.11 or newer and Git.  Both SMITH and its pinned MATRIX dependency
-are private during the collaborator test.  First accept both GitHub invitations
-and authenticate Git on the command line:
+Use Python 3.11 or newer and Git.  The release candidate and its pinned MATRIX
+dependency are private.  First accept both GitHub invitations and authenticate
+Git on the command line:
 
 ```bash
 gh auth login
 gh auth setup-git
-git clone https://github.com/yogibubu/Smith.git
-cd Smith
+export SMITH_CHECKOUT=/path/to/your/Smith
+export SMITH_ENV=/path/to/your/smith-venv
+git clone https://github.com/yogibubu/Smith.git "$SMITH_CHECKOUT"
+cd "$SMITH_CHECKOUT"
 git switch agent/oracle-boundary-standalone-smith
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv "$SMITH_ENV"
+source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip
 python -m pip install ./standalone
 ```
 
-On Windows PowerShell, activate the environment with
-`.venv\Scripts\Activate.ps1`.  The branch-switch command will no longer be
-needed after the draft branch is merged.
+Replace the two `/path/to/your/...` values with directories chosen by the user.
+On Windows PowerShell, define the corresponding paths and activate the
+environment with `<smith-env>\Scripts\Activate.ps1`.  The branch-switch command
+will no longer be needed after the release-candidate branch is merged.
 
 ## 3. Command summary
 
@@ -156,22 +159,24 @@ rank when special fragment or centre coordinates are present.
 
 ## 7. Verification and problem reports
 
-From the repository root, run:
+For the complete release-candidate verification, including direct consumption
+by MORPHEUS and LINK, install the test dependencies and run:
 
 ```bash
-python -m unittest discover -s standalone/tests -v
+python -m pip install "./standalone[test]"
+SMITH_REQUIRE_DOWNSTREAM=1 python -m unittest discover -s standalone/tests -v
 ```
 
-With the full MATRIX checkout on `PYTHONPATH`, the same suite also runs the
-MORPHEUS/LINK consumer test.  It requires direct MORPHEUS parsing of each
-`xyzin` and construction of LINK SONIC direction matrices with shapes
-`18 x 24` and `24 x 30`.
+The suite requires direct MORPHEUS parsing of each advanced `xyzin` and
+construction of LINK SONIC direction matrices with shapes `18 x 24` and
+`24 x 30`.  A normal installation without the `test` extra may still run the
+example tests; in that case the downstream test is reported as skipped.
 
 When reporting a problem, include the operating system and architecture,
 Python version, exact command, complete terminal output, input file, and
 generated `xyzin` if one was produced.  Do not include credentials or private
-tokens.  During this test phase, open an issue in the private repository or
-send the report directly to the project owner.
+tokens.  During the release-candidate phase, open an issue in the private
+repository or send the report directly to the project owner.
 
 Execution of Gaussian jobs, full optimization workflows, and the full ORACLE
 validation surface remain outside this reduced package.  The package generates

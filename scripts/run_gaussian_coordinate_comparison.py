@@ -9,15 +9,15 @@ import math
 import os
 import re
 import subprocess
-import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+from _matrix_checkout import add_matrix_packages_to_path, matrix_root
+
 
 ROOT = Path(__file__).resolve().parents[1]
-MATRIX_ROOT = Path("/Users/vincenzobarone/Documents/git/software/matrix")
 RUN_DIR = ROOT / "calculations" / "coordinate_comparison"
 DATA = ROOT / "data" / "gaussian_coordinate_comparison.json"
 FIGURE = ROOT / "figures" / "gaussian_coordinate_comparison.png"
@@ -62,22 +62,13 @@ def main() -> None:
     plot_results(results)
 
 
-def add_matrix_packages_to_path() -> None:
-    package_root = MATRIX_ROOT / "packages"
-    for path in reversed(
-        [str(item / "src") for item in sorted(package_root.iterdir()) if (item / "src").is_dir()]
-    ):
-        if path not in sys.path:
-            sys.path.insert(0, path)
-
-
 def prepare_inputs() -> None:
     add_matrix_packages_to_path()
     from matrix_chem import preprocess_to_enriched_xyz, read_enriched_xyz, write_validation_section
     from matrix_gaussian import write_gicforge_gaussian_input
     from matrix_neo import write_gicforge_build_sections
 
-    source_root = MATRIX_ROOT / "tests" / "fixtures" / "test_molecules" / "molecules"
+    source_root = matrix_root() / "tests" / "fixtures" / "test_molecules" / "molecules"
     for name, source_name, zmat_source_name in SYSTEMS:
         target_dir = RUN_DIR / name
         target_dir.mkdir(parents=True, exist_ok=True)

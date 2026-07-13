@@ -13,15 +13,15 @@ import json
 import os
 import re
 import subprocess
-import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 
+from _matrix_checkout import add_matrix_packages_to_path, matrix_root
+
 
 ROOT = Path(__file__).resolve().parents[1]
-MATRIX_ROOT = Path("/Users/vincenzobarone/Documents/git/software/matrix")
 RUN_DIR = ROOT / "calculations" / "cyclohexane_puckering_equivalence"
 DATA = ROOT / "data" / "cyclohexane_puckering_equivalence.json"
 FIGURE = ROOT / "figures" / "cyclohexane_puckering_equivalence.png"
@@ -50,15 +50,6 @@ def main() -> None:
     DATA.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     FIGURE.parent.mkdir(parents=True, exist_ok=True)
     plot(data)
-
-
-def add_matrix_packages_to_path() -> None:
-    package_root = MATRIX_ROOT / "packages"
-    for path in reversed(
-        [str(item / "src") for item in sorted(package_root.iterdir()) if (item / "src").is_dir()]
-    ):
-        if path not in sys.path:
-            sys.path.insert(0, path)
 
 
 def prepare_inputs() -> None:
@@ -144,7 +135,14 @@ def prepare_inputs() -> None:
 
 
 def read_cyclohexane_fixture() -> tuple[tuple[str, ...], np.ndarray]:
-    source = MATRIX_ROOT / "tests" / "fixtures" / "test_molecules" / "molecules" / "cyclohexane.inp"
+    source = (
+        matrix_root()
+        / "tests"
+        / "fixtures"
+        / "test_molecules"
+        / "molecules"
+        / "cyclohexane.inp"
+    )
     atoms: list[str] = []
     coords: list[tuple[float, float, float]] = []
     for line in source.read_text(encoding="utf-8").splitlines():
