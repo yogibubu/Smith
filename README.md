@@ -62,7 +62,9 @@ the SMITH/SONIC builder with a deliberately smaller command surface than the
 full MATRIX framework.  It documents the scientific boundary explicitly:
 ORACLE, developed from PROXIMA, defines cycles, symmetry, atom equivalence,
 effective atomic numbers and the remaining continuous atom/synthon descriptors;
-SMITH consumes that state and constructs the SONIC contract.
+SMITH consumes that state and constructs the SONIC contract.  The full ORACLE
+application is in final testing and will be released when ready; it is not part
+of this reduced standalone SMITH distribution.
 
 Install a local checkout and run the supplied examples with:
 
@@ -79,3 +81,6 @@ profile.  To require a complete, separately validated ORACLE state, use:
 ```bash
 smith-sonic build molecule.oracle.xyzin molecule.sonic.xyzin --require-oracle-state
 ```
+
+Instructions for a private external test are in
+[`COLLABORATOR_TESTING.md`](COLLABORATOR_TESTING.md).

@@ -12,7 +12,8 @@ SMITH and ORACLE have separate scientific responsibilities:
   graph and cycle basis, point-group operations and atom permutations, atom
   equivalence, effective atomic number, and the charge, covalency,
   delocalization, strain, bond-order, and synthon descriptors.  ORACLE develops
-  the ideas introduced in PROXIMA and will be described separately.
+  the ideas introduced in PROXIMA.  The full application is in final testing
+  and will be released and described separately when ready.
 - SMITH consumes that frozen molecular state and constructs the SONIC
   coordinate families, protected rows, rank reduction, homogeneous symmetry
   adaptation, analytic Wilson rows, and serialized coordinate contract.
@@ -21,7 +22,7 @@ Two input profiles are available.  An ORACLE-enriched `xyzin` file is the
 recommended production input.  A plain SMITH extended XYZ is accepted through
 a reduced bundled ORACLE profile so that the paper examples can be reproduced
 with one small input file.  This convenience profile is not presented as a
-replacement for the full ORACLE application.
+replacement or release of the full ORACLE application.
 
 ## Install from GitHub
 

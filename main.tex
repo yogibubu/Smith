@@ -132,7 +132,8 @@ symmetry and synthon sections from the \texttt{xyzin} file or constructs them
 from Cartesian coordinates.  ORACLE owns cycle perception, point-group
 operations and atom permutations, atom equivalence, effective atomic numbers
 and the other continuous atomic and synthon descriptors.  It is a development
-of Proxima and will be described separately.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
+of Proxima, is currently in final testing, and will be released and described
+separately when ready.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
 \SMITH{}--\SONIC & Coordinate-construction tool and its coordinate
 contract.  \SMITH\ consumes the frozen ORACLE state; it does not rediscover
 cycles, symmetry or atomic descriptors.  It performs \GIC\ construction, symmetry-adapted
@@ -363,7 +364,9 @@ and continuous chemical perception descriptors.  If those data are already
 present in the \texttt{xyzin} file, \SONIC\ consumes them as part of the frozen
 state.  Their definition belongs to ORACLE (Operator for Recognition,
 Atom-typing and Continuous Local Equivalence), the continuous-perception
-development of Proxima that will be described in a separate publication.
+development of Proxima.  The full ORACLE application is currently undergoing
+final testing and will be released, together with its separate methodological
+description, when that validation is complete.
 In particular, ORACLE defines the molecular graph and cycle basis, point-group
 operations and atom permutations, atom equivalence, effective atomic numbers
 and the charge, covalency, delocalization, strain, bond-order and synthon
@@ -385,7 +388,8 @@ subgroup.  The reduced standalone distribution invokes a pinned, limited
 ORACLE perception profile for this plain-XYZ convenience path and records
 \texttt{PERCEPTION\_PROFILE REDUCED\_ORACLE} in the output.  This mode is
 intended for the supplied examples and ordinary molecular inputs, not as a
-substitute for the full ORACLE application.  Production calculations can
+substitute for the full ORACLE application, which remains in final testing and
+will be released when ready.  Production calculations can
 instead require a separately validated ORACLE \texttt{xyzin} state, which is
 recorded as \texttt{ORACLE\_STATE}.  Thus the package is runnable on its own
 while preserving an explicit scientific boundary between perception and
@@ -2158,12 +2162,12 @@ plots.  The same repository contains a reduced standalone Python package,
 installation instructions and water and norbornane examples.  Its
 \texttt{smith-sonic build} command accepts either a validated ORACLE
 \texttt{xyzin} state or a single extended-XYZ input; the latter invokes the
-explicitly labelled reduced ORACLE profile.  The complete implementation,
-including ORACLE perception and optional Gaussian \texttt{ReadAllGIC} export,
-is available in the MATRIX repository at
-\url{https://github.com/yogibubu/MATRIX}.  Repository revision identifiers and
-the generated \texttt{\#SMITH\_PROVENANCE} section provide the software and
-perception-profile provenance for the reported results.
+explicitly labelled reduced ORACLE profile.  SMITH, including optional Gaussian
+\texttt{ReadAllGIC} export, is developed at
+\url{https://github.com/yogibubu/MATRIX}.  The package pins only reduced-perception
+components; full ORACLE is in final testing and will be released when ready.
+Repository revisions and \texttt{\#SMITH\_PROVENANCE} record the code and
+perception profile.
 
 \section*{Author Contributions}
 
