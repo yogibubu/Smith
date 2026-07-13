@@ -286,8 +286,11 @@ coordination, fragments, interaction centers and arbitrary point groups. \\
 \midrule
 TRIC/geomeTRIC coordinates & Fragment translations and rotations give excellent
 optimization variables for weakly connected systems.\cite{WangSong2016GeomeTRIC}
-& Optimization coordinates are not by themselves a frozen, symmetry-labelled
-internal-coordinate model for GF analysis or semi-experimental refinement. \\
+& TRIC combines rigid-fragment motions with intrafragment primitives and
+delocalizes the resulting space for optimization.  \SONIC\ instead retains the
+relative rigid-body directions as a protected, typed and symmetry-labelled
+source family that can be reused for GF analysis and semi-experimental
+refinement. \\
 \midrule
 Gaussian GIC syntax & Very general symbolic coordinate expressions, including
 nontraditional geometric parameters, sparse derivative rows and automatic
@@ -1120,6 +1123,35 @@ coordinates.  This follows the physical insight of translation-rotation
 coordinates used in geomeTRIC-like optimization methods,\cite{WangSong2016GeomeTRIC}
 but stores the result as a frozen, symmetry-labelled \(\GIC\) definition with
 analytic \(\Bmat\) rows.
+
+The relationship to geomeTRIC is close enough to merit a more precise
+comparison.  TRIC augments the standard internal coordinates of every fragment
+with three translations of its centroid and three rotations represented by an
+exponential map of quaternions, then forms delocalized optimization coordinates
+from the combined primitive space.\cite{WangSong2016GeomeTRIC}  \SONIC\ adopts
+the same physical separation of intrafragment deformation from rigid-fragment
+motion, but gives the latter a different mathematical role.  One fragment is
+selected deterministically as the reference; three relative translations and,
+for non-linear partners, three relative orientations are generated for every
+other fragment.  The overall translation and rotation of the complete complex
+are therefore absent from the molecular vibrational contract rather than being
+carried as optimization variables.  These relative rows remain a protected
+semantic block during rank reduction, are not delocalized together with
+stretches, bends and torsions, and transform explicitly as polar and axial
+vectors under the stored point-group operations.  Their centers, body frames,
+gauge choices, symmetry labels and analytic derivatives are serialized with
+the coordinate definition.
+
+Consequently, for a non-linear dimer such as formic acid--water, TRIC and
+\SONIC\ describe the same six-dimensional physical space of relative rigid-body
+motion, but optimize different design objectives: geomeTRIC constructs a
+well-conditioned working basis for geometry optimization, whereas \SONIC\
+constructs an auditable coordinate contract intended to survive unchanged into
+optimization, Wilson GF analysis and least-squares refinement.  This statement
+is a comparison of coordinate semantics, not an efficiency claim.  A controlled
+head-to-head comparison of convergence, step control and robustness requires
+the same electronic-structure backend and optimizer policy and is therefore
+reserved for the LINK study.
 
 The Cartesian gauge is fixed consistently across all MATRIX tools.  By default
 the weighted center is placed at the origin and the axes are ordered principal
