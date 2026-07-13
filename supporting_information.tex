@@ -39,7 +39,12 @@ container written after molecular perception and coordinate construction.  It
 contains only a standard XYZ geometry followed by the minimum SMITH directives
 needed for this Gaussian-compatible export.  In particular, \texttt{g16 = true}
 selects the Gaussian-style improper-dihedral construction in place of native
-\SONIC\ out-of-plane rows.
+\SONIC\ out-of-plane rows.  For this one-file example, the standalone package
+uses its pinned reduced ORACLE profile to supply the graph, cycles, symmetry and
+continuous atom descriptors needed by \SMITH.  This convenience profile is
+recorded in the generated provenance and is distinct from the full ORACLE
+perception application, a development of PROXIMA that will be described
+separately.
 
 The exact standalone workflow is:
 \begin{lstlisting}
@@ -48,8 +53,11 @@ python -m matrix smith gaussian-input norbornane.xyzin norbornane_g16_readallgic
   --g16 --title "norbornane SONIC ReadAllGIC optimization" \
   --route "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 \end{lstlisting}
-Equivalently, after installation the console-script shorthand is
+Equivalently, after installation of MATRIX the console-script shorthand is
 \texttt{smith standalone ...} followed by \texttt{smith gaussian-input ... --g16}.
+The reduced package distributed with the manuscript constructs the same
+contract with \texttt{smith-sonic build norbornane.smith.xyz norbornane.xyzin};
+Gaussian export remains part of the complete MATRIX installation.
 The \texttt{--g16} export switch is what suppresses active multi-dihedral
 \SONIC\ rows in the Gaussian file and writes their component periodic
 \texttt{D(...)} coordinates instead; the non-redundant \SONIC\ rows remain in

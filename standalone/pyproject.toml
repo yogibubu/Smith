@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smith-sonic"
+version = "0.1.0"
+description = "Standalone SMITH builder for SONIC internal-coordinate contracts"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=1.26",
+  "matrix-core @ git+https://github.com/yogibubu/MATRIX.git@f943523dd5468d35c7ebdc5bfa9f7bb305afda7f#subdirectory=packages/matrix-core",
+  "matrix-chem @ git+https://github.com/yogibubu/MATRIX.git@f943523dd5468d35c7ebdc5bfa9f7bb305afda7f#subdirectory=packages/matrix-chem",
+  "matrix-engines @ git+https://github.com/yogibubu/MATRIX.git@f943523dd5468d35c7ebdc5bfa9f7bb305afda7f#subdirectory=packages/matrix-engines",
+  "matrix-neo @ git+https://github.com/yogibubu/MATRIX.git@f943523dd5468d35c7ebdc5bfa9f7bb305afda7f#subdirectory=packages/matrix-neo",
+]
+
+[project.scripts]
+smith-sonic = "smith_sonic.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+smith_sonic = ["examples/*.xyz"]

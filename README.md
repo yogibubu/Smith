@@ -54,3 +54,28 @@ PYTHONPATH=$(find /Users/vincenzobarone/Documents/git/software/matrix/packages -
 
 After installation the shorter commands are `smith standalone ...` and
 `smith gaussian-input ... --g16`.
+
+## Reduced standalone package
+
+The `standalone/` directory is an installable, revision-pinned distribution of
+the SMITH/SONIC builder with a deliberately smaller command surface than the
+full MATRIX framework.  It documents the scientific boundary explicitly:
+ORACLE, developed from PROXIMA, defines cycles, symmetry, atom equivalence,
+effective atomic numbers and the remaining continuous atom/synthon descriptors;
+SMITH consumes that state and constructs the SONIC contract.
+
+Install a local checkout and run the supplied examples with:
+
+```bash
+python -m pip install ./standalone
+smith-sonic example water /tmp/water.xyzin
+smith-sonic inspect /tmp/water.xyzin
+smith-sonic example norbornane /tmp/norbornane.xyzin
+```
+
+Plain extended XYZ input uses the labelled `REDUCED_ORACLE` convenience
+profile.  To require a complete, separately validated ORACLE state, use:
+
+```bash
+smith-sonic build molecule.oracle.xyzin molecule.sonic.xyzin --require-oracle-state
+```

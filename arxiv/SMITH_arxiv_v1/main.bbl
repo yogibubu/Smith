@@ -1,0 +1,229 @@
+\providecommand{\latin}[1]{#1}
+\makeatletter
+\providecommand{\doi}
+  {\begingroup\let\do\@makeother\dospecials
+  \catcode`\{=1 \catcode`\}=2 \doi@aux}
+\providecommand{\doi@aux}[1]{\endgroup\texttt{#1}}
+\makeatother
+\providecommand*\mcitethebibliography{\thebibliography}
+\csname @ifundefined\endcsname{endmcitethebibliography}
+  {\let\endmcitethebibliography\endthebibliography}{}
+\begin{mcitethebibliography}{24}
+\providecommand*\natexlab[1]{#1}
+\providecommand*\mciteSetBstSublistMode[1]{}
+\providecommand*\mciteSetBstMaxWidthForm[2]{}
+\providecommand*\mciteBstWouldAddEndPuncttrue
+  {\def\EndOfBibitem{\unskip.}}
+\providecommand*\mciteBstWouldAddEndPunctfalse
+  {\let\EndOfBibitem\relax}
+\providecommand*\mciteSetBstMidEndSepPunct[3]{}
+\providecommand*\mciteSetBstSublistLabelBeginEnd[3]{}
+\providecommand*\EndOfBibitem{}
+\mciteSetBstSublistMode{f}
+\mciteSetBstMaxWidthForm{subitem}{(\alph{mcitesubitemcount})}
+\mciteSetBstSublistLabelBeginEnd
+  {\mcitemaxwidthsubitemform\space}
+  {\relax}
+  {\relax}
+
+\bibitem[Wilson \latin{et~al.}(1955)Wilson, Decius, and Cross]{Wilson1955}
+Wilson,~E.~B.; Decius,~J.~C.; Cross,~P.~C. \emph{Molecular Vibrations: The
+  Theory of Infrared and Raman Vibrational Spectra}; McGraw-Hill: New York,
+  1955\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Lazzari \latin{et~al.}(2020)Lazzari, Salvadori, Mancini, and
+  Barone]{Lazzari2020Proxima}
+Lazzari,~F.; Salvadori,~A.; Mancini,~G.; Barone,~V. Molecular Perception for
+  Visualization and Computation: The {Proxima} Library. \emph{J. Chem. Inf.
+  Model.} \textbf{2020}, \emph{60}, 2668--2672\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Gambi \latin{et~al.}(2019)Gambi, Pietropolli~Charmet, Stoppa,
+  Tasinato, Ceselin, and Barone]{Gambi2019Synthons}
+Gambi,~A.; Pietropolli~Charmet,~A.; Stoppa,~P.; Tasinato,~N.; Ceselin,~G.;
+  Barone,~V. Molecular Synthons for Accurate Structural Determinations: The
+  Equilibrium Geometry of 1-Chloro-1-Fluoroethene. \emph{Phys. Chem. Chem.
+  Phys.} \textbf{2019}, \emph{21}, 3615--3625\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Lazzari \latin{et~al.}(2024)Lazzari, Mendolicchio, and
+  Barone]{Lazzari2024SynthonPCS}
+Lazzari,~F.; Mendolicchio,~M.; Barone,~V. Accurate Geometries of Large
+  Molecules by Integration of the Pisa Composite Scheme and the Templating
+  Synthon Approach. \emph{J. Phys. Chem. A} \textbf{2024}, \emph{128},
+  1385--1395\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Lazzari \latin{et~al.}(2025)Lazzari, Di~Grande, Crisci, Mendolicchio,
+  and Barone]{Lazzari2025PCS141}
+Lazzari,~F.; Di~Grande,~S.; Crisci,~L.; Mendolicchio,~M.; Barone,~V. Molecular
+  Structures with Spectroscopic Accuracy at {DFT} Cost by the Templating
+  Synthon Approach and the {PCS141} Database. \emph{J. Chem. Phys.}
+  \textbf{2025}, \emph{162}, 114310\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Baker and Hehre(1991)Baker, and Hehre]{BakerHehre1991ZMatrix}
+Baker,~J.; Hehre,~W.~J. Geometry Optimization in Cartesian Coordinates: The End
+  of the Z-Matrix? \emph{J. Comput. Chem.} \textbf{1991}, \emph{12},
+  606--610\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Pulay and Fogarasi(1992)Pulay, and Fogarasi]{PulayFogarasi1992}
+Pulay,~P.; Fogarasi,~G. Geometry Optimization in Redundant Internal
+  Coordinates. \emph{J. Chem. Phys.} \textbf{1992}, \emph{96}, 2856--2860\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Peng \latin{et~al.}(1996)Peng, Ayala, Schlegel, and
+  Frisch]{Peng1996Redundant}
+Peng,~C.; Ayala,~P.~Y.; Schlegel,~H.~B.; Frisch,~M.~J. Using Redundant Internal
+  Coordinates to Optimize Equilibrium Geometries and Transition States.
+  \emph{J. Comput. Chem.} \textbf{1996}, \emph{17}, 49--56\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Bakken and Helgaker(2002)Bakken, and Helgaker]{BakkenHelgaker2002}
+Bakken,~V.; Helgaker,~T. The Efficient Optimization of Molecular Geometries
+  Using Redundant Internal Coordinates. \emph{J. Chem. Phys.} \textbf{2002},
+  \emph{117}, 9160--9174\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Baker \latin{et~al.}(1996)Baker, Kessi, and
+  Delley]{Baker1996Delocalized}
+Baker,~J.; Kessi,~A.; Delley,~B. The Generation and Use of Delocalized Internal
+  Coordinates in Geometry Optimization. \emph{J. Chem. Phys.} \textbf{1996},
+  \emph{105}, 192--212\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[B{\'e}rces(1997)]{Berces1997NaturalMetal}
+B{\'e}rces,~A. Geometry Optimization of Metal Complexes Using Natural Internal
+  Coordinates: Representation of Skeletal Degrees of Freedom. \emph{J. Comput.
+  Chem.} \textbf{1997}, \emph{18}, 45--55\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[von Arnim and Ahlrichs(1999)von Arnim, and
+  Ahlrichs]{VonArnimAhlrichs1999GNIC}
+von Arnim,~M.; Ahlrichs,~R. Geometry Optimization in Generalized Natural
+  Internal Coordinates. \emph{J. Chem. Phys.} \textbf{1999}, \emph{111},
+  9183--9190\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Swart and Bickelhaupt(2006)Swart, and
+  Bickelhaupt]{SwartBickelhaupt2006StrongWeak}
+Swart,~M.; Bickelhaupt,~F.~M. Optimization of Strong and Weak Coordinates.
+  \emph{Int. J. Quantum Chem.} \textbf{2006}, \emph{106}, 2536--2544\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Wang and Song(2016)Wang, and Song]{WangSong2016GeomeTRIC}
+Wang,~L.-P.; Song,~C. Geometry Optimization Made Simple with Translation and
+  Rotation Coordinates. \emph{J. Chem. Phys.} \textbf{2016}, \emph{144},
+  214108\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Marenich \latin{et~al.}(2025)Marenich, Brothers, Hratchian, and
+  Frisch]{Marenich2025GIC}
+Marenich,~A.~V.; Brothers,~E.~N.; Hratchian,~H.~P.; Frisch,~M.~J. Generalized
+  Internal Coordinates for Creative Exploration of Interatomic Geometries.
+  \emph{J. Chem. Theory Comput.} \textbf{2025}, \emph{21}, 10930--10944\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Lema-Saavedra and Fern{\'a}ndez-Ramos(2026)Lema-Saavedra, and
+  Fern{\'a}ndez-Ramos]{LemaSaavedraFernandezRamos2026RingCP}
+Lema-Saavedra,~A.; Fern{\'a}ndez-Ramos,~A. A General Method for Constructing
+  and Searching Conformations in Molecular Rings: From {Cremer--Pople}
+  Coordinates to 3D Geometries. \emph{J. Chem. Phys.} \textbf{2026},
+  \emph{164}, 074109\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Cremer and Pople(1975)Cremer, and Pople]{CremerPople1975}
+Cremer,~D.; Pople,~J.~A. General Definition of Ring Puckering Coordinates.
+  \emph{J. Am. Chem. Soc.} \textbf{1975}, \emph{97}, 1354--1358\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[{Gaussian, Inc.}()]{GaussianGICManual}
+{Gaussian, Inc.} Specifying Generalized Internal Coordinates.
+  \url{https://gaussian.com/gic/}, Accessed July 8, 2026\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Rauhut and Pulay(1995)Rauhut, and Pulay]{RauhutPulay1995}
+Rauhut,~G.; Pulay,~P. Transferable Scaling Factors for Density Functional
+  Derived Vibrational Force Fields. \emph{J. Phys. Chem.} \textbf{1995},
+  \emph{99}, 3093--3100\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Baker \latin{et~al.}(1998)Baker, Jarzecki, and
+  Pulay]{BakerJarzeckiPulay1998}
+Baker,~J.; Jarzecki,~A.~A.; Pulay,~P. Direct Scaling of Primitive Valence Force
+  Constants: An Alternative Approach to Scaled Quantum Mechanical Force Fields.
+  \emph{J. Phys. Chem. A} \textbf{1998}, \emph{102}, 1412--1424\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Barone \latin{et~al.}(2014)Barone, Biczysko, and
+  Bloino]{BaroneBiczyskoBloino2014}
+Barone,~V.; Biczysko,~M.; Bloino,~J. Fully Anharmonic {IR} and Raman Spectra of
+  Medium-Size Molecular Systems: Accuracy and Interpretation. \emph{Phys. Chem.
+  Chem. Phys.} \textbf{2014}, \emph{16}, 1759--1787\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Barone \latin{et~al.}(2020)Barone, Ceselin, Fus{\`e}, and
+  Tasinato]{BaroneCeselinFuseTasinato2020}
+Barone,~V.; Ceselin,~G.; Fus{\`e},~M.; Tasinato,~N. Accuracy Meets
+  Interpretability for Computational Spectroscopy by Means of Hybrid and
+  Double-Hybrid Functionals. \emph{Front. Chem.} \textbf{2020}, \emph{8},
+  584203\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Vazart \latin{et~al.}(2015)Vazart, Latouche, Cimino, and
+  Barone]{VazartLatoucheCiminoBarone2015}
+Vazart,~F.; Latouche,~C.; Cimino,~P.; Barone,~V. Accurate {IR} Spectra for
+  Molecules Containing the {C-N} Moiety by Anharmonic Computations with the
+  Double Hybrid {B2PLYP} Density Functional. \emph{J. Chem. Theory Comput.}
+  \textbf{2015}, \emph{11}, 4364--4369\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\end{mcitethebibliography}
