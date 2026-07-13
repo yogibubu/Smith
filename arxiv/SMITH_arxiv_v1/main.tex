@@ -85,8 +85,11 @@ sparse derivative machinery and Gaussian export path.  The Gaussian tests are
 serialization and solver-consumption tests: \SONIC\ generates the coordinate
 contract automatically and Gaussian reads the exported \GIC\ definitions; they
 are not presented as a competitive coordinate-generation benchmark against
-Gaussian's internal coordinate builder.  We also discuss the intended scope of
-the method and its current limitations.
+Gaussian's internal coordinate builder.  Standalone probes include a
+formic-acid--water complex with six protected intermolecular degrees of freedom
+and an $\eta^3$ allyl--palladium complex in which an ORACLE-supplied ligand center
+is retained as a protected metal--center coordinate.  We also discuss the
+intended scope of the method and its current limitations.
 \end{abstract}
 
 \begin{tocentry}
@@ -131,9 +134,9 @@ ORACLE molecular-state layer & Input/perception layer that either reads saved to
 symmetry and synthon sections from the \texttt{xyzin} file or constructs them
 from Cartesian coordinates.  ORACLE owns cycle perception, point-group
 operations and atom permutations, atom equivalence, effective atomic numbers
-and the other continuous atomic and synthon descriptors.  It is a development
-of Proxima, is currently in final testing, and will be released and described
-separately when ready.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
+and the other continuous atomic and synthon descriptors.  It develops Proxima
+and is defined in the companion ORACLE methodological manuscript; its production
+implementation remains in final validation before release.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
 \SMITH{}--\SONIC & Coordinate-construction tool and its coordinate
 contract.  \SMITH\ consumes the frozen ORACLE state; it does not rediscover
 cycles, symmetry or atomic descriptors.  It performs \GIC\ construction, symmetry-adapted
@@ -281,10 +284,14 @@ variables for well understood local motifs.\cite{Berces1997NaturalMetal,VonArnim
 & General construction is difficult for fused or bridged rings, high
 coordination, fragments, interaction centers and arbitrary point groups. \\
 \midrule
-TRIC/geomeTRIC coordinates & Fragment translations and rotations give excellent
-optimization variables for weakly connected systems.\cite{WangSong2016GeomeTRIC}
-& Optimization coordinates are not by themselves a frozen, symmetry-labelled
-internal-coordinate model for GF analysis or semi-experimental refinement. \\
+TRIC/geomeTRIC coordinates & Explicitly represents collective fragment
+translations and rotations, with the rotations described by an exponential map
+of quaternions.\cite{WangSong2016GeomeTRIC} & \SONIC\ adopts this
+exponential-map parametrization, but not the complete TRIC construction: it
+defines the rigid-body directions relative to a reference fragment and retains
+them as a protected, typed and symmetry-labelled source family; alternatively,
+the intermolecular model may be constructed from typed pseudo-bonds and
+pseudo-cycles. \\
 \midrule
 Gaussian GIC syntax & Very general symbolic coordinate expressions, including
 nontraditional geometric parameters, sparse derivative rows and automatic
@@ -364,9 +371,9 @@ and continuous chemical perception descriptors.  If those data are already
 present in the \texttt{xyzin} file, \SONIC\ consumes them as part of the frozen
 state.  Their definition belongs to ORACLE (Operator for Recognition,
 Atom-typing and Continuous Local Equivalence), the continuous-perception
-development of Proxima.  The full ORACLE application is currently undergoing
-final testing and will be released, together with its separate methodological
-description, when that validation is complete.
+development of Proxima.  Its state contract and perception methods are defined
+in the companion ORACLE manuscript, while the production application remains
+in final validation before release.
 In particular, ORACLE defines the molecular graph and cycle basis, point-group
 operations and atom permutations, atom equivalence, effective atomic numbers
 and the charge, covalency, delocalization, strain, bond-order and synthon
@@ -388,8 +395,8 @@ subgroup.  The reduced standalone distribution invokes a pinned, limited
 ORACLE perception profile for this plain-XYZ convenience path and records
 \texttt{PERCEPTION\_PROFILE REDUCED\_ORACLE} in the output.  This mode is
 intended for the supplied examples and ordinary molecular inputs, not as a
-substitute for the full ORACLE application, which remains in final testing and
-will be released when ready.  Production calculations can
+substitute for the full ORACLE application, which remains in final validation
+and will be released when ready.  Production calculations can
 instead require a separately validated ORACLE \texttt{xyzin} state, which is
 recorded as \texttt{ORACLE\_STATE}.  Thus the package is runnable on its own
 while preserving an explicit scientific boundary between perception and
@@ -812,11 +819,12 @@ local ring role.
 \subsection{Out-of-Plane and Improper Coordinates}
 
 Three-coordinate centers generate out-of-plane coordinates unless all four
-atoms involved are cyclic.  Gaussian-compatible improper dihedrals can be
-emitted in a compatibility mode, but the default analytic coordinate is the
-out-of-plane \(U\) coordinate.  This distinction is an output convention, not a
-change in the reduction policy: both forms occupy the same local
-non-planarity role and are treated as their own coordinate family.
+atoms involved are cyclic.  The standalone and command-line workflows default
+to the commercial Gaussian 16 profile and therefore emit Gaussian-compatible
+improper dihedrals.  The native analytic \(U\) coordinate remains part of the
+internal function registry and validation layer.  This distinction is an
+output convention, not a change in the reduction policy: both forms occupy the
+same local non-planarity role and are treated as their own coordinate family.
 
 \section{Rank Reduction}
 
@@ -1112,10 +1120,39 @@ intramolecular coordinate basis.  Interfragment motion is represented by
 special coordinates: fragment-center distances, fragment-center to
 atom distances, Cartesian components of relative fragment translation and
 relative fragment orientations expressed as exponential-map rotation
-coordinates.  This follows the physical insight of translation-rotation
-coordinates used in geomeTRIC-like optimization methods,\cite{WangSong2016GeomeTRIC}
-but stores the result as a frozen, symmetry-labelled \(\GIC\) definition with
-analytic \(\Bmat\) rows.
+coordinates.  This construction explicitly adopts the fragment-rotation
+parametrization introduced by Wang and Song in TRIC/geomeTRIC: collective
+translations are described through fragment centroids, while orientations are
+represented by an exponential map of quaternions.\cite{WangSong2016GeomeTRIC}
+The use of this exponential mapping in \SONIC\ should therefore be credited to
+the geomeTRIC work.
+
+This shared parametrization does not make the two coordinate constructions
+identical.  In TRIC/geomeTRIC, three translations and three rotations are added
+for each fragment and are subsequently combined with the intrafragment
+primitives in a delocalized coordinate space.\cite{WangSong2016GeomeTRIC}
+Within the \SONIC\ contract, one fragment is instead selected deterministically
+as the reference; three relative translations and, for non-linear partners,
+three relative exponential-map orientations are generated for every other
+fragment, so that the overall rigid translation and rotation of the complete
+complex do not enter the molecular vibrational contract.  These rows remain a
+protected semantic block during rank reduction rather than being delocalized
+with stretches, bends and torsions.  They transform explicitly as polar and
+axial vectors under the stored point-group operations and are serialized
+together with their centers, body frames, gauge choices, symmetry labels and
+analytic \(\Bmat\) rows.  Thus \SONIC\ adopts and credits the TRIC exponential
+map while embedding it in a distinct, frozen coordinate construction.
+
+Fragment coordinates are not the only intermolecular representation available
+in \SONIC.  For a weak complex, the coordinate contract can select either the
+\texttt{SPECIAL\_COORDINATES} fragment construction just described or the
+\texttt{PSEUDO\_BONDS} construction.  The former preserves the disconnected
+monomers and represents their relative rigid-body motion explicitly; the latter
+inserts selected weak contacts as typed pseudo-edges and generates the
+associated pseudo-cycle coordinates without reclassifying those contacts as
+covalent bonds.  The selected construction is recorded in the contract, so the
+two descriptions remain explicit alternatives rather than indistinguishable
+members of one primitive pool.
 
 The Cartesian gauge is fixed consistently across all MATRIX tools.  By default
 the weighted center is placed at the origin and the axes are ordered principal
@@ -1183,6 +1220,23 @@ and the active distance row is written as the corresponding square-root
 function of the center coordinates and the iron Cartesian coordinates.  The
 special coordinate is therefore generated from the molecular model, not
 hand-entered as an extra atom.
+
+The $\eta^3$ allyl--palladium standalone probe exercises the same interface with a
+non-ring ligand center.  For allyl carbon atoms 3--5, ORACLE supplies
+\[
+ C_{001}=\frac{\mathbf{x}_3+\mathbf{x}_4+\mathbf{x}_5}{3}
+\]
+with center kind \texttt{ETA3\_CENTER}; \SMITH\ then protects
+\[
+ q_{\eta^3}=|C_{001}-\mathbf{x}_{\rm Pd}|.
+\]
+The idealized ten-atom fixture closes at rank \(24/24\), and the reference
+value is \(q_{\eta^3}=1.8000\)~\AA.  Its Gaussian 16 export writes the three
+center components as inactive Cartesian functions and the metal--center
+distance as an active square-root expression.  This is deliberately an
+interface and rank-closure test rather than an optimized electronic-structure
+benchmark: perception of the $\eta^3$ center belongs to ORACLE, whereas its
+retention, differentiation and serialization belong to \SMITH.
 
 In the current validated \texttt{PSEUDO\_BONDS} baseline, selected
 non-covalent contacts are inserted into the construction graph as typed
@@ -1289,7 +1343,7 @@ Ring deformation/puckering & Active & Endocyclic angle and torsion sources gener
 \midrule
 Butterfly/condensed rings & Active & Fused-ring butterfly and condensed torsion families remain separate homogeneous source blocks. \\
 \midrule
-Out-of-plane/improper rows & Active & Native \(U\) rows are default; Gaussian-style improper dihedrals are a compatibility mode. \\
+Out-of-plane/improper rows & Active & Gaussian 16-compatible improper dihedrals are the standalone default; native \(U\) rows remain analytically available. \\
 \midrule
 Special fragment coordinates & Active & Fragment-center distances, center-atom distances, translations and orientations are protected first. \\
 \midrule
@@ -1326,11 +1380,12 @@ checks, not a comparison with an external published coordinate generator.
 
 The broader scientific motivation includes GF/PED analysis, DVR grids and
 semi-experimental refinement, but the validation layers must be separated.  The
-present paper validates the contract itself, tests whether
-external Gaussian calculations can consume \SONIC{}-generated coordinates, and
-adds a compact GF/PED scaling probe to show how the same family labels enter a
-classical spectroscopic analysis.  The scope of the numerical evidence is
-stated explicitly in Sec.~\ref{sec:scope-limitations}.
+present paper validates the coordinate contract itself and tests whether
+external Gaussian calculations can consume \SONIC{}-generated coordinates.
+Hessian-locality and GF/PED diagnostics based on the same frozen contract are
+reported in the companion TRINITY Communication.  The scope of the numerical
+evidence retained here is stated explicitly in
+Sec.~\ref{sec:scope-limitations}.
 
 \begin{table}[htbp]
 \centering
@@ -1356,11 +1411,6 @@ motifs. & A benchmark of Gaussian's internal optimizer. \\
 Gaussian \texttt{ReadAllGIC} optimizations, Table~\ref{tab:readallgic-opt} &
 Whether a commercial Gaussian 16 parser and optimizer can consume the generated
 coordinate block. & A universal iteration-count advantage for every molecule. \\
-\midrule
-Hessian and GF/PED probes, Fig.~\ref{fig:hessian-heatmap} and
-Table~\ref{tab:gf-ped-scaling} & Chemical readability of the accepted
-coordinate families in vibrational and force-field-style analyses. & A complete
-spectroscopic scaling study. \\
 \midrule
 Puckering and portable-export probes, Figs.~\ref{fig:puckering-scan} and
 \ref{fig:cyclohexane-puckering-equivalence}, Table~\ref{tab:external-codes} & Reuse of
@@ -1397,11 +1447,13 @@ chair-to-boat puckering path used for the portable Cartesian/Gaussian
 
 The regression corpus contains acyclic and cyclic molecules, fused and
 non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
-molecules, ferrocene in \(D_{5h}\) and \(D_{5d}\) forms, and a formic-acid--water
-weak-complex probe.  The ring subset protects the \(RDef/RPck\) source spaces,
+molecules, ferrocene in \(D_{5h}\) and \(D_{5d}\) forms, a formic-acid--water
+weak-complex probe, and an $\eta^3$ allyl--palladium interaction-center probe.  The
+ring subset protects the \(RDef/RPck\) source spaces,
 butterfly coordinates and the use of linear \(RPck\) rows rather than polar
 active coordinates.  Ferrocene protects center-based special coordinates and
-high-symmetry point-group projectors.  Weak-complex tests protect the
+high-symmetry point-group projectors; the $\eta^3$ case protects consumption of an
+explicit multi-atom ligand center.  Weak-complex tests protect the
 fragment-coordinate policy and the analytic \(\Bmat\) rows of interfragment
 translation and orientation coordinates.
 
@@ -1450,7 +1502,8 @@ Cubane & High-symmetry cage & \(O_h\) & 42/42; cyclic bends & \(\Delta_\mathrm{P
 Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\mathrm{PF}=6.71\times10^{-9}\); \(\epsilon_\mathrm{SALC}=3.33\times10^{-16}\) \\
 Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
-Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 11 protected & direct \(\Bmat\)-rank \(=18\); \(\epsilon_\mathrm{SALC}=0\) \\
+Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 6 protected & three translations plus three orientations; direct \(\Bmat\)-rank \(=18\) \\
+$\eta^3$ allyl--PdCl & ORACLE-supplied $\eta^3$ ligand center & \(C_1\) & 24/24; 1 protected & \(q_{\eta^3}=1.8000\)~\AA; analytic center--atom row retained \\
 Weak-complex pseudo-cycles & Intermolecular and intramolecular pseudo-bond
 contacts & \(C_s\), \(C_{3v}\), \(C_1\) & rank closed & formic acid--water,
 water dimer, Li\(_2\)--Ar, borane--ammonia and glycine I/II fixtures validate
@@ -1538,16 +1591,14 @@ evaluates the GIC derivatives with its own machinery and performs the
 optimization.  No hand-written surrogate coordinates are introduced.  The three
 systems in Table~\ref{tab:readallgic-opt} were chosen because they exercise
 ring and cage coordinates while remaining small enough for repeated external
-checks.  The native \SONIC\ contract uses signed out-of-plane rows and
-block-local multi-dihedral \(RPck\) puckering rows.  Those rows have been
-validated with a development Gaussian implementation that supports them as
-active variables.  Commercial Gaussian 16 has no native \(U\) out-of-plane
+checks.  The native \SONIC\ contract can represent signed out-of-plane rows and
+block-local multi-dihedral \(RPck\) puckering rows.  Commercial Gaussian 16 has no native \(U\) out-of-plane
 primitive, and the official Gaussian GIC documentation warns that active
 generic coordinates combining multiple periodic dihedrals can behave poorly
 because the periodicity of the component torsions is not applied inside the
 composite expression.\cite{GaussianGICManual}  The commercial
-\texttt{ReadAllGIC} export therefore uses a compatibility profile only when the
-\texttt{g16} option is requested: \(U\) rows are replaced by the corresponding
+\texttt{ReadAllGIC} export therefore uses the Gaussian 16 profile by default:
+\(U\) rows are replaced by the corresponding
 Gaussian improper dihedrals, multi-dihedral \SONIC\ rows are not written to the
 Gaussian input, and all component \(D(\cdots)\) terms are added as active
 redundant periodic coordinates.  After the Gaussian optimization, \SMITH\ reads
@@ -1665,15 +1716,10 @@ This compatibility export is less compact than the native
 form, but it allows standard Gaussian 16 to be used without relying on
 development-only primitives.  The native \SONIC\ contract still defines \(U\),
 multi-dihedral \(RPck\), \(QPck\) and \(\Phi P\).
-In the development Gaussian build, the default internal-coordinate model for
-camphor is sensitive to the automatic \(CX_3\) methyl treatment; adding
-\texttt{Geom=(GIC,NoXY3)} restores the stable standard-coordinate reference.
-The corresponding native-coordinate norbornane check, also run with the same
-total-symmetric active subset, contains 51 generated rows of which 36
-non-totally symmetric rows are marked \texttt{Frozen}; it converges in five
-steps.  This is a distinct input from the Gaussian 16 \texttt{ReadAllGIC}
-compatibility run above and isolates the out-of-plane and frozen-irrep handling
-before export through the commercial Gaussian parser.
+For the symmetry-enabled norbornane export, the full rank-complete contract
+contains 51 generated rows, of which 36 non-totally symmetric rows are marked
+\texttt{Frozen}.  This directly tests frozen-irrep handling through the
+commercial Gaussian 16 parser without requiring a nonstandard executable.
 
 \begin{figure}[htbp]
 \centering
@@ -1687,121 +1733,6 @@ portability; norbornane and camphor probe bridged-ring cases where a naive
 sequential Z matrix is less efficient.}
 \label{fig:gaussian-coordinate-comparison}
 \end{figure}
-
-\subsection{Hessian Locality}
-
-Let \(\Fmat_x\) be a Cartesian Hessian at the reference geometry.  For a
-full-rank \SONIC\ Wilson matrix \(\Bmat\), the minimum-norm Cartesian
-displacement associated with an internal displacement is
-\begin{equation}
-\label{eq:minimum-norm-cartesian-displacement}
-  \Delta \x = \Bmat^T(\Bmat\Bmat^T)^{-1}\Delta\q ,
-\end{equation}
-and, at a stationary point or within the linear displacement approximation,
-the corresponding internal-coordinate Hessian is
-\begin{equation}
-\label{eq:internal-hessian-transform}
-  \Fmat_q =
-  \left[\Bmat^T(\Bmat\Bmat^T)^{-1}\right]^T
-  \Fmat_x
-  \left[\Bmat^T(\Bmat\Bmat^T)^{-1}\right].
-\end{equation}
-Away from a stationary point, the exact curvilinear Hessian transformation also
-contains the usual gradient-weighted second derivatives of the coordinates;
-those terms are not part of this locality diagnostic.  This construction is
-not a new force-field definition.  The dimensionless coupling
-\begin{equation}
-\label{eq:hessian-coupling}
-  C_{ij}=\frac{|F_{ij}|}{\sqrt{|F_{ii}F_{jj}|}}
-\end{equation}
-then compares off-diagonal structure without mixing units.
-
-Figure~\ref{fig:hessian-heatmap} shows an illustrative result for cyclobutane.  In an
-orthonormal Cartesian vibrational basis the normalized Hessian is broadly
-coupled, with a mean off-diagonal value of 0.151 and a 95th percentile of
-0.394.  In the frozen \SONIC\ basis these values fall to 0.028 and 0.085.  In
-the symmetry-adapted contract they fall further to 0.013 and 0.056.  These
-numbers are single-calculation diagnostics, not quantified robustness estimates
-over geometry or method variations.  In this case, a chemically labelled basis
-makes the Hessian visibly more block structured before any empirical scaling or
-normal-mode diagonalization is applied.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\linewidth]{figures/sonic_hessian_heatmap.png}
-\caption{Normalized off-diagonal Hessian coupling for cyclobutane
-(Gaussian 16 HF/STO-3G).  The same Cartesian Hessian is represented in an
-orthonormal Cartesian vibrational basis, in the frozen \SONIC\ basis and in the
-symmetry-adapted \SONIC\ basis.  The diagonal is suppressed so that residual
-coordinate coupling is visible.}
-\label{fig:hessian-heatmap}
-\end{figure}
-
-\subsection{GF/PED Family Scaling Probe}
-
-A Wilson GF/PED calculation is the most direct spectroscopic test of whether the
-coordinate families produced by \SONIC\ remain chemically readable after
-projection.  In scaled-quantum-mechanical force-field work, force constants are
-often adjusted by coordinate class rather than by individual normal
-modes.\cite{RauhutPulay1995,BakerJarzeckiPulay1998,BaroneBiczyskoBloino2014}
-That operation is only transparent when the coordinate blocks keep stretches,
-bends, torsions and ring-puckering coordinates separated.
-
-The add-on test uses cyclohexanol at B3LYP/6-31G(d), with standard
-\texttt{Opt Freq NoSymm} and no out-of-plane GIC terms.  \SONIC\ supplies the
-stored definition and sparse \(\Bmat\) rows; the GF layer then applies
-family-level Pulay-style scale factors to the internal force field and reports
-PED percentages by source family.  The basis has rank \(51/51\).  The
-unscaled GF frequencies reproduce the Gaussian/FCHK harmonic frequencies with
-an RMS difference of \(2.6\times10^{-6}\)~cm\(^{-1}\), and the aligned
-optimized geometry agrees to \(4.7\times10^{-7}\)~\AA.  This is not intended as
-a new optimized scale-factor set.  It is a targeted demonstration of how a
-chemically labelled coordinate contract supports class-specific calibration:
-localized OH stretches, and similarly CN stretching modes in nitriles, are
-well-known sensitive regions for hybrid-DFT harmonic force fields and often
-require dedicated anharmonic or class-specific treatment rather than one global
-frequency factor.\cite{BaroneBiczyskoBloino2014,BaroneCeselinFuseTasinato2020,VazartLatoucheCiminoBarone2015}
-For that reason the hydroxyl stretch was chosen deliberately and assigned a
-force-constant factor larger than one, corresponding to an approximately
-\(+100\)~cm\(^{-1}\) shift.
-
-Because the scaling is applied to the internal force field before GF
-diagonalization, not to isolated normal-mode frequencies after the fact, modes
-other than the nearly pure OH stretch also move slightly.  The size and
-direction of those changes follow the PED mixing with the scaled coordinate
-families.  This is precisely the diagnostic value of the example: \SONIC\
-labels the coordinate families that receive the scale factor and then reports
-which normal modes are affected through the GF/PED analysis.
-
-\begin{table}[htbp]
-\centering
-\caption{Representative B3LYP/6-31G(d) GF/PED scaling probe for
-cyclohexanol.  Frequencies are in cm\(^{-1}\).  PED entries are summed over
-\SONIC\ coordinate families and rounded to one decimal percent.  Scaling is
-applied to the internal force field by coordinate family before GF
-diagonalization; small shifts in non-OH modes therefore reflect ordinary
-force-field coupling, not independent mode-by-mode frequency fitting.}
-\label{tab:gf-ped-scaling}
-\begin{tabular}{@{}p{0.24\linewidth}ccp{0.42\linewidth}@{}}
-\toprule
-Representative mode & Unscaled & Scaled & Dominant PED families \\
-\midrule
-Low-frequency ring deformation & 269.158 & 266.496 & Heavy stretch 49.8; ring puckering 25.0; bend/rock 21.9. \\
-Ring bend/deformation & 475.915 & 472.567 & Heavy stretch 58.1; ring bend 27.3; bend/rock 13.7. \\
-Heavy-atom stretch/bend & 1106.899 & 1104.650 & Heavy stretch 89.2; bend/rock 10.5. \\
-CH stretch & 3088.189 & 3033.689 & CH stretch 100.0. \\
-OH stretch & 3748.716 & 3850.456 & OH stretch 99.9. \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-The large-amplitude block analysis is consistent with the same family
-separation: the torsion block gives 270.542~cm\(^{-1}\), while the three
-ring-puckering rows give 224.217, 417.617 and 473.078~cm\(^{-1}\).  The active
-DVR candidate is the \(RPck0003\) row at 225.084~cm\(^{-1}\).  This is the
-spectroscopic counterpart of the construction principle: scaling classes are
-assigned to \SONIC\ family labels such as \texttt{Stre0012}, \texttt{RPck0002}
-or \texttt{RDef0026}, not to handwritten normal-mode descriptions.
 
 \subsection{Ring Puckering Branch}
 
@@ -2129,9 +2060,11 @@ The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
 contract is already usable as an external solver coordinate set, and the small
 iteration-count comparison places the generated \SONIC\ coordinates next to
 Gaussian defaults, Cartesians and hand-built Z matrices on the same inputs.  The
-Hessian, puckering, GF/PED scaling and portable chair-to-boat export probes illustrate
-why the same stored definition is relevant to force-field and large-amplitude work
-within the scope defined above.  Full DVR and refinement application benchmarks
+The puckering and portable chair-to-boat export probes illustrate why the same
+stored definition is relevant to large-amplitude work within the scope defined
+above.  Hessian-locality and GF/PED analyses using the frozen coordinate
+contract are presented in the companion TRINITY Communication.  Full DVR and
+refinement application benchmarks
 remain the next validation layer.  The cyclohexane export check further shows
 that a \SONIC{}-generated puckering path can be represented either as ordinary
 Cartesians or as Gaussian \texttt{ReadAllGIC} input with numerically identical
@@ -2165,7 +2098,8 @@ installation instructions and water and norbornane examples.  Its
 explicitly labelled reduced ORACLE profile.  SMITH, including optional Gaussian
 \texttt{ReadAllGIC} export, is developed at
 \url{https://github.com/yogibubu/MATRIX}.  The package pins only reduced-perception
-components; full ORACLE is in final testing and will be released when ready.
+components; full ORACLE is described in its companion manuscript, remains in
+final validation, and will be released when ready.
 Repository revisions and \texttt{\#SMITH\_PROVENANCE} record the code and
 perception profile.
 

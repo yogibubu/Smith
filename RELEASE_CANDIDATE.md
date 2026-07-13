@@ -33,6 +33,7 @@ the clean verification and all four packaged examples.
 
 ## Editorial gate
 
-After the collaborator confirms this candidate, the remaining submission work
-is limited to a final manuscript reading, regeneration of the manual PDF and
-arXiv source archive, and creation of the stable release tag.
+The final manuscript reading, manual PDF regeneration and independent arXiv
+source compilation were completed on 13 July 2026.  The stable release tag
+remains intentionally gated on the collaborator's confirmation of the pinned
+standalone candidate.

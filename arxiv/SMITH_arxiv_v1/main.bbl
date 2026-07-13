@@ -8,7 +8,7 @@
 \providecommand*\mcitethebibliography{\thebibliography}
 \csname @ifundefined\endcsname{endmcitethebibliography}
   {\let\endmcitethebibliography\endthebibliography}{}
-\begin{mcitethebibliography}{24}
+\begin{mcitethebibliography}{19}
 \providecommand*\natexlab[1]{#1}
 \providecommand*\mciteSetBstSublistMode[1]{}
 \providecommand*\mciteSetBstMaxWidthForm[2]{}
@@ -176,52 +176,6 @@ Cremer,~D.; Pople,~J.~A. General Definition of Ring Puckering Coordinates.
 \bibitem[{Gaussian, Inc.}()]{GaussianGICManual}
 {Gaussian, Inc.} Specifying Generalized Internal Coordinates.
   \url{https://gaussian.com/gic/}, Accessed July 8, 2026\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Rauhut and Pulay(1995)Rauhut, and Pulay]{RauhutPulay1995}
-Rauhut,~G.; Pulay,~P. Transferable Scaling Factors for Density Functional
-  Derived Vibrational Force Fields. \emph{J. Phys. Chem.} \textbf{1995},
-  \emph{99}, 3093--3100\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Baker \latin{et~al.}(1998)Baker, Jarzecki, and
-  Pulay]{BakerJarzeckiPulay1998}
-Baker,~J.; Jarzecki,~A.~A.; Pulay,~P. Direct Scaling of Primitive Valence Force
-  Constants: An Alternative Approach to Scaled Quantum Mechanical Force Fields.
-  \emph{J. Phys. Chem. A} \textbf{1998}, \emph{102}, 1412--1424\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Barone \latin{et~al.}(2014)Barone, Biczysko, and
-  Bloino]{BaroneBiczyskoBloino2014}
-Barone,~V.; Biczysko,~M.; Bloino,~J. Fully Anharmonic {IR} and Raman Spectra of
-  Medium-Size Molecular Systems: Accuracy and Interpretation. \emph{Phys. Chem.
-  Chem. Phys.} \textbf{2014}, \emph{16}, 1759--1787\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Barone \latin{et~al.}(2020)Barone, Ceselin, Fus{\`e}, and
-  Tasinato]{BaroneCeselinFuseTasinato2020}
-Barone,~V.; Ceselin,~G.; Fus{\`e},~M.; Tasinato,~N. Accuracy Meets
-  Interpretability for Computational Spectroscopy by Means of Hybrid and
-  Double-Hybrid Functionals. \emph{Front. Chem.} \textbf{2020}, \emph{8},
-  584203\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Vazart \latin{et~al.}(2015)Vazart, Latouche, Cimino, and
-  Barone]{VazartLatoucheCiminoBarone2015}
-Vazart,~F.; Latouche,~C.; Cimino,~P.; Barone,~V. Accurate {IR} Spectra for
-  Molecules Containing the {C-N} Moiety by Anharmonic Computations with the
-  Double Hybrid {B2PLYP} Density Functional. \emph{J. Chem. Theory Comput.}
-  \textbf{2015}, \emph{11}, 4364--4369\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax

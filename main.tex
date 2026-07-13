@@ -87,7 +87,7 @@ contract automatically and Gaussian reads the exported \GIC\ definitions; they
 are not presented as a competitive coordinate-generation benchmark against
 Gaussian's internal coordinate builder.  Standalone probes include a
 formic-acid--water complex with six protected intermolecular degrees of freedom
-and an eta3 allyl--palladium complex in which an ORACLE-supplied ligand center
+and an $\eta^3$ allyl--palladium complex in which an ORACLE-supplied ligand center
 is retained as a protected metal--center coordinate.  We also discuss the
 intended scope of the method and its current limitations.
 \end{abstract}
@@ -1221,7 +1221,7 @@ function of the center coordinates and the iron Cartesian coordinates.  The
 special coordinate is therefore generated from the molecular model, not
 hand-entered as an extra atom.
 
-The eta3 allyl--palladium standalone probe exercises the same interface with a
+The $\eta^3$ allyl--palladium standalone probe exercises the same interface with a
 non-ring ligand center.  For allyl carbon atoms 3--5, ORACLE supplies
 \[
  C_{001}=\frac{\mathbf{x}_3+\mathbf{x}_4+\mathbf{x}_5}{3}
@@ -1235,7 +1235,7 @@ value is \(q_{\eta^3}=1.8000\)~\AA.  Its Gaussian 16 export writes the three
 center components as inactive Cartesian functions and the metal--center
 distance as an active square-root expression.  This is deliberately an
 interface and rank-closure test rather than an optimized electronic-structure
-benchmark: perception of the eta3 center belongs to ORACLE, whereas its
+benchmark: perception of the $\eta^3$ center belongs to ORACLE, whereas its
 retention, differentiation and serialization belong to \SMITH.
 
 In the current validated \texttt{PSEUDO\_BONDS} baseline, selected
@@ -1448,11 +1448,11 @@ chair-to-boat puckering path used for the portable Cartesian/Gaussian
 The regression corpus contains acyclic and cyclic molecules, fused and
 non-benzenoid rings, bridged and spiro systems, high-symmetry cages, linear
 molecules, ferrocene in \(D_{5h}\) and \(D_{5d}\) forms, a formic-acid--water
-weak-complex probe, and an eta3 allyl--palladium interaction-center probe.  The
+weak-complex probe, and an $\eta^3$ allyl--palladium interaction-center probe.  The
 ring subset protects the \(RDef/RPck\) source spaces,
 butterfly coordinates and the use of linear \(RPck\) rows rather than polar
 active coordinates.  Ferrocene protects center-based special coordinates and
-high-symmetry point-group projectors; the eta3 case protects consumption of an
+high-symmetry point-group projectors; the $\eta^3$ case protects consumption of an
 explicit multi-atom ligand center.  Weak-complex tests protect the
 fragment-coordinate policy and the analytic \(\Bmat\) rows of interfragment
 translation and orientation coordinates.
@@ -1503,7 +1503,7 @@ Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\ma
 Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 6 protected & three translations plus three orientations; direct \(\Bmat\)-rank \(=18\) \\
-Eta3 allyl--PdCl & ORACLE-supplied eta3 ligand center & \(C_1\) & 24/24; 1 protected & \(q_{\eta^3}=1.8000\)~\AA; analytic center--atom row retained \\
+$\eta^3$ allyl--PdCl & ORACLE-supplied $\eta^3$ ligand center & \(C_1\) & 24/24; 1 protected & \(q_{\eta^3}=1.8000\)~\AA; analytic center--atom row retained \\
 Weak-complex pseudo-cycles & Intermolecular and intramolecular pseudo-bond
 contacts & \(C_s\), \(C_{3v}\), \(C_1\) & rank closed & formic acid--water,
 water dimer, Li\(_2\)--Ar, borane--ammonia and glycine I/II fixtures validate
