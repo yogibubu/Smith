@@ -13,6 +13,7 @@ dependencies = [
   "matrix-core @ git+https://github.com/yogibubu/MATRIX.git@f943523dd5468d35c7ebdc5bfa9f7bb305afda7f#subdirectory=packages/matrix-core",
   "matrix-chem @ git+https://github.com/yogibubu/MATRIX.git@f943523dd5468d35c7ebdc5bfa9f7bb305afda7f#subdirectory=packages/matrix-chem",
   "matrix-engines @ git+https://github.com/yogibubu/MATRIX.git@f943523dd5468d35c7ebdc5bfa9f7bb305afda7f#subdirectory=packages/matrix-engines",
+  "matrix-fragments @ git+https://github.com/yogibubu/MATRIX.git@f943523dd5468d35c7ebdc5bfa9f7bb305afda7f#subdirectory=packages/matrix-fragments",
   "matrix-neo @ git+https://github.com/yogibubu/MATRIX.git@f943523dd5468d35c7ebdc5bfa9f7bb305afda7f#subdirectory=packages/matrix-neo",
 ]
 
@@ -23,4 +24,4 @@ smith-sonic = "smith_sonic.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-smith_sonic = ["examples/*.xyz"]
+smith_sonic = ["examples/*.xyz", "examples/*.xyzin"]

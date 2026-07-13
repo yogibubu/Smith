@@ -73,6 +73,8 @@ python -m pip install ./standalone
 smith-sonic example water /tmp/water.xyzin
 smith-sonic inspect /tmp/water.xyzin
 smith-sonic example norbornane /tmp/norbornane.xyzin
+smith-sonic example formic-acid-water /tmp/formic-acid-water.xyzin
+smith-sonic example eta3-allyl-palladium /tmp/eta3-allyl-palladium.xyzin
 ```
 
 Plain extended XYZ input uses the labelled `REDUCED_ORACLE` convenience
@@ -84,3 +86,5 @@ smith-sonic build molecule.oracle.xyzin molecule.sonic.xyzin --require-oracle-st
 
 Instructions for a private external test are in
 [`COLLABORATOR_TESTING.md`](COLLABORATOR_TESTING.md).
+The full standalone reference is in
+[`standalone/MANUAL.md`](standalone/MANUAL.md).

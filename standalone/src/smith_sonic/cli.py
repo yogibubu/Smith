@@ -3,10 +3,24 @@ from __future__ import annotations
 import argparse
 from importlib.resources import as_file, files
 from pathlib import Path
+import tempfile
 
+from matrix_chem import preprocess_to_enriched_xyz, write_validation_section
 from matrix_core import read_sectioned_lines, replace_section, section_content
+from matrix_fragments import (
+    build_fragment_definition_from_xyzin,
+    write_fragment_build_section,
+    write_interaction_center_section,
+)
 from matrix_neo.definition import write_sonic_build_sections_from_cartesian
-from matrix_neo.standalone import write_smith_build_sections_from_input
+from matrix_neo.standalone import (
+    _normalized_source_kind,
+    _optional_bool,
+    _optional_string,
+    _pairs,
+    _read_smith_input,
+    _strings,
+)
 
 from . import __version__
 
@@ -14,6 +28,12 @@ from . import __version__
 REQUIRED_ORACLE_SECTIONS = ("VALIDATION", "TOPOLOGY", "SYNTHONS", "SYMMETRY")
 PROVENANCE_SCHEMA = "matrix.smith.standalone.v1"
 MATRIX_REVISION = "f943523dd5468d35c7ebdc5bfa9f7bb305afda7f"
+EXAMPLES = {
+    "water": ("water.smith.xyz", False),
+    "norbornane": ("norbornane.smith.xyz", False),
+    "formic-acid-water": ("formic_acid_water.smith.xyz", False),
+    "eta3-allyl-palladium": ("eta3_allyl_palladium.oracle.xyzin", True),
+}
 
 
 def _has_oracle_state(path: Path) -> bool:
@@ -39,9 +59,15 @@ def _build(args: argparse.Namespace) -> int:
     if has_oracle_state:
         definition = write_sonic_build_sections_from_cartesian(source, target)
         profile = "ORACLE_STATE"
+        fragment_profile = (
+            "ORACLE_SUPPLIED"
+            if section_content(read_sectioned_lines(source), "FRAGMENTS")
+            else "NONE"
+        )
     else:
-        definition = write_smith_build_sections_from_input(source, target)
+        definition, fragment_count = _build_from_reduced_input(source, target)
         profile = "REDUCED_ORACLE"
+        fragment_profile = "AUTO_CONNECTED_COMPONENTS" if fragment_count > 1 else "NONE"
 
     replace_section(
         target,
@@ -51,6 +77,7 @@ def _build(args: argparse.Namespace) -> int:
             f"SMITH_VERSION {__version__}",
             f"MATRIX_REVISION {MATRIX_REVISION}",
             f"PERCEPTION_PROFILE {profile}",
+            f"FRAGMENT_PROFILE {fragment_profile}",
             "ORACLE_RELATION CONTINUOUS_PERCEPTION_DEVELOPED_FROM_PROXIMA",
         ],
     )
@@ -65,6 +92,45 @@ def _build(args: argparse.Namespace) -> int:
             "validated ORACLE state."
         )
     return 0
+
+
+def _build_from_reduced_input(source: Path, target: Path):
+    xyz_lines, options = _read_smith_input(source)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="smith-sonic-") as scratch:
+        geometry_source = Path(scratch) / "geometry.xyz"
+        geometry_source.write_text("\n".join(xyz_lines) + "\n", encoding="utf-8")
+        preprocess_to_enriched_xyz(
+            geometry_source,
+            target,
+            source_kind=_normalized_source_kind(options.get("source_kind", "auto")),
+        )
+    write_validation_section(target)
+
+    fragments = build_fragment_definition_from_xyzin(target)
+    if len(fragments.fragments) > 1:
+        write_fragment_build_section(target)
+        write_interaction_center_section(target)
+
+    improper_dihedrals = _optional_bool(options.get("improper_dihedrals"))
+    if bool(options.get("g16", False)):
+        improper_dihedrals = True
+    fragment_mode = _optional_string(options.get("fragment_mode"))
+    if len(fragments.fragments) > 1 and fragment_mode is None:
+        fragment_mode = "special-coordinates"
+    definition = write_sonic_build_sections_from_cartesian(
+        target,
+        target,
+        symmetrize=bool(options.get("symmetrize", False)),
+        sycart=bool(options.get("sycart", False)),
+        symmetry_group=_optional_string(options.get("symmetry_group")),
+        improper_dihedrals=improper_dihedrals,
+        fragment_mode=fragment_mode,
+        xh_stretch_policy=_optional_string(options.get("xh_stretch_policy")),
+        local_xh_bonds=_pairs(options.get("local_xh_bonds")),
+        local_xh_classes=_strings(options.get("local_xh_classes")),
+    )
+    return definition, len(fragments.fragments)
 
 
 def _inspect(args: argparse.Namespace) -> int:
@@ -83,13 +149,14 @@ def _inspect(args: argparse.Namespace) -> int:
 
 
 def _example(args: argparse.Namespace) -> int:
-    resource = files("smith_sonic.examples").joinpath(f"{args.name}.smith.xyz")
+    filename, require_oracle_state = EXAMPLES[args.name]
+    resource = files("smith_sonic.examples").joinpath(filename)
     target = Path(args.output) if args.output is not None else Path(f"{args.name}.xyzin")
     with as_file(resource) as source:
         build_args = argparse.Namespace(
             input=source,
             output=target,
-            require_oracle_state=False,
+            require_oracle_state=require_oracle_state,
         )
         return _build(build_args)
 
@@ -117,7 +184,7 @@ def build_parser() -> argparse.ArgumentParser:
     inspect.set_defaults(func=_inspect)
 
     example = subparsers.add_parser("example", help="Run an example shipped in the package")
-    example.add_argument("name", choices=("water", "norbornane"))
+    example.add_argument("name", choices=tuple(EXAMPLES))
     example.add_argument("output", type=Path, nargs="?", help="Output xyzin path")
     example.set_defaults(func=_example)
     return parser

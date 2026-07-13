@@ -11,8 +11,9 @@ Keep `yogibubu/Smith` private.  In GitHub open:
 
 `Settings` -> `Collaborators` -> `Add people`
 
-Enter the collaborator's GitHub username.  They must accept the invitation
-before cloning or installing the private repository.
+Invite Federico Lazzari (`federico.lazzari@sns.it`).  If GitHub cannot resolve
+the email address, ask him for his GitHub username.  He must accept the
+invitation before cloning or installing the private repository.
 
 ## 2. Clone and install
 
@@ -46,15 +47,26 @@ smith-sonic example water water.xyzin
 smith-sonic inspect water.xyzin
 smith-sonic example norbornane norbornane.xyzin
 smith-sonic inspect norbornane.xyzin
+smith-sonic example formic-acid-water formic-acid-water.xyzin
+smith-sonic inspect formic-acid-water.xyzin
+smith-sonic example eta3-allyl-palladium eta3-allyl-palladium.xyzin
+smith-sonic inspect eta3-allyl-palladium.xyzin
 ```
 
 Expected summaries are:
 
 - water: 3 GICs, rank 3;
 - norbornane: 51 GICs, rank 51;
-- both outputs: `PERCEPTION_PROFILE REDUCED_ORACLE`.
+- formic-acid--water: 18 GICs, rank 18, including three fragment translations
+  and three fragment orientations;
+- eta3 allyl--palladium: 24 GICs, rank 24, including one protected
+  centre--atom distance;
+- the first three outputs: `PERCEPTION_PROFILE REDUCED_ORACLE`;
+- the eta3 output: `PERCEPTION_PROFILE ORACLE_STATE`.
 
-The source inputs are also visible under `standalone/examples/`.
+The source inputs are also visible under `standalone/examples/`.  Read
+`standalone/MANUAL.md` before running the advanced examples.  The eta3 geometry
+is an idealized interface probe and not a computed chemical benchmark.
 
 ## 4. Information to return
 
@@ -67,10 +79,12 @@ Please report:
 - whether the distinction between reduced ORACLE perception and SMITH/SONIC
   coordinate construction is understandable;
 - whether the commands and generated files are self-explanatory;
-- the summaries printed for water and norbornane.
+- the summaries printed for all four examples;
+- whether the non-covalent output clearly represents six intermolecular
+  degrees of freedom;
+- whether the distinction between an ORACLE-supplied eta3 centre and the SMITH
+  coordinate built from it is clear.
 
-Do not broaden this first test to the unreleased full ORACLE application.  A
-non-covalent complex and an eta3 transition-metal complex are candidate SMITH
-examples to evaluate only after this basic external test has identified any
-packaging or interface problems.
-
+Do not broaden this test to the unreleased full ORACLE application.  Treat the
+two advanced cases as packaging and interface tests; their inclusion in the
+manuscript will be decided only after the collaborator's report.

@@ -1,0 +1,68 @@
+from __future__ import annotations
+
+from pathlib import Path
+import tempfile
+import unittest
+
+from matrix_core import read_sectioned_lines, section_content
+from smith_sonic.cli import main
+
+
+class PackagedExampleTests(unittest.TestCase):
+    def _run_example(self, name: str) -> tuple[Path, list[str], tempfile.TemporaryDirectory]:
+        scratch = tempfile.TemporaryDirectory(prefix=f"smith-{name}-")
+        output = Path(scratch.name) / f"{name}.xyzin"
+        self.assertEqual(main(["example", name, str(output)]), 0)
+        return output, read_sectioned_lines(output), scratch
+
+    def test_formic_acid_water_has_six_interfragment_coordinates(self) -> None:
+        output, lines, scratch = self._run_example("formic-acid-water")
+        self.addCleanup(scratch.cleanup)
+        contract = section_content(lines, "GIC")
+        provenance = section_content(lines, "SMITH_PROVENANCE")
+
+        self.assertTrue(output.is_file())
+        self.assertIn("TARGET_RANK 18", contract)
+        self.assertIn("RANK 18", contract)
+        self.assertIn("FRAGMENT_MODE SPECIAL_COORDINATES", contract)
+        self.assertEqual(
+            sum(row.startswith("P") and "FAMILY=FRAG_TRANSLATION" in row for row in contract),
+            3,
+        )
+        self.assertEqual(
+            sum(row.startswith("P") and "FAMILY=FRAG_ORIENTATION" in row for row in contract),
+            3,
+        )
+        self.assertIn("FRAGMENT_PROFILE AUTO_CONNECTED_COMPONENTS", provenance)
+
+    def test_eta3_example_preserves_oracle_center_as_protected_coordinate(self) -> None:
+        _, lines, scratch = self._run_example("eta3-allyl-palladium")
+        self.addCleanup(scratch.cleanup)
+        contract = section_content(lines, "GIC")
+        centers = section_content(lines, "INTERACTION_CENTERS")
+        provenance = section_content(lines, "SMITH_PROVENANCE")
+
+        self.assertIn("TARGET_RANK 24", contract)
+        self.assertIn("RANK 24", contract)
+        self.assertTrue(any("KIND=ETA3_CENTER" in row and "ATOMS=3,4,5" in row for row in centers))
+        self.assertTrue(
+            any(
+                "FAMILY=CENTER_ATOM_DISTANCE" in row
+                and "CLASS=SPECIAL_PROTECTED" in row
+                and "REFS=C001,A1" in row
+                for row in contract
+            )
+        )
+        self.assertIn("PERCEPTION_PROFILE ORACLE_STATE", provenance)
+
+    def test_eta3_fixture_generator_is_reproducible(self) -> None:
+        standalone = Path(__file__).resolve().parents[1]
+        source = standalone / "examples" / "eta3_allyl_palladium.source.xyz"
+        packaged = standalone / "examples" / "eta3_allyl_palladium.oracle.xyzin"
+        self.assertTrue(source.is_file())
+        self.assertTrue(packaged.is_file())
+        self.assertIn("SOURCE=ORACLE_EXPLICIT_TEST_FIXTURE", packaged.read_text(encoding="utf-8"))
+
+
+if __name__ == "__main__":
+    unittest.main()

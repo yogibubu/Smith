@@ -51,6 +51,8 @@ a source checkout:
 smith-sonic example water water.xyzin
 smith-sonic inspect water.xyzin
 smith-sonic example norbornane norbornane.xyzin
+smith-sonic example formic-acid-water formic-acid-water.xyzin
+smith-sonic example eta3-allyl-palladium eta3-allyl-palladium.xyzin
 ```
 
 The same input files are visible under `examples/` in the GitHub repository and
@@ -68,3 +70,9 @@ consumed a complete `ORACLE_STATE` or invoked the `REDUCED_ORACLE` convenience
 profile.  Gaussian export and the wider validation/optimizer commands remain
 available in the full MATRIX distribution; the standalone package deliberately
 limits its surface to SONIC contract construction and inspection.
+
+The formic-acid–water example exercises all six intermolecular fragment
+coordinates.  The eta3 allyl–palladium example consumes an explicit, frozen
+ORACLE interaction centre; its idealized geometry is an interface test, not a
+computed chemical benchmark.  See [`MANUAL.md`](MANUAL.md) for the complete
+installation, input, example, output, and troubleshooting guide.
