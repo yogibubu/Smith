@@ -1,12 +1,16 @@
 {
   "method": "SMITH/SONIC local-pseudosymmetry SALC validation",
   "matrix_revision": "4aca962fe5a09ef92f40e5f0610f45e2961001cd",
+  "matrix_worktree_dirty": true,
   "python": "3.13.11",
   "settings": {
     "local_salc": true,
     "global_symmetrization": true,
     "effective_atomic_number_tolerance": 0.0005,
-    "radial_distance_tolerance_angstrom": 0.001
+    "radial_distance_tolerance_angstrom": 0.001,
+    "template_rms_threshold": 0.12,
+    "template_min_margin": 0.02,
+    "angle_class_tolerance": 0.02
   },
   "checks": {
     "c1_methyl_rotation_invariant": true,
@@ -66,6 +70,13 @@
           "python_rank": 12,
           "python_target_rank": 12,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "2.48253e-17"
+          ],
+          "python_template_margin": [
+            "0.217962"
+          ],
           "fortran_rank": 12,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -74,6 +85,13 @@
           "python_rank": 12,
           "python_target_rank": 12,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.0071516"
+          ],
+          "python_template_margin": [
+            "0.206418"
+          ],
           "fortran_rank": 12,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -90,6 +108,13 @@
           "python_rank": 12,
           "python_target_rank": 12,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "5.3027e-17"
+          ],
+          "python_template_margin": [
+            "0.217962"
+          ],
           "fortran_rank": 12,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -98,6 +123,13 @@
           "python_rank": 12,
           "python_target_rank": 12,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.0126695"
+          ],
+          "python_template_margin": [
+            "0.202571"
+          ],
           "fortran_rank": 12,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -114,6 +146,13 @@
           "python_rank": 15,
           "python_target_rank": 15,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0"
+          ],
+          "python_template_margin": [
+            "0.375781"
+          ],
           "fortran_rank": 15,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -122,6 +161,13 @@
           "python_rank": 15,
           "python_target_rank": 15,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.00642138"
+          ],
+          "python_template_margin": [
+            "0.364851"
+          ],
           "fortran_rank": 15,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -138,6 +184,13 @@
           "python_rank": 15,
           "python_target_rank": 15,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "9.72106e-17"
+          ],
+          "python_template_margin": [
+            "0.375781"
+          ],
           "fortran_rank": 15,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -146,6 +199,13 @@
           "python_rank": 15,
           "python_target_rank": 15,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.0057688"
+          ],
+          "python_template_margin": [
+            "0.368504"
+          ],
           "fortran_rank": 15,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -162,6 +222,13 @@
           "python_rank": 18,
           "python_target_rank": 18,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0"
+          ],
+          "python_template_margin": [
+            "0.174704"
+          ],
           "fortran_rank": 18,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -170,6 +237,13 @@
           "python_rank": 18,
           "python_target_rank": 18,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.00587801"
+          ],
+          "python_template_margin": [
+            "0.165714"
+          ],
           "fortran_rank": 18,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -186,6 +260,13 @@
           "python_rank": 18,
           "python_target_rank": 18,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "5.93439e-17"
+          ],
+          "python_template_margin": [
+            "0.174704"
+          ],
           "fortran_rank": 18,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -194,6 +275,13 @@
           "python_rank": 18,
           "python_target_rank": 18,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.00546396"
+          ],
+          "python_template_margin": [
+            "0.167037"
+          ],
           "fortran_rank": 18,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -210,6 +298,13 @@
           "python_rank": 21,
           "python_target_rank": 21,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "3.8545e-17"
+          ],
+          "python_template_margin": [
+            "0.296745"
+          ],
           "fortran_rank": 21,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -218,6 +313,13 @@
           "python_rank": 21,
           "python_target_rank": 21,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.00496483"
+          ],
+          "python_template_margin": [
+            "0.290042"
+          ],
           "fortran_rank": 21,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -234,6 +336,13 @@
           "python_rank": 21,
           "python_target_rank": 21,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "1.32697e-16"
+          ],
+          "python_template_margin": [
+            "0.296745"
+          ],
           "fortran_rank": 21,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -242,6 +351,13 @@
           "python_rank": 21,
           "python_target_rank": 21,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.00871556"
+          ],
+          "python_template_margin": [
+            "0.284759"
+          ],
           "fortran_rank": 21,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -258,6 +374,13 @@
           "python_rank": 24,
           "python_target_rank": 24,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "2.61682e-17"
+          ],
+          "python_template_margin": [
+            "0.112154"
+          ],
           "fortran_rank": 24,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -266,6 +389,13 @@
           "python_rank": 24,
           "python_target_rank": 24,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.00483331"
+          ],
+          "python_template_margin": [
+            "0.105571"
+          ],
           "fortran_rank": 24,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -282,6 +412,13 @@
           "python_rank": 24,
           "python_target_rank": 24,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0"
+          ],
+          "python_template_margin": [
+            "0.112154"
+          ],
           "fortran_rank": 24,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
@@ -290,11 +427,98 @@
           "python_rank": 24,
           "python_target_rank": 24,
           "python_group_recognized": true,
+          "python_template_frozen": true,
+          "python_template_score": [
+            "0.0044336"
+          ],
+          "python_template_margin": [
+            "0.106386"
+          ],
           "fortran_rank": 24,
           "fortran_group_recognized": true,
           "fortran_a1_first": true
         }
       }
+    }
+  ],
+  "generic_high_coordination": [
+    {
+      "coordination": 10,
+      "target_rank": 27,
+      "python_rank": 27,
+      "python_generic_fallback": true,
+      "python_assignment_frozen": true,
+      "fortran_rank": 27,
+      "fortran_generic_fallback": true,
+      "python_fortran_row_space_residual": 1.034126677673944e-08
+    },
+    {
+      "coordination": 12,
+      "target_rank": 33,
+      "python_rank": 33,
+      "python_generic_fallback": true,
+      "python_assignment_frozen": true,
+      "fortran_rank": 33,
+      "fortran_generic_fallback": true,
+      "python_fortran_row_space_residual": 1.0606791807719514e-08
+    }
+  ],
+  "template_ambiguity": {
+    "coordination": 6,
+    "interpolation_fraction": 0.2,
+    "best_margin": 0.0003381131257236547,
+    "configured_margin": 0.00033911312572365473,
+    "status": "AMBIGUOUS",
+    "generic_fallback": true
+  },
+  "chemical_examples": [
+    {
+      "system": "distorted SF6",
+      "rank": 15,
+      "target_rank": 15,
+      "expected_template": "OCTAHEDRAL",
+      "expected_group": "Oh",
+      "templates": [
+        "OCTAHEDRAL"
+      ],
+      "groups": [
+        "Oh"
+      ],
+      "template_statuses": [
+        "FROZEN"
+      ],
+      "template_scores": [
+        "0.00647201"
+      ],
+      "template_margins": [
+        "0.36438"
+      ],
+      "zeff_tolerance": 0.1,
+      "distance_tolerance_angstrom": 0.05
+    },
+    {
+      "system": "square-antiprismatic [ZrF8]4-",
+      "rank": 21,
+      "target_rank": 21,
+      "expected_template": "SQUARE_ANTIPRISMATIC",
+      "expected_group": "D4d",
+      "templates": [
+        "SQUARE_ANTIPRISMATIC"
+      ],
+      "groups": [
+        "D4d"
+      ],
+      "template_statuses": [
+        "FROZEN"
+      ],
+      "template_scores": [
+        "1.72226e-05"
+      ],
+      "template_margins": [
+        "0.296729"
+      ],
+      "zeff_tolerance": 0.0005,
+      "distance_tolerance_angstrom": 0.001
     }
   ],
   "systems": [
@@ -443,6 +667,9 @@
     "Local A1 labels refer to a center/ring/bond domain; molecular irreps remain controlled by the frozen point-group projector.",
     "The non-A1 labels identify a deterministic orthonormal complement and do not claim a complete local-irrep decomposition.",
     "Azulene ring-stretch ownership records the single shared fused edge only once.",
-    "Coordination numbers 5--9 are tested for two idealized templates each, both ideally and after a small angular distortion, in Python and Fortran when available."
+    "Coordination numbers 5--9 are tested for two idealized templates each, both ideally and after a small angular distortion, in Python and Fortran when available.",
+    "Coordination numbers 10 and 12 exercise the template-independent fallback and Python/Fortran Cartesian row-space agreement.",
+    "A configurable near-tie demonstrates the AMBIGUOUS decision and generic fallback without changing the frozen SONIC identity.",
+    "Distorted SF6 and square-antiprismatic [ZrF8]4- provide chemically named CN 6 and CN 8 examples."
   ]
 }

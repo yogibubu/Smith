@@ -615,7 +615,9 @@ later valence or torsional candidates.
 \SMITH\ groups them around each bonded center.
 When a center has equivalent ligands or high coordination, the candidate angles
 are grouped by local equivalence or by recognized idealized coordination
-templates before block-local reduction.  In the optional local-pseudosymmetry
+templates before block-local reduction.  Named templates are optional: every
+coordination number above four has a template-independent equivalence fallback.
+In the optional local-pseudosymmetry
 path, equivalent stretch and angle orbits are replaced by a canonical
 orthonormal SALC block with the local \(A_1\) row first.
 \item Exocyclic torsions are generated only for non-ring central bonds with
@@ -682,9 +684,10 @@ derivative becomes singular at linearity.
 For three- and four-coordinate centers, \SONIC\ uses local equivalence classes to
 construct chemically recognizable bend combinations: symmetric deformations,
 rocking coordinates and tetrahedral or \(WXY_3/W_2XY_2\)-like patterns.  For
-coordination numbers between five and nine, the construction first attempts to match an
-idealized local template; if no template closes reliably, ligand-equivalence
-classes define the block that is reduced by SVD.  This is the practical
+coordination numbers between five and nine, the construction first attempts to
+match an idealized local template.  For every coordination number greater than
+four, including those outside the named-template range, ligand-equivalence
+classes provide a general fallback.  This is the practical
 realization of the ``\(XY_n\) local symmetry'' idea: the algebra is local, the
 grouping is chemically typed, and the result does not mix angle rows with
 stretches or torsions.
@@ -699,7 +702,8 @@ partitioned by the continuous effective atomic number or synthon descriptor
 and by radial shell.  The current validated defaults are
 \(5\times10^{-4}\) for the effective-atomic-number descriptor and
 \(10^{-3}\)~\AA\ for the center--ligand distance.  These are construction
-tolerances, not physical constants; both are written to the diagnostic record.
+tolerances, not physical constants; they can be selected in the CLI or GUI and
+are written to the diagnostic record.
 The multiplicity pattern and ligand geometry then identify the local template,
 for example \(C_{3v}\) for a \(WXY_3\) center or \(T_d\) for \(XY_4\).
 Coordination numbers 5--9 are treated by the same path.  The current template
@@ -707,9 +711,29 @@ pairs are trigonal-bipyramidal/square-pyramidal (CN 5),
 octahedral/trigonal-prismatic (CN 6), pentagonal-bipyramidal/capped-octahedral
 (CN 7), square-antiprismatic/dodecahedral-like (CN 8), and
 tricapped-trigonal-prismatic/capped-square-antiprismatic (CN 9).  If no
-template is accepted, the construction falls back to ligand-equivalence
-classes without changing the final rank criterion.
-Angles are partitioned separately according to the pair of ligand classes, so
+template is available, the best score is outside threshold, or two scores are
+too close, the construction falls back to ligand-equivalence classes without
+changing the final rank criterion.  If the sorted vectors of the
+\(M=n(n-1)/2\) ligand-pair cosines are \(\mathbf c\) and
+\(\mathbf t_T\), the template score is
+\begin{equation}
+ s_T=\left[\frac{1}{M}\sum_{k=1}^{M}(c_k-t_{T,k})^2\right]^{1/2}.
+ \label{eq:local-template-score}
+\end{equation}
+Sorting makes this score invariant to Cartesian orientation and ligand order.
+The best template is accepted only if \(s_1\le s_{\max}\) and
+\(s_2-s_1\ge\Delta_s\); the defaults are \(s_{\max}=0.12\) and
+\(\Delta_s=0.02\).  The selected template, best score, margin, decision status
+and thresholds are frozen in the \SONIC\ contract.  LINK therefore retains the
+same coordinate identity throughout an optimization rather than reclassifying
+the center at every step.
+The diagnostic additionally stores the signed headroom from both acceptance
+boundaries.  Assignments within ten percent of a selected threshold are marked
+as near the RMS boundary, near the margin boundary, or near both.  This warning
+does not rebuild the basis; it makes a potentially sensitive local decision
+visible before a geometry trajectory is started.
+Angles are partitioned separately according to the pair of ligand classes and,
+for an accepted high-coordination template, the ideal pair-cosine class, so
 that the SALC construction never mixes a stretch orbit with an angle orbit or
 two chemically different angular blocks.
 
@@ -740,9 +764,10 @@ ring stretches, endocyclic valence angles and ring torsions are transformed in
 separate blocks.  In a fused system a shared edge is owned by the first ring
 stretch domain and reported as shared in the subsequent domain, avoiding a
 duplicate stretch source.  For an exocyclic central bond, equivalent primitive
-dihedrals are averaged as one local-rotor \(A_1\) orbit; if the orbit cannot be
-closed reliably, the existing one-dihedral rule is used and the fallback is
-recorded.  Every generated row still passes the final analytic
+dihedrals are combined as one local-rotor \(A_1\) orbit only when the signed
+analytic Wilson row has nonzero rank, adequate norm stability and a continuous
+local reference branch.  Otherwise the existing one-dihedral rule is used and
+the failed rank/stability test is recorded.  Every generated row still passes the final analytic
 \(\Bmat\)-rank test.
 
 \subsection{Exocyclic Torsions}
@@ -1413,7 +1438,7 @@ Covalent stretches & Active & All topology bonds; local equivalence grouping ava
 \midrule
 Exocyclic bends & Active & Bonded-center bends; local symmetric combinations for common motifs. \\
 \midrule
-High coordination & Active & Coordination 5--9 by two templates per coordination number or ligand-equivalence fallback; canonical local SALCs are implemented in both Python and Fortran. \\
+High coordination & Active & Two named templates per CN 5--9; generic ligand-equivalence fallback for every CN $>4$. Python is dynamically sized; the distributed Fortran backend is compiled through CN 32. \\
 \midrule
 One-dihedral exocyclic torsions & Active default & \texttt{ONEDIH} is the default intramolecular path; legacy alternatives are diagnostic. \\
 \midrule
@@ -1573,7 +1598,9 @@ protected-prefix rule.
 Ranks are final/target ranks.  \(\Delta_\mathrm{PF}\) is the Python--Fortran
 Wilson-row-space residual where the Fortran control comparison is applicable.
 \(\epsilon_\mathrm{SALC}\) is the maximum norm error of nontrivial saved SALC
-coefficient vectors.}
+coefficient vectors, and \(\epsilon_\mathrm{FD}\) is the maximum componentwise
+difference between a final analytic SONIC row and its central Cartesian finite
+difference.}
 \label{tab:validation}
 \begin{tabular}{@{}p{0.17\linewidth}p{0.25\linewidth}p{0.07\linewidth}p{0.16\linewidth}p{0.27\linewidth}@{}}
 \toprule
@@ -1587,6 +1614,8 @@ Cubane & High-symmetry cage & \(O_h\) & 42/42; cyclic bends & \(\Delta_\mathrm{P
 Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\mathrm{PF}=6.71\times10^{-9}\); \(\epsilon_\mathrm{SALC}=3.33\times10^{-16}\) \\
 Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Pagodane & Cage and fused-ring source spaces & \(D_{2h}\) & 114/114 & \(\epsilon_\mathrm{FD}=4.02\times10^{-10}\); stretches and cyclic bends covered \\
+Indane & Fused aromatic/alicyclic rings & \(C_s\) & 51/51 & \(\epsilon_\mathrm{FD}=4.77\times10^{-10}\); butterfly and \(RPck\) rows covered \\
 Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 6 protected & three translations plus three orientations; direct \(\Bmat\)-rank \(=18\) \\
 $\eta^3$ allyl--PdCl & ORACLE-supplied $\eta^3$ ligand center & \(C_1\) & 24/24; 1 protected & \(q_{\eta^3}=1.8000\)~\AA; analytic center--atom row retained \\
 Weak-complex pseudo-cycles & Intermolecular and intramolecular pseudo-bond
@@ -1597,6 +1626,32 @@ Semantic layer & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probe
 \bottomrule
 \end{tabular}
 \end{table}
+
+The finite-difference audit in the pagodane and indane rows is applied after
+the complete stored SONIC chain rule, rather than separately to selected
+primitive formulas.  It therefore covers local SALCs and the linear
+combinations defining cyclic, butterfly and puckering coordinates.  For all 114
+pagodane and all 51 indane coordinates, mathematical display vectors are
+generated with the Wilson
+matrix frozen at the reference structure,
+\(\Delta\mathbf{x}_k=\mathbf{B}_0^+\mathbf{e}_k\Delta q_k\).  The two frames
+\(\mathbf{x}_0\pm\Delta\mathbf{x}_k\) are therefore exactly symmetric and
+freeze every other SONIC to first order; they are not presented as nonlinear
+back-transformations.  The amplitude is reduced if necessary to preserve
+perceived connectivity and proper orientation, keep the maximum atomic
+displacement below 0.10~\AA, and change no reference bond by 15\% or more.
+An optional mass-weighted right inverse,
+\(\mathbf{M}^{-1/2}(\mathbf{B}_0\mathbf{M}^{-1/2})^+\), provides the
+corresponding minimum-mass-norm vector without changing this first-order
+contract.  The mathematical step is distinct from the interactive display
+amplitude: the viewer normalizes each half-vector to a user-selected maximum
+atomic displacement in \AA.  The machine record reports row-normalized
+conditioning, Cartesian amplification, participation ratio, significantly
+moving atoms and the dominant atom.  Ring motions additionally retain the
+canonical ring order and primitive coefficients, which are highlighted with
+their displacement arrows in the viewer.  The tests consume every generated
+three-frame XYZ trajectory and vector table through the same data loader used
+by the GUI.
 
 The local-pseudosymmetry validation is summarized separately in
 Table~\ref{tab:local-salc-validation}.  The first probe is intentionally
@@ -1615,6 +1670,20 @@ coordination number from five through nine.  Each geometry is repeated after a
 small angular distortion of one ligand, giving 20 models in each implementation.
 Python and Fortran retain the same local-group assignment and close at ranks
 12, 15, 18, 21 and 24 for CN 5, 6, 7, 8 and 9, respectively.
+For CN 10 and CN 12, for which no named template is assumed, both
+implementations select the generic equivalence fallback and close at ranks 27
+and 33.  Their Cartesian row-space residuals are $1.03\times10^{-8}$ and
+$1.06\times10^{-8}$, respectively.  Rotation and ligand permutation leave
+the accepted-template score and margin unchanged.  A separate near-tie stress
+test, with a deliberately widened absolute acceptance gate, is classified as
+\texttt{AMBIGUOUS} and therefore uses the same generic fallback.
+Two chemically named controls complement the anonymous polyhedral probes: a
+slightly distorted \(\mathrm{SF_6}\) structure gives the octahedral local block
+and closes at 15/15, while idealized square-antiprismatic
+\([\mathrm{ZrF_8}]^{4-}\) gives \(D_{4d}\) and closes at 21/21.  The former uses
+explicitly relaxed descriptor and distance thresholds (0.1 and 0.05~\AA),
+illustrating that pseudosymmetry is a declared construction choice rather than
+an implicit relabelling.
 
 \begin{table}[htbp]
 \centering
@@ -1637,6 +1706,10 @@ Toluene & \(C_s\) & substituted ring \(C_1\) & 39/39 & one cyclic operation at t
 Azulene & \(C_{2v}\) & two fused-ring domains & 48/48 & ring domains 1 and 2 recorded; one shared edge assigned once \\
 \midrule
 CN 5--9 centers & \(C_1\) & ten local polyhedral templates & 12--24 & 20 ideal/distorted models; Python--Fortran group and rank agreement \\
+\midrule
+CN 10/12 centers & \(C_1\) & generic equivalence fallback & 27/33 & Python--Fortran row-space residual below \(1.1\times10^{-8}\) \\
+\midrule
+\(\mathrm{SF_6}\), \([\mathrm{ZrF_8}]^{4-}\) & \(C_1\), \(D_{4d}\) & octahedral and square-antiprismatic domains & 15/15, 21/21 & frozen template, score, margin and thresholds recorded \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -2002,8 +2075,12 @@ the tolerances, confidence, participating atoms and kept/pruned status are
 serialized, that change is auditable rather than implicit.
 The same table also removes the former high-coordination refactor boundary:
 both implementations now recognize the two documented templates for every
-coordination number from five to nine, while retaining the
-ligand-equivalence fallback for unrecognized or chemically split environments.
+coordination number from five to nine, while the generic construction closes
+CN 10 and CN 12 without introducing additional named polyhedra.  The
+ligand-equivalence fallback is also selected for unrecognized, ambiguous or
+chemically split environments.  Because the score, second-template margin,
+thresholds and selected status are serialized, this choice is fixed for LINK
+and auditable across a geometry trajectory.
 
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
 symmetry-projector normalization and Python--Fortran row-space equivalence for

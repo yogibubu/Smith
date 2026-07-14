@@ -126,6 +126,34 @@ format translation.  LINK constructed SONIC optimizer direction matrices of
 dimensions \(18\times24\) and \(24\times30\), respectively, confirming that
 the serialized contracts are consumable by the two downstream workflows.
 
+\section*{Pagodane and Indane Ring-Coordinate Fixtures}
+
+Two supplied Cartesian structures are retained verbatim as publication
+fixtures in the MATRIX test distribution.  The first is pagodane,
+\(\mathrm{C}_{20}\mathrm{H}_{20}\); ORACLE perceives 50 covalent bonds, 11 rings, no aromatic atoms
+and a \(D_{2h}\) reference assignment.  Its redundant PIC contract and the
+SMITH SONIC basis both have Cartesian rank 114.  The second structure is
+indane, \(\mathrm{C}_{9}\mathrm{H}_{10}\); ORACLE perceives 20 bonds, two fused rings, six aromatic
+atoms and a \(C_s\) reference assignment, while SMITH closes at rank 51.
+The name ``indane'' follows the fused benzene--cyclopentane connectivity of the
+provided structure rather than its original generic filename.
+
+Central finite differences of every final SONIC row give maximum absolute
+analytic-row errors of \(4.02\times10^{-10}\) for pagodane and
+\(4.77\times10^{-10}\) for indane.  The indane set contains stretch, bend,
+cyclic-bend, butterfly and ring-puckering-component families.  All 114 pagodane
+and all 51 indane motions are constructed in both signs from the pseudoinverse of the B matrix
+frozen at the reference geometry.  The resulting Cartesian frames are exactly
+symmetric and are checked for the first-order SONIC displacement, unchanged
+connectivity, proper orientation, a maximum atom displacement not above
+0.10~\AA, and a maximum relative reference-bond change below 0.15.  Every
+three-frame XYZ file and Cartesian-vector table is parsed by the GUI data
+contract.  The manifest also records the optional Euclidean or mass-weighted
+right-inverse metric, coordinate conditioning and localization, and canonical
+ring order with primitive coefficients.  Animation amplitude is independent of
+the mathematical step and is normalized to a selected maximum atom displacement.
+
+\enlargethispage{2\baselineskip}
 \begingroup
 \small
 \section*{Local-Pseudosymmetry Validation}
@@ -137,11 +165,13 @@ explicitly selected MATRIX checkout:
 export MATRIX_ROOT=/path/to/your/MATRIX
 python scripts/run_local_salc_validation.py
 \end{lstlisting}
-The cases cover the \(C_1/C_{3v}\) methyl probe, benzene, toluene, azulene and
-two ideal/distorted templates for each coordination number from 5 to 9.  They
-record rank, rotation, ring and fused-edge checks; an available Fortran control
-also runs \texttt{LOCSALC}.  Local labels are domain labels; the molecular
-point-group projector remains final.
+The cases comprise the \(C_1/C_{3v}\) methyl probe, benzene, toluene, azulene,
+20 ideal/distorted CN 5--9 templates, generic CN 10/12 centers, distorted
+\(\mathrm{SF_6}\), and square-antiprismatic \([\mathrm{ZrF_8}]^{4-}\).
+Recorded checks include rank, rotation/permutation invariance, template
+score/margin and ambiguity fallback, ring/fused-edge behavior, and
+Python--Fortran row-space residuals.  Local labels apply only to domains; the
+molecular point-group projector remains final.
 \endgroup
 
 \end{document}
