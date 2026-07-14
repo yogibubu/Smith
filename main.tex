@@ -61,9 +61,10 @@ construction of non-redundant, symmetry-adapted generalized internal
 coordinates.  The \SMITH\ (Symmetry-Mapped Internal-coordinate Template
 Handler) implementation starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
-point-group operations, fragments and optional interaction centers.  It then
-builds chemically typed primitive families, protects special coordinates for
-rings and fragments, reduces the coordinate space using analytic Wilson
+point-group operations, fragments, optional interaction centers and an
+ORACLE-frozen redundant primitive/B source space.  It validates and classifies
+the ordinary primitive rows, augments them with chemically typed special or
+composite families, protects coordinates for rings and fragments, and reduces the coordinate space using analytic Wilson
 \(\Bmat\)-row rank tests, and applies symmetry only inside homogeneous
 coordinate blocks.  The result is a deterministic constructive protocol and a
 frozen coordinate contract, rather than an arbitrary non-redundant basis.  The
@@ -133,13 +134,14 @@ Name & Role \\
 ORACLE molecular-state layer & Input/perception layer that either reads saved topology,
 symmetry and synthon sections from the \texttt{xyzin} file or constructs them
 from Cartesian coordinates.  ORACLE owns cycle perception, point-group
-operations and atom permutations, atom equivalence, effective atomic numbers
-and the other continuous atomic and synthon descriptors.  It develops Proxima
+operations and atom permutations, atom equivalence, effective atomic numbers,
+the other continuous atomic and synthon descriptors, and the redundant ordinary
+primitive coordinates with their Wilson B matrix.  It develops Proxima
 and is defined in the companion ORACLE methodological manuscript; its production
 implementation remains in final validation before release.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
 \SMITH{}--\SONIC & Coordinate-construction tool and its coordinate
 contract.  \SMITH\ consumes the frozen ORACLE state; it does not rediscover
-cycles, symmetry or atomic descriptors.  It performs \GIC\ construction, symmetry-adapted
+cycles, symmetry, atomic descriptors or ordinary primitive definitions.  It performs SONIC construction, special/composite coordinate generation, symmetry-adapted
 Cartesian reference spaces, analytic \(\Bmat\) rows, symmetry labels and
 provenance. \\
 GF/PED, DVR & Wilson GF/potential-energy-distribution analysis and discrete
@@ -190,8 +192,8 @@ electronic-structure backend handling remain outside \SMITH. \\
   },
   arrow/.style={-{Latex[length=2.2mm]}, line width=0.45pt, draw=black!70}
 ]
-\node[stage=blue!7] (state) {Geometry\\Topology\\Symmetry state};
-\node[stage=green!8, right=of state] (families) {Primitive\\coordinate\\families};
+\node[stage=blue!7] (state) {ORACLE molecular\\state};
+\node[stage=green!8, right=of state] (families) {ORACLE primitive/B\\source + SMITH\\family labels};
 \node[stage=orange!10, right=of families] (semantic) {Protected\\semantic, ring\\and fragment rows};
 \node[stage=purple!8, right=of semantic] (reduction) {Block-local\\rank reduction\\and symmetry};
 \node[contract, right=of reduction] (contract) {Frozen\\coordinate\\contract};
@@ -213,7 +215,8 @@ electronic-structure backend handling remain outside \SMITH. \\
   \draw[arrow] (\target.north |- bus) -- (\target.north);
 \end{tikzpicture}
 }
-\caption{Constructive workflow implemented by \SMITH\ for \SONIC\ coordinates.
+\caption{Constructive workflow implemented by \SMITH\ for \SONIC\ coordinates,
+starting from the ORACLE molecular and redundant primitive/B contracts.
 The model-building stage
 ends at the frozen coordinate contract; downstream modules reuse that object
 and update only the numerical quantities required for their task, such as
@@ -366,8 +369,9 @@ semantic coordinate rather than as an opaque handwritten expression.
 
 \SONIC\ does not rediscover the molecule at every downstream step.  Its input is
 a validated molecular state containing Cartesian geometry, covalent bonds,
-rings, point-group operations, optional fragments, optional interaction centers
-and continuous chemical perception descriptors.  If those data are already
+rings, point-group operations, optional fragments, optional interaction centers,
+continuous chemical perception descriptors and redundant ordinary primitives
+with their Wilson B rows.  If those data are already
 present in the \texttt{xyzin} file, \SONIC\ consumes them as part of the frozen
 state.  Their definition belongs to ORACLE (Operator for Recognition,
 Atom-typing and Continuous Local Equivalence), the continuous-perception
@@ -375,11 +379,15 @@ development of Proxima.  Its state contract and perception methods are defined
 in the companion ORACLE manuscript, while the production application remains
 in final validation before release.
 In particular, ORACLE defines the molecular graph and cycle basis, point-group
-operations and atom permutations, atom equivalence, effective atomic numbers
-and the charge, covalency, delocalization, strain, bond-order and synthon
+operations and atom permutations, atom equivalence, effective atomic numbers,
+the charge, covalency, delocalization, strain, bond-order and synthon
 descriptors used below.  \SMITH\ consumes these objects and does not recompute
-them.
-The output is a frozen \(\#\)GIC definition: primitive coordinate records,
+them.  ORACLE also supplies the ordinary stretch, bend, linear-bend, dihedral
+and out-of-plane source definitions and their reference B matrix.  \SMITH\ may
+add fragment exponential-map, pseudo-bond, ring-puckering, interaction-center
+or protected semantic rows because these belong to the requested SONIC chart,
+not to molecular reperception.
+The output is a frozen \(\#\)GIC definition: consumed and augmented primitive coordinate records,
 final generalized coordinates, coefficients, family labels, irreducible
 representations, total-symmetric subsets and the metadata required to
 reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
@@ -395,8 +403,8 @@ subgroup.  The reduced standalone distribution invokes a pinned, limited
 ORACLE perception profile for this plain-XYZ convenience path and records
 \texttt{PERCEPTION\_PROFILE REDUCED\_ORACLE} in the output.  This mode is
 intended for the supplied examples and ordinary molecular inputs, not as a
-substitute for the full ORACLE application, which remains in final validation
-and will be released when ready.  Production calculations can
+substitute for the full ORACLE application, which is validated and distributed
+as an independent release candidate.  Production calculations can
 instead require a separately validated ORACLE \texttt{xyzin} state, which is
 recorded as \texttt{ORACLE\_STATE}.  Thus the package is runnable on its own
 while preserving an explicit scientific boundary between perception and
@@ -516,8 +524,10 @@ A frozen coordinate contract is the tuple
 \[
   \mathcal{C} = (\mathcal{P},\mathcal{G},\Bmat,\Sigma,\mathcal{M}).
 \]
-Here \(\mathcal{P}=(p_1,\ldots,p_m)\) is the ordered set of typed primitive
-candidates; \(\mathcal{G}=(\mathbf{g},\Cmat_{\mathcal{G}})\) is the accepted
+Here \(\mathcal{P}_{\rm O}=(p_1,\ldots,p_{m_0})\) is the ordered redundant
+primitive/B source frozen by ORACLE and \(\mathcal{P}\supseteq\mathcal{P}_{\rm O}\)
+is the typed source space after any SMITH special/composite augmentation;
+\(\mathcal{G}=(\mathbf{g},\Cmat_{\mathcal{G}})\) is the accepted
 non-redundant generalized-coordinate basis together with its coefficient
 matrix; \(\Bmat\) contains the analytic Wilson rows of the accepted basis;
 \(\Sigma\) contains point-group transformation matrices,
@@ -595,10 +605,12 @@ The construction is easiest to state as a sequence of constraints on the
 candidate space.
 
 \begin{enumerate}
-\item All covalent bonds in the validated topology generate stretch candidates.
+\item All covalent bonds in the validated topology have ORACLE stretch rows.
+\SMITH\ validates and classifies those candidates.
 Stretches establish the bonded frame and are not allowed to be displaced by
 later valence or torsional candidates.
-\item Valence-angle candidates are generated locally around each bonded center.
+\item ORACLE supplies the ordinary local valence-angle and linear-bend rows.
+\SMITH\ groups them around each bonded center.
 When a center has equivalent ligands or high coordination, the candidate angles
 are grouped by local equivalence or by recognized idealized coordination
 templates before block-local reduction.
@@ -644,17 +656,17 @@ abstract mathematical sense.  It replaces hidden numerical weighting choices by
 an explicit chemical priority order whose provenance is stored in the frozen
 definition.
 
-\section{Primitive Families}
+\section{Primitive Source and SMITH Coordinate Families}
 
-The primitive layer is intentionally redundant.  Redundancy is useful at this
+The ORACLE primitive source layer is intentionally redundant.  Redundancy is useful at this
 stage because it allows chemical rules to create all plausible local
 deformations before the rank selector removes dependent rows.  The important
-restriction is that primitives are born with family labels that survive
+restriction is that source primitives receive SMITH family labels that survive
 reduction, symmetry adaptation and output.
 
 \subsection{Bonded Coordinates}
 
-Every covalent edge generates a stretch.  Equivalent stretches can be converted
+Every covalent edge arrives as an ORACLE stretch. Equivalent stretches can be converted
 to local sums and differences using a block-local SVD of their analytic
 \(\Bmat\) rows, but the source block remains a stretch block.  Ordinary bends
 are generated from pairs of neighbors around each center.  Nearly linear
@@ -2037,7 +2049,7 @@ provenance rather than hidden in an implementation choice.
 
 \section{Conclusions}
 
-\SONIC\ provides a general, frozen and symmetry-aware construction of
+Starting from an ORACLE redundant primitive/B contract, \SONIC\ provides a general, frozen and symmetry-aware construction of
 non-redundant internal coordinates.  Its main contribution is a
 reproducible coordinate object that integrates ingredients usually treated
 separately: natural-coordinate locality, analytic Wilson-\(\Bmat\) rank control,
@@ -2098,8 +2110,8 @@ installation instructions and water and norbornane examples.  Its
 explicitly labelled reduced ORACLE profile.  SMITH, including optional Gaussian
 \texttt{ReadAllGIC} export, is developed at
 \url{https://github.com/yogibubu/MATRIX}.  The package pins only reduced-perception
-components; full ORACLE is described in its companion manuscript, remains in
-final validation, and will be released when ready.
+components; full ORACLE is described in its companion manuscript and is
+validated as an independent release candidate.
 Repository revisions and \texttt{\#SMITH\_PROVENANCE} record the code and
 perception profile.
 

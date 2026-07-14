@@ -11,10 +11,10 @@ SMITH and ORACLE have separate scientific responsibilities:
 - ORACLE performs continuous molecular perception.  It owns the molecular
   graph and cycle basis, point-group operations and atom permutations, atom
   equivalence, effective atomic number, and the charge, covalency,
-  delocalization, strain, bond-order, and synthon descriptors.  ORACLE develops
-  the ideas introduced in PROXIMA.  The full application is in final testing
-  and will be released and described separately when ready.
-- SMITH consumes that frozen molecular state and constructs the SONIC
+  delocalization, strain, bond-order, and synthon descriptors, together with
+  the redundant primitive/Wilson-B source.  ORACLE develops the ideas
+  introduced in PROXIMA and is validated as an independent release candidate.
+- SMITH consumes that frozen molecular and primitive state and constructs the SONIC
   coordinate families, protected rows, rank reduction, homogeneous symmetry
   adaptation, analytic Wilson rows, and serialized coordinate contract.
 
@@ -79,6 +79,11 @@ limits its surface to SONIC contract construction and inspection.  Each build
 also writes a `.smith.out` coordinate report and a `.g16.gjf` Gaussian 16 input.
 The G16 profile is the default, and non-totally symmetric coordinates are
 written as `Frozen`.
+
+With `--require-oracle-state`, the required production boundary is
+`VALIDATION`, `TOPOLOGY`, `SYNTHONS`, `SYMMETRY`, and `PRIMITIVES`. The last
+section freezes the primitive ordering, reference values and Wilson-B
+fingerprint that SMITH consumes before constructing SONIC.
 
 The formic-acid–water example exercises all six intermolecular fragment
 coordinates.  The eta3 allyl–palladium example consumes an explicit, frozen

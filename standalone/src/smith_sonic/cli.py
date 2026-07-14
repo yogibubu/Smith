@@ -26,9 +26,15 @@ from matrix_neo.standalone import (
 from . import __version__
 
 
-REQUIRED_ORACLE_SECTIONS = ("VALIDATION", "TOPOLOGY", "SYNTHONS", "SYMMETRY")
+REQUIRED_ORACLE_SECTIONS = (
+    "VALIDATION",
+    "TOPOLOGY",
+    "SYNTHONS",
+    "SYMMETRY",
+    "PRIMITIVES",
+)
 PROVENANCE_SCHEMA = "matrix.smith.standalone.v1"
-MATRIX_REVISION = "711a8283ba50a064ae36a438f8c6e5a24e1fe0e7"
+MATRIX_REVISION = "8fc2607a61c8f54f0f7cb69fe76498ea463f55c6"
 DEFAULT_G16_ROUTE = "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 EXAMPLES = {
     "water": ("water.smith.xyz", False),

@@ -40,9 +40,11 @@ class PackagedExampleTests(unittest.TestCase):
         self.addCleanup(scratch.cleanup)
         contract = section_content(lines, "GIC")
         centers = section_content(lines, "INTERACTION_CENTERS")
+        primitives = section_content(lines, "PRIMITIVES")
         provenance = section_content(lines, "SMITH_PROVENANCE")
 
         self.assertIn("TARGET_RANK 24", contract)
+        self.assertTrue(primitives)
         self.assertIn("RANK 24", contract)
         self.assertTrue(any("KIND=ETA3_CENTER" in row and "ATOMS=3,4,5" in row for row in centers))
         self.assertTrue(

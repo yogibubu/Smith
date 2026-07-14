@@ -9,9 +9,9 @@ distribution of the complete MATRIX framework.
 
 ORACLE and SMITH have distinct roles.  ORACLE performs continuous molecular
 perception, including topology and cycles, symmetry and atom equivalence,
-effective atomic numbers, synthons, and interaction centres.  It develops the
-ideas introduced in PROXIMA and is in final testing; it will be released and
-described separately when ready.  SMITH consumes a frozen ORACLE state and
+effective atomic numbers, synthons, interaction centres, and the redundant
+primitive/Wilson-B source.  It develops the ideas introduced in PROXIMA and is
+validated as an independent release candidate.  SMITH consumes a frozen ORACLE state and
 constructs coordinate candidates, protected special coordinates, rank
 reduction, symmetry adaptation, analytic Wilson rows, and the serialized SONIC
 contract.
@@ -74,14 +74,15 @@ smith-sonic build molecule.oracle.xyzin molecule.sonic.xyzin --require-oracle-st
 ```
 
 This option refuses an input missing any of `VALIDATION`, `TOPOLOGY`,
-`SYNTHONS`, or `SYMMETRY`.
+`SYNTHONS`, `SYMMETRY`, or `PRIMITIVES`. The latter contains ORACLE's ordered
+redundant coordinates, reference values and Wilson-B fingerprint.
 
 ## 4. Input profiles
 
 ### Frozen ORACLE state
 
 This is the production interface.  SMITH preserves the molecular perception
-sections and adds the SONIC construction.  The output provenance contains
+and primitive/B sections and adds the SONIC construction.  The output provenance contains
 `PERCEPTION_PROFILE ORACLE_STATE`.
 
 ### Reduced ORACLE convenience profile
