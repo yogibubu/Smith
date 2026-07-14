@@ -126,4 +126,22 @@ format translation.  LINK constructed SONIC optimizer direction matrices of
 dimensions \(18\times24\) and \(24\times30\), respectively, confirming that
 the serialized contracts are consumable by the two downstream workflows.
 
+\begingroup
+\small
+\section*{Local-Pseudosymmetry Validation}
+
+The machine-readable results in
+\nolinkurl{data/local_salc_validation.json} can be regenerated from an
+explicitly selected MATRIX checkout:
+\begin{lstlisting}
+export MATRIX_ROOT=/path/to/your/MATRIX
+python scripts/run_local_salc_validation.py
+\end{lstlisting}
+The cases cover a globally \(C_1\), locally \(C_{3v}\) methyl probe, benzene,
+toluene and azulene: rank closure, rigid-rotation invariance, ring operations
+and fused-edge ownership are recorded.  An available Fortran control also
+exercises \texttt{LOCSALC}.  Local labels refer to center/ring/bond domains;
+the exact molecular point-group projector remains final.
+\endgroup
+
 \end{document}

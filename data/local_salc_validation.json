@@ -1,0 +1,205 @@
+{
+  "method": "SMITH/SONIC local-pseudosymmetry SALC validation",
+  "matrix_revision": "ec610dedeb5f01944ee36297f26db379f1a32e5d",
+  "python": "3.13.11",
+  "settings": {
+    "local_salc": true,
+    "global_symmetrization": true,
+    "effective_atomic_number_tolerance": 0.0005,
+    "radial_distance_tolerance_angstrom": 0.001
+  },
+  "checks": {
+    "c1_methyl_rotation_invariant": true,
+    "c1_methyl_global_point_group": "C1",
+    "c1_methyl_local_center_groups": [
+      "C1",
+      "C3v"
+    ],
+    "c1_methyl_local_center_irreps": [
+      "A1",
+      "NON_A1_1",
+      "NON_A1_2"
+    ],
+    "benzene_ring_groups": [
+      "D6"
+    ],
+    "benzene_ring_operations": [
+      "12"
+    ],
+    "toluene_ring_groups": [
+      "C1"
+    ],
+    "toluene_ring_operations": [
+      "1"
+    ],
+    "azulene_ring_domains": [
+      "RING:1",
+      "RING:2"
+    ],
+    "azulene_shared_edges": [
+      "0",
+      "1"
+    ]
+  },
+  "fortran_control": {
+    "available": true,
+    "gic_count": 18,
+    "final_counts": [
+      7,
+      9,
+      0,
+      2,
+      0,
+      18
+    ],
+    "c3v_diagnostic_count": 3,
+    "a1_first_count": 7
+  },
+  "systems": [
+    {
+      "system": "C1 methyl probe",
+      "point_group": "C1",
+      "rank": 18,
+      "target_rank": 18,
+      "symmetry_method": "LOCAL_BLOCK_SALC",
+      "local_salc_records": 19,
+      "local_groups": [
+        "C1",
+        "C3v",
+        "LOCAL_ROTOR"
+      ],
+      "local_domains": [
+        "BOND:1-5",
+        "BOND:5-7",
+        "CENTER:1",
+        "CENTER:5",
+        "CENTER:7"
+      ],
+      "local_irreps": [
+        "A1",
+        "NON_A1_1",
+        "NON_A1_2"
+      ],
+      "kept": 18,
+      "pruned": 1
+    },
+    {
+      "system": "benzene",
+      "point_group": "D6h",
+      "rank": 30,
+      "target_rank": 30,
+      "symmetry_method": "POINT_GROUP_PROJECTOR",
+      "local_salc_records": 30,
+      "local_groups": [
+        "C1",
+        "Cs",
+        "D6"
+      ],
+      "local_domains": [
+        "CENTER:11",
+        "CENTER:2",
+        "CENTER:3",
+        "CENTER:5",
+        "CENTER:7",
+        "CENTER:9",
+        "RING:1"
+      ],
+      "local_irreps": [
+        "A1",
+        "FOURIER_1",
+        "FOURIER_2",
+        "FOURIER_3",
+        "NON_A1_1",
+        "NON_A1_2",
+        "NON_A1_3",
+        "NON_A1_4",
+        "NON_A1_5"
+      ],
+      "kept": 24,
+      "pruned": 6
+    },
+    {
+      "system": "toluene",
+      "point_group": "Cs",
+      "rank": 39,
+      "target_rank": 39,
+      "symmetry_method": "POINT_GROUP_PROJECTOR",
+      "local_salc_records": 40,
+      "local_groups": [
+        "C1",
+        "C2v",
+        "Cs",
+        "LOCAL_ROTOR"
+      ],
+      "local_domains": [
+        "BOND:4-7",
+        "CENTER:1",
+        "CENTER:2",
+        "CENTER:3",
+        "CENTER:4",
+        "CENTER:5",
+        "CENTER:6",
+        "CENTER:7",
+        "RING:1"
+      ],
+      "local_irreps": [
+        "A1",
+        "FOURIER_1",
+        "FOURIER_2",
+        "FOURIER_3",
+        "NON_A1_1",
+        "NON_A1_2",
+        "NON_A1_3",
+        "NON_A1_4",
+        "NON_A1_5"
+      ],
+      "kept": 39,
+      "pruned": 1
+    },
+    {
+      "system": "azulene",
+      "point_group": "C2v",
+      "rank": 48,
+      "target_rank": 48,
+      "symmetry_method": "POINT_GROUP_PROJECTOR",
+      "local_salc_records": 49,
+      "local_groups": [
+        "C1",
+        "Cs"
+      ],
+      "local_domains": [
+        "CENTER:1",
+        "CENTER:10",
+        "CENTER:2",
+        "CENTER:3",
+        "CENTER:4",
+        "CENTER:5",
+        "CENTER:6",
+        "CENTER:7",
+        "CENTER:8",
+        "CENTER:9",
+        "RING:1",
+        "RING:2"
+      ],
+      "local_irreps": [
+        "A1",
+        "FOURIER_1",
+        "FOURIER_2",
+        "FOURIER_3",
+        "FOURIER_4",
+        "NON_A1_1",
+        "NON_A1_2",
+        "NON_A1_3",
+        "NON_A1_4",
+        "NON_A1_5"
+      ],
+      "kept": 45,
+      "pruned": 4
+    }
+  ],
+  "notes": [
+    "Local A1 labels refer to a center/ring/bond domain; molecular irreps remain controlled by the frozen point-group projector.",
+    "The non-A1 labels identify a deterministic orthonormal complement and do not claim a complete local-irrep decomposition.",
+    "Azulene ring-stretch ownership records the single shared fused edge only once."
+  ]
+}
