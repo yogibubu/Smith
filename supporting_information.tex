@@ -137,11 +137,11 @@ explicitly selected MATRIX checkout:
 export MATRIX_ROOT=/path/to/your/MATRIX
 python scripts/run_local_salc_validation.py
 \end{lstlisting}
-The cases cover a globally \(C_1\), locally \(C_{3v}\) methyl probe, benzene,
-toluene and azulene: rank closure, rigid-rotation invariance, ring operations
-and fused-edge ownership are recorded.  An available Fortran control also
-exercises \texttt{LOCSALC}.  Local labels refer to center/ring/bond domains;
-the exact molecular point-group projector remains final.
+The cases cover the \(C_1/C_{3v}\) methyl probe, benzene, toluene, azulene and
+two ideal/distorted templates for each coordination number from 5 to 9.  They
+record rank, rotation, ring and fused-edge checks; an available Fortran control
+also runs \texttt{LOCSALC}.  Local labels are domain labels; the molecular
+point-group projector remains final.
 \endgroup
 
 \end{document}

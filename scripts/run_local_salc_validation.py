@@ -30,6 +30,18 @@ C1_METHYL_COORDINATES = np.array(
     ],
     dtype=float,
 )
+HIGH_COORDINATION_GROUPS = {
+    "TRIGONAL_BIPYRAMIDAL": "D3h",
+    "SQUARE_PYRAMIDAL": "C4v",
+    "OCTAHEDRAL": "Oh",
+    "TRIGONAL_PRISMATIC": "D3h",
+    "PENTAGONAL_BIPYRAMIDAL": "D5h",
+    "CAPPED_OCTAHEDRAL": "C3v",
+    "SQUARE_ANTIPRISMATIC": "D4d",
+    "DODECAHEDRAL_LIKE": "D2d",
+    "TRICAPPED_TRIGONAL_PRISMATIC": "D3h",
+    "CAPPED_SQUARE_ANTIPRISMATIC": "C4v",
+}
 
 
 def _git_revision(root: Path) -> str:
@@ -161,6 +173,10 @@ def main() -> None:
         )
 
         from matrix_engines import gicforge_fortran_layout, run_legacy_gicforge
+        from matrix_neo.runtime.gicforge_python import (
+            _LOCAL_COORDINATION_TEMPLATES,
+            build_gicforge_python_model,
+        )
 
         fortran_layout = gicforge_fortran_layout(matrix)
         fortran_available = shutil.which("gfortran") is not None or fortran_layout.legacy_executable.is_file()
@@ -182,6 +198,80 @@ def main() -> None:
                     "a1_first_count": run.provout.count("A1_FIRST=YES"),
                 }
             )
+
+        high_coordination = []
+        for coordination in range(5, 10):
+            for template_index, template in enumerate(
+                _LOCAL_COORDINATION_TEMPLATES[coordination]
+            ):
+                expected_group = HIGH_COORDINATION_GROUPS[template.name]
+                directions = np.asarray(template.directions, dtype=float)
+                directions /= np.linalg.norm(directions, axis=1)[:, None]
+                variants = {}
+                for distorted in (False, True):
+                    working_directions = directions.copy()
+                    if distorted:
+                        working_directions[0] += np.array(
+                            (0.025, -0.015, 0.010), dtype=float
+                        )
+                        working_directions[0] /= np.linalg.norm(working_directions[0])
+                    coordinates = np.vstack(
+                        (np.zeros((1, 3), dtype=float), 1.6 * working_directions)
+                    )
+                    atoms = ("Fe",) + ("H",) * coordination
+                    model = build_gicforge_python_model(
+                        atoms,
+                        coordinates,
+                        local_salc=True,
+                    )
+                    python_angles = "\n".join(
+                        coordinate.diagnostic
+                        for coordinate in model.coordinates
+                        if "KIND=ANGLE" in coordinate.diagnostic
+                    )
+                    variant = {
+                        "python_rank": len(model.coordinates),
+                        "python_target_rank": model.target_rank,
+                        "python_group_recognized": f"GROUP={expected_group}"
+                        in python_angles,
+                    }
+                    if fortran_available:
+                        high_run = run_legacy_gicforge(
+                            work
+                            / (
+                                f"fortran_cn{coordination}_template{template_index}_"
+                                f"distorted{int(distorted)}"
+                            ),
+                            atoms=atoms,
+                            coordinates_angstrom=coordinates,
+                            point_group="C1",
+                            keywords=("GNIC", "BMAT", "LOCSALC"),
+                            repo_root=matrix,
+                        )
+                        fortran_angles = "\n".join(
+                            line
+                            for line in high_run.provout.splitlines()
+                            if "LOCAL_SALC DOMAIN=CENTER:" in line
+                            and "KIND=ANGLE" in line
+                        )
+                        variant.update(
+                            {
+                                "fortran_rank": high_run.final_counts[-1],
+                                "fortran_group_recognized": f"GROUP={expected_group}"
+                                in fortran_angles,
+                                "fortran_a1_first": "A1_FIRST=YES" in fortran_angles,
+                            }
+                        )
+                    variants["distorted" if distorted else "ideal"] = variant
+                high_coordination.append(
+                    {
+                        "coordination": coordination,
+                        "template": template.name,
+                        "expected_local_group": expected_group,
+                        "target_rank": 3 * coordination - 3,
+                        "variants": variants,
+                    }
+                )
 
         output = {
             "method": "SMITH/SONIC local-pseudosymmetry SALC validation",
@@ -206,11 +296,13 @@ def main() -> None:
                 "azulene_shared_edges": _field_values(azulene_ring, "SHARED_EDGES"),
             },
             "fortran_control": fortran,
+            "high_coordination": high_coordination,
             "systems": systems,
             "notes": [
                 "Local A1 labels refer to a center/ring/bond domain; molecular irreps remain controlled by the frozen point-group projector.",
                 "The non-A1 labels identify a deterministic orthonormal complement and do not claim a complete local-irrep decomposition.",
                 "Azulene ring-stretch ownership records the single shared fused edge only once.",
+                "Coordination numbers 5--9 are tested for two idealized templates each, both ideally and after a small angular distortion, in Python and Fortran when available.",
             ],
         }
         DATA.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")

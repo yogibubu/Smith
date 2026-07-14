@@ -30,7 +30,8 @@ python scripts/run_construction_scaling_benchmark.py
 `MATRIX_ROOT` is supplied by the user; no developer-machine path is assumed.
 
 The local-pseudosymmetry validation (globally C1/local C3v center, substituted
-and fused rings, rigid-rotation invariance, and the Fortran control path) is
+and fused rings, CN 5--9 ideal/distorted templates, rigid-rotation invariance,
+and the Fortran control path) is
 tracked in `data/local_salc_validation.json` and can be regenerated with:
 
 ```bash

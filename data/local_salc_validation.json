@@ -1,6 +1,6 @@
 {
   "method": "SMITH/SONIC local-pseudosymmetry SALC validation",
-  "matrix_revision": "ec610dedeb5f01944ee36297f26db379f1a32e5d",
+  "matrix_revision": "4aca962fe5a09ef92f40e5f0610f45e2961001cd",
   "python": "3.13.11",
   "settings": {
     "local_salc": true,
@@ -55,6 +55,248 @@
     "c3v_diagnostic_count": 3,
     "a1_first_count": 7
   },
+  "high_coordination": [
+    {
+      "coordination": 5,
+      "template": "TRIGONAL_BIPYRAMIDAL",
+      "expected_local_group": "D3h",
+      "target_rank": 12,
+      "variants": {
+        "ideal": {
+          "python_rank": 12,
+          "python_target_rank": 12,
+          "python_group_recognized": true,
+          "fortran_rank": 12,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 12,
+          "python_target_rank": 12,
+          "python_group_recognized": true,
+          "fortran_rank": 12,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    },
+    {
+      "coordination": 5,
+      "template": "SQUARE_PYRAMIDAL",
+      "expected_local_group": "C4v",
+      "target_rank": 12,
+      "variants": {
+        "ideal": {
+          "python_rank": 12,
+          "python_target_rank": 12,
+          "python_group_recognized": true,
+          "fortran_rank": 12,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 12,
+          "python_target_rank": 12,
+          "python_group_recognized": true,
+          "fortran_rank": 12,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    },
+    {
+      "coordination": 6,
+      "template": "OCTAHEDRAL",
+      "expected_local_group": "Oh",
+      "target_rank": 15,
+      "variants": {
+        "ideal": {
+          "python_rank": 15,
+          "python_target_rank": 15,
+          "python_group_recognized": true,
+          "fortran_rank": 15,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 15,
+          "python_target_rank": 15,
+          "python_group_recognized": true,
+          "fortran_rank": 15,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    },
+    {
+      "coordination": 6,
+      "template": "TRIGONAL_PRISMATIC",
+      "expected_local_group": "D3h",
+      "target_rank": 15,
+      "variants": {
+        "ideal": {
+          "python_rank": 15,
+          "python_target_rank": 15,
+          "python_group_recognized": true,
+          "fortran_rank": 15,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 15,
+          "python_target_rank": 15,
+          "python_group_recognized": true,
+          "fortran_rank": 15,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    },
+    {
+      "coordination": 7,
+      "template": "PENTAGONAL_BIPYRAMIDAL",
+      "expected_local_group": "D5h",
+      "target_rank": 18,
+      "variants": {
+        "ideal": {
+          "python_rank": 18,
+          "python_target_rank": 18,
+          "python_group_recognized": true,
+          "fortran_rank": 18,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 18,
+          "python_target_rank": 18,
+          "python_group_recognized": true,
+          "fortran_rank": 18,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    },
+    {
+      "coordination": 7,
+      "template": "CAPPED_OCTAHEDRAL",
+      "expected_local_group": "C3v",
+      "target_rank": 18,
+      "variants": {
+        "ideal": {
+          "python_rank": 18,
+          "python_target_rank": 18,
+          "python_group_recognized": true,
+          "fortran_rank": 18,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 18,
+          "python_target_rank": 18,
+          "python_group_recognized": true,
+          "fortran_rank": 18,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    },
+    {
+      "coordination": 8,
+      "template": "SQUARE_ANTIPRISMATIC",
+      "expected_local_group": "D4d",
+      "target_rank": 21,
+      "variants": {
+        "ideal": {
+          "python_rank": 21,
+          "python_target_rank": 21,
+          "python_group_recognized": true,
+          "fortran_rank": 21,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 21,
+          "python_target_rank": 21,
+          "python_group_recognized": true,
+          "fortran_rank": 21,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    },
+    {
+      "coordination": 8,
+      "template": "DODECAHEDRAL_LIKE",
+      "expected_local_group": "D2d",
+      "target_rank": 21,
+      "variants": {
+        "ideal": {
+          "python_rank": 21,
+          "python_target_rank": 21,
+          "python_group_recognized": true,
+          "fortran_rank": 21,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 21,
+          "python_target_rank": 21,
+          "python_group_recognized": true,
+          "fortran_rank": 21,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    },
+    {
+      "coordination": 9,
+      "template": "TRICAPPED_TRIGONAL_PRISMATIC",
+      "expected_local_group": "D3h",
+      "target_rank": 24,
+      "variants": {
+        "ideal": {
+          "python_rank": 24,
+          "python_target_rank": 24,
+          "python_group_recognized": true,
+          "fortran_rank": 24,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 24,
+          "python_target_rank": 24,
+          "python_group_recognized": true,
+          "fortran_rank": 24,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    },
+    {
+      "coordination": 9,
+      "template": "CAPPED_SQUARE_ANTIPRISMATIC",
+      "expected_local_group": "C4v",
+      "target_rank": 24,
+      "variants": {
+        "ideal": {
+          "python_rank": 24,
+          "python_target_rank": 24,
+          "python_group_recognized": true,
+          "fortran_rank": 24,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        },
+        "distorted": {
+          "python_rank": 24,
+          "python_target_rank": 24,
+          "python_group_recognized": true,
+          "fortran_rank": 24,
+          "fortran_group_recognized": true,
+          "fortran_a1_first": true
+        }
+      }
+    }
+  ],
   "systems": [
     {
       "system": "C1 methyl probe",
@@ -200,6 +442,7 @@
   "notes": [
     "Local A1 labels refer to a center/ring/bond domain; molecular irreps remain controlled by the frozen point-group projector.",
     "The non-A1 labels identify a deterministic orthonormal complement and do not claim a complete local-irrep decomposition.",
-    "Azulene ring-stretch ownership records the single shared fused edge only once."
+    "Azulene ring-stretch ownership records the single shared fused edge only once.",
+    "Coordination numbers 5--9 are tested for two idealized templates each, both ideally and after a small angular distortion, in Python and Fortran when available."
   ]
 }

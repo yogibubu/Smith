@@ -702,6 +702,13 @@ and by radial shell.  The current validated defaults are
 tolerances, not physical constants; both are written to the diagnostic record.
 The multiplicity pattern and ligand geometry then identify the local template,
 for example \(C_{3v}\) for a \(WXY_3\) center or \(T_d\) for \(XY_4\).
+Coordination numbers 5--9 are treated by the same path.  The current template
+pairs are trigonal-bipyramidal/square-pyramidal (CN 5),
+octahedral/trigonal-prismatic (CN 6), pentagonal-bipyramidal/capped-octahedral
+(CN 7), square-antiprismatic/dodecahedral-like (CN 8), and
+tricapped-trigonal-prismatic/capped-square-antiprismatic (CN 9).  If no
+template is accepted, the construction falls back to ligand-equivalence
+classes without changing the final rank criterion.
 Angles are partitioned separately according to the pair of ligand classes, so
 that the SALC construction never mixes a stretch orbit with an angle orbit or
 two chemically different angular blocks.
@@ -1406,7 +1413,7 @@ Covalent stretches & Active & All topology bonds; local equivalence grouping ava
 \midrule
 Exocyclic bends & Active & Bonded-center bends; local symmetric combinations for common motifs. \\
 \midrule
-High coordination & Active/refactor boundary & Coordination 5--9 by templates or ligand-equivalence blocks with local SVD. \\
+High coordination & Active & Coordination 5--9 by two templates per coordination number or ligand-equivalence fallback; canonical local SALCs are implemented in both Python and Fortran. \\
 \midrule
 One-dihedral exocyclic torsions & Active default & \texttt{ONEDIH} is the default intramolecular path; legacy alternatives are diagnostic. \\
 \midrule
@@ -1603,6 +1610,11 @@ The separate Fortran path independently reports the same \(C_{3v}\) center,
 places \(A_1\) first and closes at 18 coordinates.  This test checks the local
 classification contract; the established tetrahedral control test continues
 to provide the stricter Python--Fortran ordered-primitive and Wilson-row check.
+The high-coordination extension is tested on both template geometries for each
+coordination number from five through nine.  Each geometry is repeated after a
+small angular distortion of one ligand, giving 20 models in each implementation.
+Python and Fortran retain the same local-group assignment and close at ranks
+12, 15, 18, 21 and 24 for CN 5, 6, 7, 8 and 9, respectively.
 
 \begin{table}[htbp]
 \centering
@@ -1623,6 +1635,8 @@ Benzene & \(D_{6h}\) & ring \(D_6\) & 30/30 & 12 color-preserving cyclic operati
 Toluene & \(C_s\) & substituted ring \(C_1\) & 39/39 & one cyclic operation at the default descriptor/distance tolerances \\
 \midrule
 Azulene & \(C_{2v}\) & two fused-ring domains & 48/48 & ring domains 1 and 2 recorded; one shared edge assigned once \\
+\midrule
+CN 5--9 centers & \(C_1\) & ten local polyhedral templates & 12--24 & 20 ideal/distorted models; Python--Fortran group and rank agreement \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1986,6 +2000,10 @@ same separation between a cyclic local subgroup and the exact molecular group.
 The local thresholds can change a domain partition near a boundary; because
 the tolerances, confidence, participating atoms and kept/pruned status are
 serialized, that change is auditable rather than implicit.
+The same table also removes the former high-coordination refactor boundary:
+both implementations now recognize the two documented templates for every
+coordination number from five to nine, while retaining the
+ligand-equivalence fallback for unrecognized or chemically split environments.
 
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
 symmetry-projector normalization and Python--Fortran row-space equivalence for
