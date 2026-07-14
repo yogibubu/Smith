@@ -61,11 +61,14 @@ construction of non-redundant, symmetry-adapted generalized internal
 coordinates.  The \SMITH\ (Symmetry-Mapped Internal-coordinate Template
 Handler) implementation starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
-point-group operations, fragments and optional interaction centers.  It then
-builds chemically typed primitive families, protects special coordinates for
-rings and fragments, reduces the coordinate space using analytic Wilson
-\(\Bmat\)-row rank tests, and applies symmetry only inside homogeneous
-coordinate blocks.  The result is a deterministic constructive protocol and a
+point-group operations, fragments, optional interaction centers and an
+ORACLE-frozen redundant primitive/B source space.  It validates and classifies
+the ordinary primitive rows, augments them with chemically typed special or
+composite families, protects coordinates for rings and fragments, and reduces the coordinate space using analytic Wilson
+\(\Bmat\)-row rank tests.  A local-pseudosymmetry layer first orders
+center-, ring- and bond-domain coordinates with the locally totally symmetric
+combination first; the exact molecular point-group projector is then applied
+inside homogeneous coordinate blocks.  The result is a deterministic constructive protocol and a
 frozen coordinate contract, rather than an arbitrary non-redundant basis.  The
 contract can also incorporate optional user-defined protected semantic
 coordinates and derived observables.  This stored definition is designed to
@@ -133,13 +136,14 @@ Name & Role \\
 ORACLE molecular-state layer & Input/perception layer that either reads saved topology,
 symmetry and synthon sections from the \texttt{xyzin} file or constructs them
 from Cartesian coordinates.  ORACLE owns cycle perception, point-group
-operations and atom permutations, atom equivalence, effective atomic numbers
-and the other continuous atomic and synthon descriptors.  It develops Proxima
+operations and atom permutations, atom equivalence, effective atomic numbers,
+the other continuous atomic and synthon descriptors, and the redundant ordinary
+primitive coordinates with their Wilson B matrix.  It develops Proxima
 and is defined in the companion ORACLE methodological manuscript; its production
 implementation remains in final validation before release.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
 \SMITH{}--\SONIC & Coordinate-construction tool and its coordinate
 contract.  \SMITH\ consumes the frozen ORACLE state; it does not rediscover
-cycles, symmetry or atomic descriptors.  It performs \GIC\ construction, symmetry-adapted
+cycles, symmetry, atomic descriptors or ordinary primitive definitions.  It performs SONIC construction, special/composite coordinate generation, symmetry-adapted
 Cartesian reference spaces, analytic \(\Bmat\) rows, symmetry labels and
 provenance. \\
 GF/PED, DVR & Wilson GF/potential-energy-distribution analysis and discrete
@@ -190,8 +194,8 @@ electronic-structure backend handling remain outside \SMITH. \\
   },
   arrow/.style={-{Latex[length=2.2mm]}, line width=0.45pt, draw=black!70}
 ]
-\node[stage=blue!7] (state) {Geometry\\Topology\\Symmetry state};
-\node[stage=green!8, right=of state] (families) {Primitive\\coordinate\\families};
+\node[stage=blue!7] (state) {ORACLE molecular\\state};
+\node[stage=green!8, right=of state] (families) {ORACLE primitive/B\\source + SMITH\\family labels};
 \node[stage=orange!10, right=of families] (semantic) {Protected\\semantic, ring\\and fragment rows};
 \node[stage=purple!8, right=of semantic] (reduction) {Block-local\\rank reduction\\and symmetry};
 \node[contract, right=of reduction] (contract) {Frozen\\coordinate\\contract};
@@ -213,7 +217,8 @@ electronic-structure backend handling remain outside \SMITH. \\
   \draw[arrow] (\target.north |- bus) -- (\target.north);
 \end{tikzpicture}
 }
-\caption{Constructive workflow implemented by \SMITH\ for \SONIC\ coordinates.
+\caption{Constructive workflow implemented by \SMITH\ for \SONIC\ coordinates,
+starting from the ORACLE molecular and redundant primitive/B contracts.
 The model-building stage
 ends at the frozen coordinate contract; downstream modules reuse that object
 and update only the numerical quantities required for their task, such as
@@ -366,8 +371,9 @@ semantic coordinate rather than as an opaque handwritten expression.
 
 \SONIC\ does not rediscover the molecule at every downstream step.  Its input is
 a validated molecular state containing Cartesian geometry, covalent bonds,
-rings, point-group operations, optional fragments, optional interaction centers
-and continuous chemical perception descriptors.  If those data are already
+rings, point-group operations, optional fragments, optional interaction centers,
+continuous chemical perception descriptors and redundant ordinary primitives
+with their Wilson B rows.  If those data are already
 present in the \texttt{xyzin} file, \SONIC\ consumes them as part of the frozen
 state.  Their definition belongs to ORACLE (Operator for Recognition,
 Atom-typing and Continuous Local Equivalence), the continuous-perception
@@ -375,11 +381,15 @@ development of Proxima.  Its state contract and perception methods are defined
 in the companion ORACLE manuscript, while the production application remains
 in final validation before release.
 In particular, ORACLE defines the molecular graph and cycle basis, point-group
-operations and atom permutations, atom equivalence, effective atomic numbers
-and the charge, covalency, delocalization, strain, bond-order and synthon
+operations and atom permutations, atom equivalence, effective atomic numbers,
+the charge, covalency, delocalization, strain, bond-order and synthon
 descriptors used below.  \SMITH\ consumes these objects and does not recompute
-them.
-The output is a frozen \(\#\)GIC definition: primitive coordinate records,
+them.  ORACLE also supplies the ordinary stretch, bend, linear-bend, dihedral
+and out-of-plane source definitions and their reference B matrix.  \SMITH\ may
+add fragment exponential-map, pseudo-bond, ring-puckering, interaction-center
+or protected semantic rows because these belong to the requested SONIC chart,
+not to molecular reperception.
+The output is a frozen \(\#\)GIC definition: consumed and augmented primitive coordinate records,
 final generalized coordinates, coefficients, family labels, irreducible
 representations, total-symmetric subsets and the metadata required to
 reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
@@ -395,8 +405,8 @@ subgroup.  The reduced standalone distribution invokes a pinned, limited
 ORACLE perception profile for this plain-XYZ convenience path and records
 \texttt{PERCEPTION\_PROFILE REDUCED\_ORACLE} in the output.  This mode is
 intended for the supplied examples and ordinary molecular inputs, not as a
-substitute for the full ORACLE application, which remains in final validation
-and will be released when ready.  Production calculations can
+substitute for the full ORACLE application, which is validated and distributed
+as an independent release candidate.  Production calculations can
 instead require a separately validated ORACLE \texttt{xyzin} state, which is
 recorded as \texttt{ORACLE\_STATE}.  Thus the package is runnable on its own
 while preserving an explicit scientific boundary between perception and
@@ -516,8 +526,10 @@ A frozen coordinate contract is the tuple
 \[
   \mathcal{C} = (\mathcal{P},\mathcal{G},\Bmat,\Sigma,\mathcal{M}).
 \]
-Here \(\mathcal{P}=(p_1,\ldots,p_m)\) is the ordered set of typed primitive
-candidates; \(\mathcal{G}=(\mathbf{g},\Cmat_{\mathcal{G}})\) is the accepted
+Here \(\mathcal{P}_{\rm O}=(p_1,\ldots,p_{m_0})\) is the ordered redundant
+primitive/B source frozen by ORACLE and \(\mathcal{P}\supseteq\mathcal{P}_{\rm O}\)
+is the typed source space after any SMITH special/composite augmentation;
+\(\mathcal{G}=(\mathbf{g},\Cmat_{\mathcal{G}})\) is the accepted
 non-redundant generalized-coordinate basis together with its coefficient
 matrix; \(\Bmat\) contains the analytic Wilson rows of the accepted basis;
 \(\Sigma\) contains point-group transformation matrices,
@@ -595,13 +607,19 @@ The construction is easiest to state as a sequence of constraints on the
 candidate space.
 
 \begin{enumerate}
-\item All covalent bonds in the validated topology generate stretch candidates.
+\item All covalent bonds in the validated topology have ORACLE stretch rows.
+\SMITH\ validates and classifies those candidates.
 Stretches establish the bonded frame and are not allowed to be displaced by
 later valence or torsional candidates.
-\item Valence-angle candidates are generated locally around each bonded center.
+\item ORACLE supplies the ordinary local valence-angle and linear-bend rows.
+\SMITH\ groups them around each bonded center.
 When a center has equivalent ligands or high coordination, the candidate angles
 are grouped by local equivalence or by recognized idealized coordination
-templates before block-local reduction.
+templates before block-local reduction.  Named templates are optional: every
+coordination number above four has a template-independent equivalence fallback.
+In the optional local-pseudosymmetry
+path, equivalent stretch and angle orbits are replaced by a canonical
+orthonormal SALC block with the local \(A_1\) row first.
 \item Exocyclic torsions are generated only for non-ring central bonds with
 non-terminal substituents.  The default intramolecular path keeps one
 representative torsional coordinate per exocyclic bond, selected by a CIP-like
@@ -613,7 +631,9 @@ by ring.  Their active combinations are not arbitrary lists of primitive
 angles or dihedrals; they are block-local deformation and puckering components.
 For an \(n\)-membered ring, the default active puckering source dimension is
 \(n-3\), with Fourier-style component vectors and optional
-bond-order-based flexibility factors.
+bond-order-based flexibility factors.  Ring stretches, valence angles and
+torsions remain separate local source blocks, and the cyclic operations used
+for local ordering must preserve the atom/synthon coloring of the ring.
 \item Fused and condensed rings introduce additional torsional sources,
 including butterfly coordinates around bonds shared by two rings.  These rows
 remain in ring/torsional source blocks during reduction and symmetry
@@ -644,17 +664,17 @@ abstract mathematical sense.  It replaces hidden numerical weighting choices by
 an explicit chemical priority order whose provenance is stored in the frozen
 definition.
 
-\section{Primitive Families}
+\section{Primitive Source and SMITH Coordinate Families}
 
-The primitive layer is intentionally redundant.  Redundancy is useful at this
+The ORACLE primitive source layer is intentionally redundant.  Redundancy is useful at this
 stage because it allows chemical rules to create all plausible local
 deformations before the rank selector removes dependent rows.  The important
-restriction is that primitives are born with family labels that survive
+restriction is that source primitives receive SMITH family labels that survive
 reduction, symmetry adaptation and output.
 
 \subsection{Bonded Coordinates}
 
-Every covalent edge generates a stretch.  Equivalent stretches can be converted
+Every covalent edge arrives as an ORACLE stretch. Equivalent stretches can be converted
 to local sums and differences using a block-local SVD of their analytic
 \(\Bmat\) rows, but the source block remains a stretch block.  Ordinary bends
 are generated from pairs of neighbors around each center.  Nearly linear
@@ -664,12 +684,91 @@ derivative becomes singular at linearity.
 For three- and four-coordinate centers, \SONIC\ uses local equivalence classes to
 construct chemically recognizable bend combinations: symmetric deformations,
 rocking coordinates and tetrahedral or \(WXY_3/W_2XY_2\)-like patterns.  For
-coordination numbers between five and nine, the construction first attempts to match an
-idealized local template; if no template closes reliably, ligand-equivalence
-classes define the block that is reduced by SVD.  This is the practical
+coordination numbers between five and nine, the construction first attempts to
+match an idealized local template.  For every coordination number greater than
+four, including those outside the named-template range, ligand-equivalence
+classes provide a general fallback.  This is the practical
 realization of the ``\(XY_n\) local symmetry'' idea: the algebra is local, the
 grouping is chemically typed, and the result does not mix angle rows with
 stretches or torsions.
+
+\subsection{Local Pseudosymmetry and Canonical SALCs}
+
+The molecular point group can be \(C_1\) even when a methyl group, a local
+coordination sphere or a ring retains a useful approximate symmetry.  \SMITH\
+therefore provides an optional local-pseudosymmetry construction before the
+exact molecular projector.  For a bonded center, non-ring ligands are first
+partitioned by the continuous effective atomic number or synthon descriptor
+and by radial shell.  The current validated defaults are
+\(5\times10^{-4}\) for the effective-atomic-number descriptor and
+\(10^{-3}\)~\AA\ for the center--ligand distance.  These are construction
+tolerances, not physical constants; they can be selected in the CLI or GUI and
+are written to the diagnostic record.
+The multiplicity pattern and ligand geometry then identify the local template,
+for example \(C_{3v}\) for a \(WXY_3\) center or \(T_d\) for \(XY_4\).
+Coordination numbers 5--9 are treated by the same path.  The current template
+pairs are trigonal-bipyramidal/square-pyramidal (CN 5),
+octahedral/trigonal-prismatic (CN 6), pentagonal-bipyramidal/capped-octahedral
+(CN 7), square-antiprismatic/dodecahedral-like (CN 8), and
+tricapped-trigonal-prismatic/capped-square-antiprismatic (CN 9).  If no
+template is available, the best score is outside threshold, or two scores are
+too close, the construction falls back to ligand-equivalence classes without
+changing the final rank criterion.  If the sorted vectors of the
+\(M=n(n-1)/2\) ligand-pair cosines are \(\mathbf c\) and
+\(\mathbf t_T\), the template score is
+\begin{equation}
+ s_T=\left[\frac{1}{M}\sum_{k=1}^{M}(c_k-t_{T,k})^2\right]^{1/2}.
+ \label{eq:local-template-score}
+\end{equation}
+Sorting makes this score invariant to Cartesian orientation and ligand order.
+The best template is accepted only if \(s_1\le s_{\max}\) and
+\(s_2-s_1\ge\Delta_s\); the defaults are \(s_{\max}=0.12\) and
+\(\Delta_s=0.02\).  The selected template, best score, margin, decision status
+and thresholds are frozen in the \SONIC\ contract.  LINK therefore retains the
+same coordinate identity throughout an optimization rather than reclassifying
+the center at every step.
+The diagnostic additionally stores the signed headroom from both acceptance
+boundaries.  Assignments within ten percent of a selected threshold are marked
+as near the RMS boundary, near the margin boundary, or near both.  This warning
+does not rebuild the basis; it makes a potentially sensitive local decision
+visible before a geometry trajectory is started.
+Angles are partitioned separately according to the pair of ligand classes and,
+for an accepted high-coordination template, the ideal pair-cosine class, so
+that the SALC construction never mixes a stretch orbit with an angle orbit or
+two chemically different angular blocks.
+
+For an ordered orbit of \(m\) equivalent primitive rows
+\(p_1,\ldots,p_m\), the first stored combination is
+\begin{equation}
+  q_{A_1}=\frac{1}{\sqrt{m}}\sum_{i=1}^{m}p_i .
+\end{equation}
+The remaining deterministic Helmert rows are
+\begin{equation}
+  q_{k+1}=\frac{\sum_{i=1}^{k}p_i-kp_{k+1}}{\sqrt{k(k+1)}},
+  \qquad k=1,\ldots,m-1.
+  \label{eq:local-helmert-salc}
+\end{equation}
+They form an orthonormal complement to \(q_{A_1}\), have zero coefficient sum
+and fix a reproducible printed gauge.  Unless a full local character table has
+also been resolved, the implementation deliberately labels these rows
+\texttt{NON\_A1\_1}, \texttt{NON\_A1\_2}, \ldots rather than assigning an
+unsupported local irrep.  Thus ``local \(A_1\)'' is an ordering and partitioning
+property; the molecular irrep remains the one assigned later by the exact
+point-group projector.
+
+For a ring, the candidate local operations are the rotations and reversals of
+the cyclic atom order.  Only operations preserving the effective-atomic-number/
+synthon coloring and the outgoing-bond signature are retained.  The resulting
+cyclic subgroup is recorded with its operation count and confidence, while
+ring stretches, endocyclic valence angles and ring torsions are transformed in
+separate blocks.  In a fused system a shared edge is owned by the first ring
+stretch domain and reported as shared in the subsequent domain, avoiding a
+duplicate stretch source.  For an exocyclic central bond, equivalent primitive
+dihedrals are combined as one local-rotor \(A_1\) orbit only when the signed
+analytic Wilson row has nonzero rank, adequate norm stability and a continuous
+local reference branch.  Otherwise the existing one-dihedral rule is used and
+the failed rank/stability test is recorded.  Every generated row still passes the final analytic
+\(\Bmat\)-rank test.
 
 \subsection{Exocyclic Torsions}
 
@@ -1019,8 +1118,12 @@ model, then uses ordinary coordinates for completeness.
 
 \section{Symmetry Adaptation}
 
-Symmetry is applied only after a non-redundant coordinate basis has been
-selected.  Let \(G_{\mathrm{pt}}\) be the molecular point group stored in the
+Two symmetry levels are kept distinct.  The local construction described above
+uses center, ring or bond domains to obtain chemically ordered source blocks
+even for a globally asymmetric molecule.  Exact molecular symmetry is applied
+only after a non-redundant coordinate basis has been selected and remains the
+final authority for molecular irrep labels and totally symmetric export.  Let
+\(G_{\mathrm{pt}}\) be the molecular point group stored in the
 source state.  The point group is not guessed from idealized element labels
 alone: the molecular-state builder first clusters atoms by continuous element,
 coordination, bond-order and synthon descriptors, then tests candidate
@@ -1335,7 +1438,7 @@ Covalent stretches & Active & All topology bonds; local equivalence grouping ava
 \midrule
 Exocyclic bends & Active & Bonded-center bends; local symmetric combinations for common motifs. \\
 \midrule
-High coordination & Active/refactor boundary & Coordination 5--9 by templates or ligand-equivalence blocks with local SVD. \\
+High coordination & Active & Two named templates per CN 5--9; generic ligand-equivalence fallback for every CN $>4$. Python is dynamically sized; the distributed Fortran backend is compiled through CN 32. \\
 \midrule
 One-dihedral exocyclic torsions & Active default & \texttt{ONEDIH} is the default intramolecular path; legacy alternatives are diagnostic. \\
 \midrule
@@ -1354,6 +1457,8 @@ Semantic \texttt{PROTECT}/\texttt{OBSERVABLE} layer & Active baseline & Deduplic
 Pseudo-bond/pseudo-cycle mode & Validated baseline & Typed weak contacts become pseudo-edges; pseudo-cycle bends/torsions stay labelled separately. \\
 \midrule
 Point-group projector & Active & Applied after non-redundant reduction inside homogeneous blocks; fallback is recorded. \\
+\midrule
+Local-pseudosymmetry SALCs & Active optional path & Center, ring and bond domains use effective-atomic-number/synthon and radial equivalence; the local \(A_1\) row is first and the exact molecular projector remains final. \\
 \midrule
 \SONIC\ symmetry-adapted Cartesian reference & Active & Cartesian active-space reference for validation; does not change \GIC\ construction. \\
 \midrule
@@ -1403,6 +1508,11 @@ Internal corpus, Table~\ref{tab:validation} & Rank closure, analytic
 \(\Bmat\)-row consistency, point-group block closure and agreement with a
 separate Fortran control implementation. & External superiority over another
 published coordinate generator. \\
+\midrule
+Local-pseudosymmetry corpus, Table~\ref{tab:local-salc-validation} & Local
+\(A_1\)-first ordering, rigid-rotation invariance, substituted/fused-ring domain
+records and independent Python/Fortran classification. & Replacement of the
+exact molecular point group or a complete local-irrep decomposition. \\
 \midrule
 Gaussian-GIC motifs, Table~\ref{tab:frisch-si} & Automatic construction of
 coordinate objects that otherwise appear as explicit GIC examples or dedicated
@@ -1488,7 +1598,9 @@ protected-prefix rule.
 Ranks are final/target ranks.  \(\Delta_\mathrm{PF}\) is the Python--Fortran
 Wilson-row-space residual where the Fortran control comparison is applicable.
 \(\epsilon_\mathrm{SALC}\) is the maximum norm error of nontrivial saved SALC
-coefficient vectors.}
+coefficient vectors, and \(\epsilon_\mathrm{FD}\) is the maximum componentwise
+difference between a final analytic SONIC row and its central Cartesian finite
+difference.}
 \label{tab:validation}
 \begin{tabular}{@{}p{0.17\linewidth}p{0.25\linewidth}p{0.07\linewidth}p{0.16\linewidth}p{0.27\linewidth}@{}}
 \toprule
@@ -1502,6 +1614,8 @@ Cubane & High-symmetry cage & \(O_h\) & 42/42; cyclic bends & \(\Delta_\mathrm{P
 Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\mathrm{PF}=6.71\times10^{-9}\); \(\epsilon_\mathrm{SALC}=3.33\times10^{-16}\) \\
 Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+Pagodane & Cage and fused-ring source spaces & \(D_{2h}\) & 114/114 & \(\epsilon_\mathrm{FD}=4.02\times10^{-10}\); stretches and cyclic bends covered \\
+Indane & Fused aromatic/alicyclic rings & \(C_s\) & 51/51 & \(\epsilon_\mathrm{FD}=4.77\times10^{-10}\); butterfly and \(RPck\) rows covered \\
 Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 6 protected & three translations plus three orientations; direct \(\Bmat\)-rank \(=18\) \\
 $\eta^3$ allyl--PdCl & ORACLE-supplied $\eta^3$ ligand center & \(C_1\) & 24/24; 1 protected & \(q_{\eta^3}=1.8000\)~\AA; analytic center--atom row retained \\
 Weak-complex pseudo-cycles & Intermolecular and intramolecular pseudo-bond
@@ -1509,6 +1623,107 @@ contacts & \(C_s\), \(C_{3v}\), \(C_1\) & rank closed & formic acid--water,
 water dimer, Li\(_2\)--Ar, borane--ammonia and glycine I/II fixtures validate
 the current pseudo-cycle/interfragment baseline \\
 Semantic layer & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probes & duplicate protected row rejected; row-equivalent substitution recorded; protected rank excess fails fast \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The finite-difference audit in the pagodane and indane rows is applied after
+the complete stored SONIC chain rule, rather than separately to selected
+primitive formulas.  It therefore covers local SALCs and the linear
+combinations defining cyclic, butterfly and puckering coordinates.  For all 114
+pagodane and all 51 indane coordinates, mathematical display vectors are
+generated with the Wilson
+matrix frozen at the reference structure,
+\(\Delta\mathbf{x}_k=\mathbf{B}_0^+\mathbf{e}_k\Delta q_k\).  The two frames
+\(\mathbf{x}_0\pm\Delta\mathbf{x}_k\) are therefore exactly symmetric and
+freeze every other SONIC to first order; they are not presented as nonlinear
+back-transformations.  The amplitude is reduced if necessary to preserve
+perceived connectivity and proper orientation, keep the maximum atomic
+displacement below 0.10~\AA, and change no reference bond by 15\% or more.
+Both accepted frames are subjected to the complete ORACLE topology perception,
+rather than to a distance-only connectivity surrogate, and the number of full
+topology evaluations is retained in the diagnostic record.
+An optional mass-weighted right inverse,
+\(\mathbf{M}^{-1/2}(\mathbf{B}_0\mathbf{M}^{-1/2})^+\), provides the
+corresponding minimum-mass-norm vector without changing this first-order
+contract.  Its mass provenance is explicit: the user can select average atomic
+masses, default spectroscopic isotopes, masses stored with a Cartesian Hessian,
+or a named isotopologue; the automatic choice prefers Hessian masses when they
+are available and otherwise uses average masses.  The mathematical step is
+distinct from the interactive display
+amplitude: the viewer normalizes each half-vector to a user-selected maximum
+atomic displacement in \AA.  The machine record reports row-normalized
+conditioning, Cartesian amplification, participation ratio, significantly
+moving atoms and the dominant atom.  It also stores the center, ring or bond
+domain, local pseudogroup, local irrep and independent local/global
+total-symmetry flags whenever those labels apply.  Ring motions additionally
+retain the
+canonical ring order and primitive coefficients, which are highlighted with
+their displacement arrows in the viewer.  The tests consume every generated
+three-frame XYZ trajectory and vector table through the same data loader used
+by the GUI.  The versioned \texttt{matrix.smith.sonic\_diagnostics.v2}
+manifest has a distributed JSON Schema and dependency-free validator; the GUI
+loader remains compatible with archived version-1 manifests.  For large
+coordinate sets the same viewer can filter by coordinate family, local domain,
+local pseudogroup and local or global total-symmetry character.
+
+The local-pseudosymmetry validation is summarized separately in
+Table~\ref{tab:local-salc-validation}.  The first probe is intentionally
+globally \(C_1\): it contains three equivalent C--H bonds at one carbon and an
+asymmetric C--F/C--O substituent framework.  The purpose is to verify that a
+local \(C_{3v}\) methyl domain can be used to place its symmetric stretch and
+bend combinations first without promoting the whole molecule to \(C_{3v}\).
+A rigid rotation by 0.731 rad about the normalized axis
+\((1,-2,0.5)\) leaves the complete center-domain diagnostic records identical.
+The separate Fortran path independently reports the same \(C_{3v}\) center,
+places \(A_1\) first and closes at 18 coordinates.  This test checks the local
+classification contract; the established tetrahedral control test continues
+to provide the stricter Python--Fortran ordered-primitive and Wilson-row check.
+The high-coordination extension is tested on both template geometries for each
+coordination number from five through nine.  Each geometry is repeated after a
+small angular distortion of one ligand, giving 20 models in each implementation.
+Python and Fortran retain the same local-group assignment and close at ranks
+12, 15, 18, 21 and 24 for CN 5, 6, 7, 8 and 9, respectively.
+For CN 10 and CN 12, for which no named template is assumed, both
+implementations select the generic equivalence fallback and close at ranks 27
+and 33.  Their Cartesian row-space residuals are $1.03\times10^{-8}$ and
+$1.06\times10^{-8}$, respectively.  Rotation and ligand permutation leave
+the accepted-template score and margin unchanged.  A separate near-tie stress
+test, with a deliberately widened absolute acceptance gate, is classified as
+\texttt{AMBIGUOUS} and therefore uses the same generic fallback.
+Two chemically named controls complement the anonymous polyhedral probes: a
+slightly distorted \(\mathrm{SF_6}\) structure gives the octahedral local block
+and closes at 15/15, while idealized square-antiprismatic
+\([\mathrm{ZrF_8}]^{4-}\) gives \(D_{4d}\) and closes at 21/21.  The former uses
+explicitly relaxed descriptor and distance thresholds (0.1 and 0.05~\AA),
+illustrating that pseudosymmetry is a declared construction choice rather than
+an implicit relabelling.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Local-pseudosymmetry validation with the local-SALC path enabled.
+The PG column is the exact molecular point group; the local column reports only
+the center or ring domain relevant to the test.}
+\label{tab:local-salc-validation}
+\begin{tabular}{@{}p{0.19\linewidth}p{0.08\linewidth}p{0.22\linewidth}p{0.12\linewidth}p{0.29\linewidth}@{}}
+\toprule
+System & PG & Local domain & Rank & Diagnostic check \\
+\midrule
+\(C_1\) methyl probe & \(C_1\) & center \(C_{3v}\) & 18/18 & identical after rigid rotation; Python and Fortran put local \(A_1\) first \\
+\midrule
+Benzene & \(D_{6h}\) & ring \(D_6\) & 30/30 & 12 color-preserving cyclic operations \\
+\midrule
+Toluene & \(C_s\) & substituted ring \(C_1\) & 39/39 & one cyclic operation at the default descriptor/distance tolerances \\
+\midrule
+Azulene & \(C_{2v}\) & two fused-ring domains & 48/48 & ring domains 1 and 2 recorded; one shared edge assigned once \\
+\midrule
+CN 5--9 centers & \(C_1\) & ten local polyhedral templates & 12--24 & 20 ideal/distorted models; Python--Fortran group and rank agreement \\
+\midrule
+CN 10/12 centers & \(C_1\) & generic equivalence fallback & 27/33 & Python--Fortran row-space residual below \(1.1\times10^{-8}\) \\
+\midrule
+\(\mathrm{SF_6}\), \([\mathrm{ZrF_8}]^{4-}\) & \(C_1\), \(D_{4d}\) & octahedral and square-antiprismatic domains & 15/15, 21/21 & frozen template, score, margin and thresholds recorded \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1572,22 +1787,6 @@ intended path mode when a scan leaves the high-symmetry stratum. \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-For every final SONIC, SMITH can also generate a pair of linearized Cartesian
-motion frames with the Wilson matrix frozen at the reference geometry,
-\(\Delta\mathbf{x}_k=\mathbf{B}_0^+\mathbf{e}_k\Delta q_k\) and
-\(\mathbf{x}_{k,\pm}=\mathbf{x}_0\pm\Delta\mathbf{x}_k\).  These frames are
-exactly symmetric and freeze all other SONICs to first order; they are
-visualization vectors rather than nonlinear back-transformations.  An optional
-mass-weighted right inverse
-\(\mathbf{M}^{-1/2}(\mathbf{B}_0\mathbf{M}^{-1/2})^+\) changes the Cartesian
-minimum-norm metric without changing that contract.  The mathematical step is
-kept separate from the viewer amplitude, which normalizes each half-vector to a
-selected maximum atomic displacement.  Per-coordinate records include
-conditioning, amplification, participation ratio and dominant atoms; ring
-records additionally preserve the ordered ring and primitive coefficients for
-highlighted visualization.  The regression gate generates and consumes all 114
-pagodane and all 51 indane motions, including their XYZ and vector files.
 
 \section{Application Probes}
 
@@ -1880,6 +2079,23 @@ Cartesian nullspace that is not built from GIC primitives; agreement shows that
 the chemical conclusion depends on topology, symmetry and rank, not on a hidden
 generator choice.
 
+Table~\ref{tab:local-salc-validation} adds a complementary check that is not
+available from molecular point-group tests alone: a chemically useful local
+totally symmetric coordinate remains identifiable in a \(C_1\) molecule, but
+it does not acquire a false molecular \(A_1\) label.  The ring cases show the
+same separation between a cyclic local subgroup and the exact molecular group.
+The local thresholds can change a domain partition near a boundary; because
+the tolerances, confidence, participating atoms and kept/pruned status are
+serialized, that change is auditable rather than implicit.
+The same table also removes the former high-coordination refactor boundary:
+both implementations now recognize the two documented templates for every
+coordination number from five to nine, while the generic construction closes
+CN 10 and CN 12 without introducing additional named polyhedra.  The
+ligand-equivalence fallback is also selected for unrecognized, ambiguous or
+chemically split environments.  Because the score, second-template margin,
+thresholds and selected status are serialized, this choice is fixed for LINK
+and auditable across a geometry trajectory.
+
 The internal validation in Table~\ref{tab:validation} establishes rank closure,
 symmetry-projector normalization and Python--Fortran row-space equivalence for
 representative cases.  This is an implementation-level cross-check inside
@@ -1994,7 +2210,10 @@ the paper.
 
 Other validation items remain open.  The local-stability statement gives an
 existence threshold \(\delta\) in terms of decision margins and Lipschitz
-constants, but no numerical values are reported for a real molecule.
+constants, but no general numerical values are reported for a real molecule.
+The local-SALC probe now supplies one rigid-rotation invariant and fixed-threshold
+classification test, but it is not yet a statistical tolerance-sensitivity
+study over thermally distorted structures.
 Near-threshold point-group perception has the same limitation: the
 implementation records operation residuals, minimum margins and warning flags,
 but quantitative tolerance-sensitivity tables remain future work.  Likewise,
@@ -2053,11 +2272,12 @@ provenance rather than hidden in an implementation choice.
 
 \section{Conclusions}
 
-\SONIC\ provides a general, frozen and symmetry-aware construction of
+Starting from an ORACLE redundant primitive/B contract, \SONIC\ provides a general, frozen and symmetry-aware construction of
 non-redundant internal coordinates.  Its main contribution is a
 reproducible coordinate object that integrates ingredients usually treated
 separately: natural-coordinate locality, analytic Wilson-\(\Bmat\) rank control,
-block-local point-group symmetrization and special coordinates for
+local \(A_1\)-first pseudosymmetry blocks, block-local point-group
+symmetrization and special coordinates for
 rings, fragments and interaction centers.  This is the coordinate object
 intended for reuse across Gaussian input generation, GF/PED vibrational scaling
 and force-field analysis, large-amplitude DVR grids, PES fitting,
@@ -2072,10 +2292,12 @@ with special-coordinate and pseudo-bond models for weak complexes within the
 validated baseline described above.  The next methodological step is to enlarge
 the pseudo-cycle validation corpus for intermolecular systems, using the same
 rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of \SONIC.
-The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
+The local-SALC validation additionally shows that center and ring
+pseudosymmetry can order coordinates without changing the exact molecular
+point group.  The Gaussian \texttt{ReadAllGIC} optimization probes show that the present
 contract is already usable as an external solver coordinate set, and the small
 iteration-count comparison places the generated \SONIC\ coordinates next to
-Gaussian defaults, Cartesians and hand-built Z matrices on the same inputs.  The
+Gaussian defaults, Cartesians and hand-built Z matrices on the same inputs.
 The puckering and portable chair-to-boat export probes illustrate why the same
 stored definition is relevant to large-amplitude work within the scope defined
 above.  Hessian-locality and GF/PED analyses using the frozen coordinate
@@ -2100,22 +2322,28 @@ executable documented in the accompanying scripts.  The method and basis set
 are stated with each probe.  The reported
 construction tests use fixed inputs and no stochastic seeds.  The
 Python implementation is checked against a separate Fortran control
-implementation for the corpus rows where that comparison is applicable.
+implementation for the corpus rows where that comparison is applicable.  The
+local-pseudosymmetry data can be regenerated with
+\texttt{scripts/run\_local\_salc\_validation.py}; it records the descriptor and
+distance tolerances, all final ranks, the rigid-rotation check and the
+Fortran center-classification result.
 
 \section*{Data and Code Availability}
 
 The manuscript repository at
 \url{https://github.com/yogibubu/Smith} contains the scripts, JSON data files,
 figures and Supporting Information used to generate the tables and application
-plots.  The same repository contains a reduced standalone Python package,
-installation instructions and water and norbornane examples.  Its
+plots, including \texttt{data/local\_salc\_validation.json} and its generating
+script.  The same repository contains a reduced standalone Python package,
+installation instructions and water, norbornane, formic-acid--water and
+$\eta^3$ allyl--palladium examples.  Its
 \texttt{smith-sonic build} command accepts either a validated ORACLE
 \texttt{xyzin} state or a single extended-XYZ input; the latter invokes the
 explicitly labelled reduced ORACLE profile.  SMITH, including optional Gaussian
 \texttt{ReadAllGIC} export, is developed at
 \url{https://github.com/yogibubu/MATRIX}.  The package pins only reduced-perception
-components; full ORACLE is described in its companion manuscript, remains in
-final validation, and will be released when ready.
+components; full ORACLE is described in its companion manuscript and is
+validated as an independent release candidate.
 Repository revisions and \texttt{\#SMITH\_PROVENANCE} record the code and
 perception profile.
 

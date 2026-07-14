@@ -1640,18 +1640,32 @@ freeze every other SONIC to first order; they are not presented as nonlinear
 back-transformations.  The amplitude is reduced if necessary to preserve
 perceived connectivity and proper orientation, keep the maximum atomic
 displacement below 0.10~\AA, and change no reference bond by 15\% or more.
+Both accepted frames are subjected to the complete ORACLE topology perception,
+rather than to a distance-only connectivity surrogate, and the number of full
+topology evaluations is retained in the diagnostic record.
 An optional mass-weighted right inverse,
 \(\mathbf{M}^{-1/2}(\mathbf{B}_0\mathbf{M}^{-1/2})^+\), provides the
 corresponding minimum-mass-norm vector without changing this first-order
-contract.  The mathematical step is distinct from the interactive display
+contract.  Its mass provenance is explicit: the user can select average atomic
+masses, default spectroscopic isotopes, masses stored with a Cartesian Hessian,
+or a named isotopologue; the automatic choice prefers Hessian masses when they
+are available and otherwise uses average masses.  The mathematical step is
+distinct from the interactive display
 amplitude: the viewer normalizes each half-vector to a user-selected maximum
 atomic displacement in \AA.  The machine record reports row-normalized
 conditioning, Cartesian amplification, participation ratio, significantly
-moving atoms and the dominant atom.  Ring motions additionally retain the
+moving atoms and the dominant atom.  It also stores the center, ring or bond
+domain, local pseudogroup, local irrep and independent local/global
+total-symmetry flags whenever those labels apply.  Ring motions additionally
+retain the
 canonical ring order and primitive coefficients, which are highlighted with
 their displacement arrows in the viewer.  The tests consume every generated
 three-frame XYZ trajectory and vector table through the same data loader used
-by the GUI.
+by the GUI.  The versioned \texttt{matrix.smith.sonic\_diagnostics.v2}
+manifest has a distributed JSON Schema and dependency-free validator; the GUI
+loader remains compatible with archived version-1 manifests.  For large
+coordinate sets the same viewer can filter by coordinate family, local domain,
+local pseudogroup and local or global total-symmetry character.
 
 The local-pseudosymmetry validation is summarized separately in
 Table~\ref{tab:local-salc-validation}.  The first probe is intentionally
@@ -2311,7 +2325,7 @@ Python implementation is checked against a separate Fortran control
 implementation for the corpus rows where that comparison is applicable.  The
 local-pseudosymmetry data can be regenerated with
 \texttt{scripts/run\_local\_salc\_validation.py}; it records the descriptor and
-distance tolerances, all four final ranks, the rigid-rotation check and the
+distance tolerances, all final ranks, the rigid-rotation check and the
 Fortran center-classification result.
 
 \section*{Data and Code Availability}
@@ -2321,7 +2335,8 @@ The manuscript repository at
 figures and Supporting Information used to generate the tables and application
 plots, including \texttt{data/local\_salc\_validation.json} and its generating
 script.  The same repository contains a reduced standalone Python package,
-installation instructions and water and norbornane examples.  Its
+installation instructions and water, norbornane, formic-acid--water and
+$\eta^3$ allyl--palladium examples.  Its
 \texttt{smith-sonic build} command accepts either a validated ORACLE
 \texttt{xyzin} state or a single extended-XYZ input; the latter invokes the
 explicitly labelled reduced ORACLE profile.  SMITH, including optional Gaussian

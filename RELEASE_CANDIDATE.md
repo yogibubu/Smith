@@ -28,12 +28,12 @@ python -m build --wheel --outdir "$SMITH_WHEEL_DIR" standalone
 ```
 
 The pinned MATRIX revision is
-`711a8283ba50a064ae36a438f8c6e5a24e1fe0e7`. Change it only after repeating
+`598773a1c72a70d3a76c943a372cc5e204490ae9`. Change it only after repeating
 the clean verification and all four packaged examples.
 
 ## Editorial gate
 
 The final manuscript reading, manual PDF regeneration and independent arXiv
-source compilation were completed on 13 July 2026.  The stable release tag
+source compilation were completed on 14 July 2026.  The stable release tag
 remains intentionally gated on the collaborator's confirmation of the pinned
 standalone candidate.

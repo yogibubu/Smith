@@ -148,10 +148,17 @@ symmetric and are checked for the first-order SONIC displacement, unchanged
 connectivity, proper orientation, a maximum atom displacement not above
 0.10~\AA, and a maximum relative reference-bond change below 0.15.  Every
 three-frame XYZ file and Cartesian-vector table is parsed by the GUI data
-contract.  The manifest also records the optional Euclidean or mass-weighted
-right-inverse metric, coordinate conditioning and localization, and canonical
-ring order with primitive coefficients.  Animation amplitude is independent of
-the mathematical step and is normalized to a selected maximum atom displacement.
+contract.  The version-2 manifest also records the optional Euclidean or
+mass-weighted right-inverse metric, the explicit average/default-isotope/
+Hessian/isotopologue mass provenance, coordinate conditioning and localization,
+the number of complete ORACLE topology evaluations, local-domain and
+local/global total-symmetry labels, and canonical ring order with primitive
+coefficients.  A distributed JSON Schema and dependency-free validator define
+the current machine contract, while the reader accepts archived version-1
+manifests.  Animation amplitude is independent of the mathematical step and is
+normalized to a selected maximum atom displacement.  The GUI can filter the
+resulting set by family, local domain, local pseudogroup and local or global
+total-symmetry character.
 
 \enlargethispage{2\baselineskip}
 \begingroup

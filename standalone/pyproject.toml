@@ -10,20 +10,20 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "numpy>=1.26",
-  "matrix-core @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-core",
-  "matrix-chem @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-chem",
-  "matrix-engines @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-engines",
-  "matrix-fragments @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-fragments",
-  "matrix-gaussian @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-gaussian",
-  "matrix-neo @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-neo",
-  "matrix-qm @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-qm",
-  "matrix-rovib @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-rovib",
+  "matrix-core @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-core",
+  "matrix-chem @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-chem",
+  "matrix-engines @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-engines",
+  "matrix-fragments @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-fragments",
+  "matrix-gaussian @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-gaussian",
+  "matrix-neo @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-neo",
+  "matrix-qm @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-qm",
+  "matrix-rovib @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-rovib",
 ]
 
 [project.optional-dependencies]
 test = [
-  "matrix-morpheus @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-morpheus",
-  "matrix-trinity @ git+https://github.com/yogibubu/MATRIX.git@711a8283ba50a064ae36a438f8c6e5a24e1fe0e7#subdirectory=packages/matrix-trinity",
+  "matrix-morpheus @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-morpheus",
+  "matrix-trinity @ git+https://github.com/yogibubu/MATRIX.git@598773a1c72a70d3a76c943a372cc5e204490ae9#subdirectory=packages/matrix-trinity",
 ]
 
 [project.scripts]

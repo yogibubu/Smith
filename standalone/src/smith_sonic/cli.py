@@ -34,7 +34,7 @@ REQUIRED_ORACLE_SECTIONS = (
     "PRIMITIVES",
 )
 PROVENANCE_SCHEMA = "matrix.smith.standalone.v1"
-MATRIX_REVISION = "8fc2607a61c8f54f0f7cb69fe76498ea463f55c6"
+MATRIX_REVISION = "598773a1c72a70d3a76c943a372cc5e204490ae9"
 DEFAULT_G16_ROUTE = "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 EXAMPLES = {
     "water": ("water.smith.xyz", False),
