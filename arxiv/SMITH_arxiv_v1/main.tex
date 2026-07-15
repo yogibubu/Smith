@@ -626,13 +626,13 @@ representative torsional coordinate per exocyclic bond, selected by a CIP-like
 priority based on the continuous effective atomic numbers and local
 connectivity.  Symmetry-equivalent alternatives are averaged when they belong
 to the same local orbit.
-\item Endocyclic valence-angle and torsional source spaces are generated ring
+\item Endocyclic valence-angle and curvilinear out-of-plane source spaces are generated ring
 by ring.  Their active combinations are not arbitrary lists of primitive
 angles or dihedrals; they are block-local deformation and puckering components.
 For an \(n\)-membered ring, the default active puckering source dimension is
 \(n-3\), with Fourier-style component vectors and optional
 bond-order-based flexibility factors.  Ring stretches, valence angles and
-torsions remain separate local source blocks, and the cyclic operations used
+out-of-plane puckering sources remain separate local source blocks, and the cyclic operations used
 for local ordering must preserve the atom/synthon coloring of the ring.
 \item Fused and condensed rings introduce additional torsional sources,
 including butterfly coordinates around bonds shared by two rings.  These rows
@@ -760,7 +760,7 @@ For a ring, the candidate local operations are the rotations and reversals of
 the cyclic atom order.  Only operations preserving the effective-atomic-number/
 synthon coloring and the outgoing-bond signature are retained.  The resulting
 cyclic subgroup is recorded with its operation count and confidence, while
-ring stretches, endocyclic valence angles and ring torsions are transformed in
+ring stretches, endocyclic valence angles and ring out-of-plane sources are transformed in
 separate blocks.  In a fused system a shared edge is owned by the first ring
 stretch domain and reported as shared in the subsequent domain, avoiding a
 duplicate stretch source.  For an exocyclic central bond, equivalent primitive
@@ -794,15 +794,24 @@ unphysical zero-degree torsion.
 
 Ring coordinates are the main place where primitive internal coordinates must
 be replaced by natural combinations.  An \(n\)-membered ring has redundant
-endocyclic angle and dihedral lists.  \SONIC\ constructs ring deformation
+endocyclic angle and out-of-plane source lists.  \SONIC\ constructs ring deformation
 coordinates and \(RPck\) puckering components as linear combinations of those
 source rows, keeping \(n-3\) independent puckering components for rings larger
 than three atoms.  The endocyclic valence-angle combinations are the CyGNA
 source family and are stored as \(RDef\) rows; the corresponding endocyclic
-torsional combinations are stored as \(RPck\) rows.  The polar
+out-of-plane combinations are stored as \(RPck\) rows.  For each ordered ring
+stencil \(D(a,b,c,d)\), the native source is the curvilinear coordinate
+\(U(b,a,d,c)\); the dihedral only specifies the cyclic atom ordering.  These
+signed U sources are the closest local curvilinear counterpart of the
+Cremer--Pople puckering displacements, while retaining analytic Wilson rows
+and a direct local definition for planar and nonplanar rings.  This is a
+geometric analogy, not an identification: Cremer--Pople coordinates describe
+global ring-shape amplitudes and phases, whereas the (U) rows are local,
+signed curvilinear sources from which the active (RPck) combinations are
+constructed.  The polar
 Cremer--Pople-like descriptors \(Q\) and \(\phi\) are useful for
 interpretation, but the active coordinate basis stores linear \(RPck\) rows
-because their \(\Bmat\) rows are analytic linear combinations of dihedral
+because their \(\Bmat\) rows are analytic linear combinations of out-of-plane
 derivatives.\cite{CremerPople1975}
 For every selected cosine--sine puckering pair, \SMITH\ can also emit the
 derived observables
@@ -817,7 +826,7 @@ than additional rank-carrying coordinates.
 The ring rows are a constructive extension of the natural-coordinate principle
 to cyclic source lists rather than a direct quotation of a published
 molecule-specific formula.  If \(s_j\) denotes such a list, for example the
-endocyclic valence angles or a torsional puckering list, the stored rows are
+endocyclic valence angles or a curvilinear out-of-plane puckering list, the stored rows are
 real Fourier-like combinations
 \begin{equation}
 \label{eq:ring-fourier-combinations}
@@ -827,7 +836,7 @@ real Fourier-like combinations
 with the alternating row \(Q_{n/2}=n^{-1/2}\sum_j(-1)^{j-1}s_j\) for even
 \(n\).  The normalization \(N_m\) is chosen so that coefficient vectors are
 unit length before the symmetry projection.  Thus the same cyclic algebra is
-used for the CyGNA valence-angle family and for \(RPck\) torsional puckering
+used for the CyGNA valence-angle family and for \(RPck\) out-of-plane puckering
 rows; only the source primitive list changes.
 
 For a six-membered ring segment \(1\cdots6\), a typical generated angle row has
@@ -841,13 +850,14 @@ RDef &=
 \end{aligned}
 \end{equation}
 and the analogous puckering row is built from the corresponding cyclic
-dihedrals with the same normalized coefficient pattern.  In the frozen
+\(U\) coordinates with the same normalized coefficient pattern.  In the frozen
 contract these rows carry family labels, source primitive identifiers and
 symmetry labels; \(Q\) and \(\phi\) are then functions of the \(RPck\) rows, not
 replacement active coordinates.
 Table~\ref{tab:ring-coordinate-examples} gives representative generated ring
 rows in a compact cyclic notation.  Let
-\(A_i=A(i-1,i,i+1)\) and \(\tau_i=D(i,i+1,i+2,i+3)\), with atom indices taken
+\(A_i=A(i-1,i,i+1)\) and
+\(u_i=U(i+1,i,i+3,i+2)\), with atom indices taken
 modulo six.  The printed signs are one valid gauge; for degenerate irreps a
 different orthonormal pair spans the same symmetry subspace.
 
@@ -869,13 +879,13 @@ Stored row & Symmetry & Linear form \\
 \(\left(2A_1-A_2-A_3+2A_4-A_5-A_6\right)/\sqrt{12}\) \\
 \midrule
 \(A_{1g}RPck001\) & \(A_{1g}\) &
-\(\left(2\tau_1-\tau_2-\tau_3+2\tau_4-\tau_5-\tau_6\right)/\sqrt{12}\) \\
+\(\left(2u_1-u_2-u_3+2u_4-u_5-u_6\right)/\sqrt{12}\) \\
 \midrule
 \(E_uRPck001\) & \(E_u\) &
-\(\left(\tau_1-\tau_2-\tau_4+\tau_5\right)/2\) \\
+\(\left(u_1-u_2-u_4+u_5\right)/2\) \\
 \midrule
 \(E_uRPck002\) & \(E_u\) &
-\(\left(\tau_1+\tau_2-2\tau_3-\tau_4-\tau_5+2\tau_6\right)/\sqrt{12}\) \\
+\(\left(u_1+u_2-2u_3-u_4-u_5+2u_6\right)/\sqrt{12}\) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -886,8 +896,9 @@ Fern{\'a}ndez-Ramos explicitly reduces the puckering dimensionality in the
 presence of rigid or multiple bonds and then recovers the full ring geometry by
 distributing the remaining distortions under constraints.\cite{LemaSaavedraFernandezRamos2026RingCP}
 The present \SONIC\ construction already introduces bond-order-dependent
-flexibility factors in \(RPck\) source vectors, so dihedrals centered on more
-rigid bonds contribute less to the puckering row.  The rigid-bond treatment of
+flexibility factors in \(RPck\) source vectors, so out-of-plane sources
+associated with more rigid ring bonds contribute less to the puckering row.
+The rigid-bond treatment of
 Ref.~\citenum{LemaSaavedraFernandezRamos2026RingCP} is therefore most naturally
 viewed in \SONIC\ as a stronger, optional source-space contraction rather than as
 a rewrite of the covalent graph.  A rigid bond \(i-j\) can be replaced, inside
@@ -1807,15 +1818,15 @@ optimization.  No hand-written surrogate coordinates are introduced.  The three
 systems in Table~\ref{tab:readallgic-opt} were chosen because they exercise
 ring and cage coordinates while remaining small enough for repeated external
 checks.  The native \SONIC\ contract can represent signed out-of-plane rows and
-block-local multi-dihedral \(RPck\) puckering rows.  Commercial Gaussian 16 has no native \(U\) out-of-plane
+block-local multi-\(U\) \(RPck\) puckering rows.  Commercial Gaussian 16 has no native \(U\) out-of-plane
 primitive, and the official Gaussian GIC documentation warns that active
 generic coordinates combining multiple periodic dihedrals can behave poorly
 because the periodicity of the component torsions is not applied inside the
 composite expression.\cite{GaussianGICManual}  The commercial
 \texttt{ReadAllGIC} export therefore uses the Gaussian 16 profile by default:
 \(U\) rows are replaced by the corresponding
-Gaussian improper dihedrals, multi-dihedral \SONIC\ rows are not written to the
-Gaussian input, and all component \(D(\cdots)\) terms are added as active
+Gaussian improper dihedrals, composite \(RPck\) rows are not written to the
+Gaussian input, and all terminally translated component \(D(\cdots)\) terms are added as active
 redundant periodic coordinates.  After the Gaussian optimization, \SMITH\ reads
 the optimized Cartesian structure and evaluates it again in the frozen
 non-redundant \SONIC\ contract.  The calculations reported here used Gaussian
@@ -1923,14 +1934,15 @@ HF/STO-3G optimization steps.  The commercial Gaussian 16 compatibility input
 uses the Fortran/G16 improper-dihedral convention
 \(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving \(D(4,6,8,7)\) for the same local
 non-planarity.  For ring puckering, commercial Gaussian 16 receives the
-individual periodic dihedrals that enter each \(RPck\) row as active redundant
+individual periodic dihedrals obtained by terminal translation of the
+\(U\) sources of each \(RPck\) row as active redundant
 coordinates; the original \(RPck\) combinations are retained only in the
 \SMITH\ contract and do not appear in the commercial Gaussian 16 input.  The
 optimized structure is then projected back onto the native \SONIC\ contract.
 This compatibility export is less compact than the native
 form, but it allows standard Gaussian 16 to be used without relying on
 development-only primitives.  The native \SONIC\ contract still defines \(U\),
-multi-dihedral \(RPck\), \(QPck\) and \(\Phi P\).
+multi-\(U\) \(RPck\), \(QPck\) and \(\Phi P\).
 For the symmetry-enabled norbornane export, the full rank-complete contract
 contains 51 generated rows, of which 36 non-totally symmetric rows are marked
 \texttt{Frozen}.  This directly tests frozen-irrep handling through the

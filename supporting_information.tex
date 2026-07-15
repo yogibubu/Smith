@@ -62,8 +62,9 @@ The reduced package distributed with the manuscript constructs the same
 contract with \texttt{smith-sonic build norbornane.smith.xyz norbornane.xyzin}
 and automatically writes both \texttt{norbornane.smith.out} and
 \texttt{norbornane.g16.gjf}.  The default Gaussian 16 profile suppresses active
-multi-dihedral \SONIC\ rows in the Gaussian file and writes their component periodic
-\texttt{D(...)} coordinates instead; the non-redundant \SONIC\ rows remain in
+composite, U-based ring-puckering \SONIC\ rows in the Gaussian file and writes
+their terminally translated component periodic \texttt{D(...)} coordinates
+instead; the non-redundant \SONIC\ rows remain in
 the \texttt{xyzin} contract used for post-processing.
 
 \subsection*{SMITH/SONIC input}
@@ -72,7 +73,7 @@ the \texttt{xyzin} contract used for post-processing.
 
 \subsection*{Generated Gaussian 16 input}
 
-\lstinputlisting[caption={Commercial Gaussian 16-compatible \texttt{ReadAllGIC} input generated automatically from the SMITH/SONIC contract.  Multi-dihedral \SONIC\ ring-puckering rows are absent by construction; their component periodic dihedrals appear as \texttt{V0001}, \texttt{V0002}, \ldots.}]{si/norbornane_g16_readallgic.gjf}
+\lstinputlisting[caption={Commercial Gaussian 16-compatible \texttt{ReadAllGIC} input generated automatically from the SMITH/SONIC contract.  Composite U-based \SONIC\ ring-puckering rows are absent by construction; their terminally translated component periodic dihedrals appear as \texttt{V0001}, \texttt{V0002}, \ldots.}]{si/norbornane_g16_readallgic.gjf}
 
 \subsection*{Gaussian 16 output excerpt}
 
