@@ -34,13 +34,13 @@ python -m venv "$SMITH_ENV"
 source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip
 python -m pip install \
-  "smith-sonic @ git+https://github.com/yogibubu/Smith.git@agent/oracle-boundary-standalone-smith#subdirectory=standalone"
+  "smith-sonic @ git+https://github.com/yogibubu/Smith.git@v0.1.0rc4#subdirectory=standalone"
 ```
 
 The environment directory is selected by the installer.  The package contains
 no absolute path to the developer's machine.
-The branch name can be replaced by `main` after the release candidate is
-merged.
+The immutable tag is deliberate; replacing it by `main` would make the
+manuscript environment depend on later, unvalidated changes.
 
 For a local checkout:
 

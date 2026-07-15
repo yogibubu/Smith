@@ -382,8 +382,10 @@ in the companion ORACLE manuscript, while the production application remains
 in final validation before release.
 In particular, ORACLE defines the molecular graph and cycle basis, point-group
 operations and atom permutations, atom equivalence, effective atomic numbers,
-the charge, covalency, delocalization, strain, bond-order and synthon
-descriptors used below.  \SMITH\ consumes these objects and does not recompute
+the charge, covalency, delocalization and strain, the topological edge order,
+the distinct Mayer/Pauling multiplicity, and separate
+$\sigma$, first-$\pi$ and second-$\pi$ ($\pi\pi$) synthon indices used below.
+\SMITH\ consumes these objects and does not recompute
 them.  ORACLE also supplies the ordinary stretch, bend, linear-bend, dihedral
 and out-of-plane source definitions and their reference B matrix.  \SMITH\ may
 add fragment exponential-map, pseudo-bond, ring-puckering, interaction-center
@@ -400,7 +402,7 @@ For standalone use the same information can be supplied in a single
 coordinates.  Optional SMITH directives follow after the atom list, so the same
 file can still be opened by ordinary XYZ viewers while carrying construction
 options such as symmetrization, \texttt{SYCART} export, fragment treatment,
-X--H policies, improper-dihedral compatibility and an optional reduced working
+X--H policies and an optional reduced working
 subgroup.  The reduced standalone distribution invokes a pinned, limited
 ORACLE perception profile for this plain-XYZ convenience path and records
 \texttt{PERCEPTION\_PROFILE REDUCED\_ORACLE} in the output.  This mode is
@@ -424,11 +426,16 @@ that combine nuclear charge with local coordination, distance-derived
 bond-order information, angular rigidity and delocalization-like terms.  These
 continuous descriptors order atoms and ligands in cases where a pure graph
 label would be ambiguous.  The topology layer also exposes synthon
-descriptors--charge, covalency, delocalization, strain and effective
-nuclear charge--which provide a natural route to more refined equivalence
+descriptors--charge, covalency, delocalization, strain, effective nuclear
+charge and incident $\sigma/\pi/\pi\pi$ indices--which provide a natural route
+to more refined equivalence
 classes.  In the present contract, this continuous perception enters ring
 orientation, ligand grouping, local stretch equivalence, high-coordination
-templates and the one-dihedral exocyclic torsion rule.
+templates and the one-dihedral exocyclic torsion rule.  In particular, ring
+puckering diagnostics report the first- and second-$\pi$ indices of every
+endocyclic central bond alongside its topological order and flexibility factor.
+Triple-bond character is therefore not collapsed into the same aggregate
+$\max(\mathrm{BO}-1,0)$ used historically for all multiple bonds.
 The reproducibility statements below are conditional on these descriptors being
 part of the frozen input state.  In other words, \SONIC\ does not assume an
 unstated human perception step: the descriptor values, perception version,
@@ -928,13 +935,13 @@ local ring role.
 
 \subsection{Out-of-Plane and Improper Coordinates}
 
-Three-coordinate centers generate out-of-plane coordinates unless all four
-atoms involved are cyclic.  The standalone and command-line workflows default
-to the commercial Gaussian 16 profile and therefore emit Gaussian-compatible
-improper dihedrals.  The native analytic \(U\) coordinate remains part of the
-internal function registry and validation layer.  This distinction is an
-output convention, not a change in the reduction policy: both forms occupy the
-same local non-planarity role and are treated as their own coordinate family.
+Three-coordinate centers generate native analytic out-of-plane coordinates
+unless all four atoms involved are cyclic.  This \(U\) definition is used both
+for the primitive source and for the final SONIC coordinate; an improper
+dihedral is never selected during ORACLE perception or SMITH reduction.  Only
+the Gaussian~16 \texttt{.gjf} writer translates
+\(U(I,J,K,L)\mapsto D(J,I,L,K)\).  Thus Gaussian compatibility is a terminal
+serialization step and cannot change the native coordinate model.
 
 \section{Rank Reduction}
 
@@ -1298,6 +1305,60 @@ on LINK's step, initial-Hessian and trust policies and are therefore reserved
 for the dedicated optimizer study rather than treated here as properties of
 the \SONIC\ generator.
 
+\subsection{Finite predictor--constrained corrector realization}
+The Wilson right inverse remains appropriate for infinitesimal motion and for
+the symmetric display vectors discussed below, but it is not used as the
+primary generator of a large soft-coordinate displacement.  The nonlinear
+realization service distributed with the \SONIC\ contract instead uses a
+predictor--corrector construction.  Acyclic one-dihedral coordinates are
+recognized by removing their central bond from the frozen graph.  When this
+separates the graph, one component is rotated rigidly through the requested
+finite angle,
+\begin{equation}
+ \mathbf x_i'=\mathbf a+
+ \exp\!\left([\Delta\phi\,\hat{\mathbf u}]_\times\right)
+ (\mathbf x_i-\mathbf a),
+\end{equation}
+which is the Rodrigues rotation written as an exponential map.  Complete
+interfragment translation and orientation triplets are imposed as rigid-body
+motions; rotation increments are composed on \(\mathrm{SO}(3)\), rather than
+added as large rotation vectors.
+
+After this finite predictor, stretches, bends and the other hard targets are
+restored by damped least squares in the numerical null space of the protected
+soft rows.  If \(B_h\) and \(B_s\) denote the current hard and protected-soft
+Wilson blocks and \(Z_s\) spans \(\ker B_s\), the corrector solves
+\begin{equation}
+ \min_{\mathbf y}
+ \left\|B_hZ_s\mathbf y-\mathbf r_h\right\|^2
+ +\lambda\|\mathbf y\|^2,
+ \qquad \Delta\mathbf x=Z_s\mathbf y .
+\end{equation}
+The finite predictor is reapplied after each nonlinear correction, so the hard
+projection cannot systematically retract the requested torsion or fragment
+pose.
+
+A single bond rotation is not a valid finite predictor for a cyclic bond.
+Ring-puckering, butterfly, inversion, mixed torsional SALCs and other coupled
+soft coordinates therefore follow a continuation path.  Each path increment
+is corrected before the next is taken, so ring closure and the selected hard
+coordinates are enforced throughout.  The default maximum increment is
+0.12 rad and is reduced effectively by adding substeps near linear geometries;
+both this value and the maximum number of substeps are exposed by LINK and its
+GUI.  Thus scan points and SENTINEL candidates use the same frozen \SONIC
+semantics, while choosing the appropriate finite or continuation realization
+from the coordinate topology.
+
+For PES exploration the equilibrium SONIC contract is not blindly reused with
+its reference point-group adaptation.  SMITH constructs a transient basis in a
+user-declared retained group, understood as the symmetry common to the entire
+scan or population and defaulted to \(C_1\).  ORACLE may still detect and
+project a different instantaneous Cartesian point group at every geometry for
+the subsequent energy calculation; that operation never relabels the frozen
+exploration variables.  Exocyclic torsions used as scan genes remain single
+physical dihedrals and are excluded from both local and retained-group SALC
+combination.
+
 Interaction centers extend the same idea to non-atomic reference objects.  A
 center may be a ring centroid, a bond midpoint or a contact center.  Distances
 from atoms or fragments to such centers are special coordinates and
@@ -1457,7 +1518,7 @@ Ring deformation/puckering & Active & Endocyclic angle and torsion sources gener
 \midrule
 Butterfly/condensed rings & Active & Fused-ring butterfly and condensed torsion families remain separate homogeneous source blocks. \\
 \midrule
-Out-of-plane/improper rows & Active & Gaussian 16-compatible improper dihedrals are the standalone default; native \(U\) rows remain analytically available. \\
+Out-of-plane rows & Active & Native \(U\) primitives and SONICs; improper dihedrals are generated only in a requested Gaussian 16 \texttt{.gjf} export. \\
 \midrule
 Special fragment coordinates & Active & Fragment-center distances, center-atom distances, translations and orientations are protected first. \\
 \midrule
@@ -2327,8 +2388,9 @@ naturally be built.
 
 The calculations reported in the validation and application sections were
 generated with the \SMITH\ implementation in MATRIX and Python 3.13.11.  The
-software state corresponding to this preprint is identified by the MATRIX and
-manuscript repository revisions recorded with the archived submission.  Gaussian
+frozen code state is MATRIX tag \texttt{v0.1.0rc4}, commit
+\texttt{cf5fdcebb85a5035d5c0400d7cc2398a0580df66}; the corresponding SMITH
+manuscript tag and checksums are recorded with the archived submission.  Gaussian
 optimization jobs used Gaussian 16; other Gaussian-family probes use the local
 executable documented in the accompanying scripts.  The method and basis set
 are stated with each probe.  The reported
@@ -2356,7 +2418,9 @@ explicitly labelled reduced ORACLE profile.  SMITH, including optional Gaussian
 \url{https://github.com/yogibubu/MATRIX}.  The package pins only reduced-perception
 components; full ORACLE is described in its companion manuscript and is
 validated as an independent release candidate.
-Repository revisions and \texttt{\#SMITH\_PROVENANCE} record the code and
+The reproducible standalone environment is tagged \texttt{v0.1.0rc4} in the
+SMITH repository and pins the exact MATRIX commit stated above. Repository
+revisions and \texttt{\#SMITH\_PROVENANCE} record the code and
 perception profile.
 
 \section*{Author Contributions}

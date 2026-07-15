@@ -2388,8 +2388,9 @@ naturally be built.
 
 The calculations reported in the validation and application sections were
 generated with the \SMITH\ implementation in MATRIX and Python 3.13.11.  The
-software state corresponding to this preprint is identified by the MATRIX and
-manuscript repository revisions recorded with the archived submission.  Gaussian
+frozen code state is MATRIX tag \texttt{v0.1.0rc4}, commit
+\texttt{cf5fdcebb85a5035d5c0400d7cc2398a0580df66}; the corresponding SMITH
+manuscript tag and checksums are recorded with the archived submission.  Gaussian
 optimization jobs used Gaussian 16; other Gaussian-family probes use the local
 executable documented in the accompanying scripts.  The method and basis set
 are stated with each probe.  The reported
@@ -2417,7 +2418,9 @@ explicitly labelled reduced ORACLE profile.  SMITH, including optional Gaussian
 \url{https://github.com/yogibubu/MATRIX}.  The package pins only reduced-perception
 components; full ORACLE is described in its companion manuscript and is
 validated as an independent release candidate.
-Repository revisions and \texttt{\#SMITH\_PROVENANCE} record the code and
+The reproducible standalone environment is tagged \texttt{v0.1.0rc4} in the
+SMITH repository and pins the exact MATRIX commit stated above. Repository
+revisions and \texttt{\#SMITH\_PROVENANCE} record the code and
 perception profile.
 
 \section*{Author Contributions}

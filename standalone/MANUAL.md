@@ -29,7 +29,7 @@ export SMITH_CHECKOUT=/path/to/your/Smith
 export SMITH_ENV=/path/to/your/smith-venv
 git clone https://github.com/yogibubu/Smith.git "$SMITH_CHECKOUT"
 cd "$SMITH_CHECKOUT"
-git switch agent/oracle-boundary-standalone-smith
+git switch --detach v0.1.0rc4
 python3 -m venv "$SMITH_ENV"
 source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip
@@ -38,8 +38,8 @@ python -m pip install ./standalone
 
 Replace the two `/path/to/your/...` values with directories chosen by the user.
 On Windows PowerShell, define the corresponding paths and activate the
-environment with `<smith-env>\Scripts\Activate.ps1`.  The branch-switch command
-will no longer be needed after the release-candidate branch is merged.
+environment with `<smith-env>\Scripts\Activate.ps1`.  The detached checkout is
+intentional and fixes both the standalone wrapper and its MATRIX dependency.
 
 ## 3. Command summary
 

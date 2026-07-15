@@ -29,7 +29,7 @@ export SMITH_CHECKOUT=/path/to/your/Smith
 export SMITH_ENV=/path/to/your/smith-venv
 git clone https://github.com/yogibubu/Smith.git "$SMITH_CHECKOUT"
 cd "$SMITH_CHECKOUT"
-git switch agent/oracle-boundary-standalone-smith
+git switch --detach v0.1.0rc4
 python3 -m venv "$SMITH_ENV"
 source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip
@@ -46,8 +46,8 @@ On Windows PowerShell, activation is:
 <smith-env>\Scripts\Activate.ps1
 ```
 
-After the release-candidate branch is merged, the `git switch` line is no
-longer needed.
+The detached checkout is intentional: it guarantees that the test uses the
+immutable release-candidate tag rather than a moving branch.
 
 ## 3. Run the packaged examples
 

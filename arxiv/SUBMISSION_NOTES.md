@@ -4,7 +4,7 @@
 - Suggested cross-list: `physics.comp-ph` (Computational Physics), if desired
 - Top-level TeX file: `main.tex`
 - Compiler: `pdfLaTeX`
-- Suggested comments: `62 pages, 6 figures; Supporting Information supplied as a 7-page ancillary PDF; code and reproducibility materials available from the linked repositories.`
+- Suggested comments: `64 pages, 6 figures; Supporting Information supplied as a 7-page ancillary PDF; code and reproducibility materials available from the linked repositories.`
 - Journal reference and DOI: leave blank for version 1
 - License: the arXiv perpetual, non-exclusive distribution license is the conservative default pending the final journal choice
 
