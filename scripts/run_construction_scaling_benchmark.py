@@ -59,7 +59,7 @@ class Trial:
 def run_trial(name: str, source_name: str, symmetrize: bool, fragment_mode: str) -> Trial:
     from matrix_chem import preprocess_to_enriched_xyz, read_enriched_xyz, write_validation_section
     from matrix_fragments import write_fragment_build_section, write_interaction_center_section
-    from matrix_neo import build_gic_b_matrix, write_gicforge_build_sections
+    from matrix_smith import build_gic_b_matrix, write_gicforge_build_sections
 
     with TemporaryDirectory(prefix=f"smith-bench-{name}-") as tmp:
         tmp_path = Path(tmp)

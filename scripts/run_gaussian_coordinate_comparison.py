@@ -66,7 +66,7 @@ def prepare_inputs() -> None:
     add_matrix_packages_to_path()
     from matrix_chem import preprocess_to_enriched_xyz, read_enriched_xyz, write_validation_section
     from matrix_gaussian import write_gicforge_gaussian_input
-    from matrix_neo import write_gicforge_build_sections
+    from matrix_smith import write_gicforge_build_sections
 
     source_root = matrix_root() / "tests" / "fixtures" / "test_molecules" / "molecules"
     for name, source_name, zmat_source_name in SYSTEMS:
@@ -191,7 +191,7 @@ def run_gaussian(executable: str) -> None:
 
 def summarize_results() -> dict[str, object]:
     add_matrix_packages_to_path()
-    from matrix_neo import read_gic_definition_from_xyzin
+    from matrix_smith import read_gic_definition_from_xyzin
 
     systems = []
     for name, source, zmat_source in SYSTEMS:

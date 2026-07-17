@@ -53,7 +53,7 @@ def build_data_from_qm() -> dict[str, object]:
     add_matrix_packages_to_path()
 
     from matrix_chem import preprocess_to_enriched_xyz, write_validation_section
-    from matrix_neo import build_gic_b_matrix_from_xyzin, write_gicforge_build_sections
+    from matrix_smith import build_gic_b_matrix_from_xyzin, write_gicforge_build_sections
 
     fchk = parse_fchk(QM_DIR / "cyclobutane_hfsto3g.fchk")
     atom_symbols = atomic_symbols(fchk["atomic_numbers"])

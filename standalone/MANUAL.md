@@ -29,7 +29,7 @@ export SMITH_CHECKOUT=/path/to/your/Smith
 export SMITH_ENV=/path/to/your/smith-venv
 git clone https://github.com/yogibubu/Smith.git "$SMITH_CHECKOUT"
 cd "$SMITH_CHECKOUT"
-git switch --detach v0.1.0rc4
+git switch --detach v0.1.0rc5
 python3 -m venv "$SMITH_ENV"
 source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip

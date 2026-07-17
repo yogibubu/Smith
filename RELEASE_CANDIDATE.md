@@ -1,4 +1,4 @@
-# SMITH 0.1.0rc4 acceptance record
+# SMITH 0.1.0rc5 acceptance record
 
 SMITH is ready for collaborator release-candidate testing when every item below
 passes from a clean Python 3.11+ environment.
@@ -28,12 +28,12 @@ python -m build --wheel --outdir "$SMITH_WHEEL_DIR" standalone
 ```
 
 The pinned MATRIX revision is
-`cf5fdcebb85a5035d5c0400d7cc2398a0580df66`. Change it only after repeating
+`4003cd7b8607446036134ca52386397138a9b957`. Change it only after repeating
 the clean verification and all four packaged examples.
 
 ## Editorial gate
 
-The code bundle is built from the MATRIX tag `v0.1.0rc4`, whose commit is the
+The code bundle is built from the MATRIX tag `smith-v0.1.0rc5`, whose commit is the
 pinned revision above.  The manuscript, manual and independent arXiv source
 compilation must be regenerated from the matching SMITH tag before the final
 collaborator handoff.  Publication remains gated on the collaborator's report;

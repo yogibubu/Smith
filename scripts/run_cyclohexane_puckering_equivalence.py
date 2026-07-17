@@ -57,7 +57,7 @@ def prepare_inputs() -> None:
 
     from matrix_chem import preprocess_to_enriched_xyz, write_validation_section
     from matrix_gaussian import write_gicforge_gaussian_input
-    from matrix_neo import gaussian_gic_lines_from_xyzin, write_gicforge_build_sections
+    from matrix_smith import gaussian_gic_lines_from_xyzin, write_gicforge_build_sections
 
     RUN_DIR.mkdir(parents=True, exist_ok=True)
     atoms, chair = read_cyclohexane_fixture()

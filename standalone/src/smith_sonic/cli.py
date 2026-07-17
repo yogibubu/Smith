@@ -12,9 +12,12 @@ from matrix_fragments import (
     write_fragment_build_section,
     write_interaction_center_section,
 )
-from matrix_neo import write_gic_report, write_gicforge_gaussian_input
-from matrix_neo.definition import write_sonic_build_sections_from_cartesian
-from matrix_neo.standalone import (
+from matrix_smith import (
+    write_gic_report,
+    write_gicforge_gaussian_input,
+    write_sonic_build_sections_from_cartesian,
+)
+from matrix_smith.standalone import (
     _normalized_source_kind,
     _optional_bool,
     _optional_string,
@@ -34,7 +37,7 @@ REQUIRED_ORACLE_SECTIONS = (
     "PRIMITIVES",
 )
 PROVENANCE_SCHEMA = "matrix.smith.standalone.v1"
-MATRIX_REVISION = "cf5fdcebb85a5035d5c0400d7cc2398a0580df66"
+MATRIX_REVISION = "4003cd7b8607446036134ca52386397138a9b957"
 DEFAULT_G16_ROUTE = "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 EXAMPLES = {
     "water": ("water.smith.xyz", False),

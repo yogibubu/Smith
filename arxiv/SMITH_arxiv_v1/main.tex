@@ -1536,12 +1536,41 @@ Local-pseudosymmetry SALCs & Active optional path & Center, ring and bond domain
 \midrule
 Sparse Wilson-\(\Bmat\) representation & Validated baseline & Sparse derivative rows are stored; dense matrices are only audit representations. \\
 \midrule
+Sparse first derivative of \(\Bmat\) & Active baseline & Analytic primitive Hessians are assembled into Cartesian slices of $\partial B_{ia}/\partial x_b$ and stored as sparse row maps; dense three-index tensors are audit-only. \\
+\midrule
 Primitive/function registry & Validated baseline & Canonical primitive and \(\y=f(\q)\) records prevent duplicate coordinate objects. \\
 \midrule
 Coordinate-function layer & Validated baseline & Inverse/exponential distances, trigonometric functions, polar radii and quadratic functions use sparse chain rules. \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The first Wilson-matrix derivative is represented as
+\begin{equation}
+ \mathcal D_{iab}=\frac{\partial B_{ia}}{\partial x_b}.
+ \label{eq:sparse-b-first-derivative}
+\end{equation}
+The production implementation evaluates the Cartesian Hessian of each local
+primitive by second-order forward algorithmic differentiation.  The frozen
+linear coefficients defining a PIC or SONIC then assemble these primitive
+Hessians directly into $\partial\Bmat/\partial x_b$ slices, each retaining only
+its nonzero row--column map.  A parallel fourth-order centered differentiation
+of the analytic $\Bmat$ rows is retained as an independent audit and is invoked
+explicitly as a reported fallback at a singular or unsupported primitive; it
+is not the production route. Consequently neither PIC nor SONIC use a dense
+$n_q\times(3N)^2$ object. At a
+nonstationary geometry the curvature contribution required by the Hessian
+chain rule is accumulated directly from the sparse slices,
+\begin{equation}
+ C_{ab}=\sum_i g_i^{(q)}\mathcal D_{iab},
+ \label{eq:sparse-b-curvature}
+\end{equation}
+and symmetrized only after the contraction. The same frozen-coordinate API is
+used for primitive PIC rows and for their local SONIC combinations.  The
+analytic path covers stretches, valence and linear bends, dihedrals,
+out-of-plane coordinates, ring combinations, fragment translations and
+finite fragment rotations; the contract records the primitive identifiers of
+any numerical fallback.
 
 \section{Validation Strategy}
 
@@ -2388,8 +2417,8 @@ naturally be built.
 
 The calculations reported in the validation and application sections were
 generated with the \SMITH\ implementation in MATRIX and Python 3.13.11.  The
-frozen code state is MATRIX tag \texttt{v0.1.0rc4}, commit
-\texttt{cf5fdcebb85a5035d5c0400d7cc2398a0580df66}; the corresponding SMITH
+frozen code state is MATRIX tag \texttt{smith-v0.1.0rc5}, commit
+\texttt{4003cd7b8607446036134ca52386397138a9b957}; the corresponding SMITH
 manuscript tag and checksums are recorded with the archived submission.  Gaussian
 optimization jobs used Gaussian 16; other Gaussian-family probes use the local
 executable documented in the accompanying scripts.  The method and basis set
@@ -2418,7 +2447,7 @@ explicitly labelled reduced ORACLE profile.  SMITH, including optional Gaussian
 \url{https://github.com/yogibubu/MATRIX}.  The package pins only reduced-perception
 components; full ORACLE is described in its companion manuscript and is
 validated as an independent release candidate.
-The reproducible standalone environment is tagged \texttt{v0.1.0rc4} in the
+The reproducible standalone environment is tagged \texttt{v0.1.0rc5} in the
 SMITH repository and pins the exact MATRIX commit stated above. Repository
 revisions and \texttt{\#SMITH\_PROVENANCE} record the code and
 perception profile.

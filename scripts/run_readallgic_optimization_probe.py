@@ -58,7 +58,7 @@ def prepare_inputs() -> None:
 
     from matrix_chem import preprocess_to_enriched_xyz, write_validation_section
     from matrix_gaussian import write_gicforge_gaussian_input
-    from matrix_neo import gaussian_gic_lines_from_xyzin, write_gicforge_build_sections
+    from matrix_smith import gaussian_gic_lines_from_xyzin, write_gicforge_build_sections
 
     source_root = matrix_root() / "tests" / "fixtures" / "test_molecules" / "molecules"
     for name, source_name in MOLECULES:
@@ -175,8 +175,8 @@ def summarize_one(
 ) -> dict[str, object]:
     add_matrix_packages_to_path()
 
-    from matrix_neo import gaussian_gic_lines_from_xyzin, read_gic_definition_from_xyzin
-    from matrix_neo import total_symmetric_gic_names
+    from matrix_smith import gaussian_gic_lines_from_xyzin, read_gic_definition_from_xyzin
+    from matrix_smith import total_symmetric_gic_names
 
     definition = read_gic_definition_from_xyzin(xyzin)
     total_names = total_symmetric_gic_names(definition)

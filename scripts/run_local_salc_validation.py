@@ -103,7 +103,7 @@ def _field_values(lines: tuple[str, ...], field: str) -> list[str]:
 
 def _build(source: Path, target: Path, *, local_salc_settings=None):
     from matrix_chem import preprocess_to_enriched_xyz, write_validation_section
-    from matrix_neo import write_gicforge_build_sections
+    from matrix_smith import write_gicforge_build_sections
 
     preprocess_to_enriched_xyz(source, target)
     write_validation_section(target)
@@ -214,13 +214,13 @@ def main() -> None:
         )
 
         from matrix_engines import gicforge_fortran_layout, run_legacy_gicforge
-        from matrix_neo.runtime.gicforge_python import (
+        from matrix_smith.runtime.gicforge_python import (
             LocalSALCSettings,
             _LOCAL_COORDINATION_TEMPLATES,
             _local_coordination_match,
             build_gicforge_python_model,
         )
-        from matrix_neo.survibfit.pipeline import b_matrix_analytic
+        from matrix_smith.survibfit.pipeline import b_matrix_analytic
 
         fortran_layout = gicforge_fortran_layout(matrix)
         fortran_available = shutil.which("gfortran") is not None or fortran_layout.legacy_executable.is_file()

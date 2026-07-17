@@ -13,6 +13,10 @@ seven-page Supporting Information PDF. After arXiv compiles the source, compare
 the generated PDF with the local `main.pdf`, paying particular attention to the
 tables, figures, bibliography, and final TOC graphic.
 
+The rc5 archive was compiled independently from its own source tree and yields
+the same 64-page content as the working manuscript. SHA256:
+`68429fd493a89170738f504e3c0d0ff8e64e869ef9b421a606032798bab9cf8a`.
+
 The first-submission workflow may ask for endorsement in `physics.chem-ph`.
 This is an account/category requirement and is separate from manuscript
 moderation.
