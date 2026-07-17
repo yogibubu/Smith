@@ -4,13 +4,13 @@ This package is the self-contained publication distribution of SMITH.  It
 builds a frozen SONIC internal-coordinate contract without installing or
 accessing any other repository.  The small topology, primitive-coordinate and
 Gaussian-export libraries required by the release are included in the source
-distribution.
+distribution, together with the revision-pinned ORACLE point-group kernel.
 
 SMITH uses a provider-neutral input boundary.  It can start from Cartesian
 geometry plus a supplied topology, from a supplied redundant primitive/Wilson-B
 contract, or from a complete frozen molecular state.  With plain Cartesian
-input, a bundled minimal frontend constructs the topology and ordinary
-primitives needed by SONIC.
+input, a bundled perception frontend constructs the topology, point-group
+operations, atom permutations and ordinary primitives needed by SONIC.
 
 The permanent boundary is:
 
@@ -27,15 +27,19 @@ In particular, SMITH does not construct or serialize B-prime.  A program that
 transforms Hessians away from a stationary point can evaluate B-prime on demand
 from the frozen coordinate definitions.
 
-In the complete MATRIX suite, ORACLE is the provider of primitives and B, LINK
-owns all finite internal-to-Cartesian realization, and ARCHITECT owns B-prime
-and nonstationary Hessian transformation. MORPHEUS and SENTINEL do not perform
-their own B inversion; they request geometry services from LINK.
+In the complete MATRIX suite, ORACLE is the authoritative provider of symmetry,
+topology, primitives and B; SMITH consumes these sections without reperception.
+The standalone package embeds a revision-pinned subset of that implementation
+only to remove a runtime dependency.  LINK owns all finite
+internal-to-Cartesian realization, and ARCHITECT owns B-prime and nonstationary
+Hessian transformation. MORPHEUS and SENTINEL do not perform their own B
+inversion; they request geometry services from LINK.
 
 Four input profiles are available: `FROZEN_STATE`,
 `STANDALONE_TOPOLOGY`, `STANDALONE_PRIMITIVES`, and
 `STANDALONE_MINIMAL`.  The last profile is sufficient for ordinary inputs and
-the paper examples; advanced descriptors, symmetry operations, fragments, or
+the paper examples and includes ordinary point-group perception.  Advanced
+continuous descriptors, nondefault quasi-symmetry decisions, fragments or
 interaction centers can be supplied in a complete frozen state.
 
 ## Install from GitHub
@@ -114,3 +118,11 @@ complexes.  The eta3 allyl–palladium example consumes an explicitly supplied
 interaction centre; its idealized geometry is an interface test, not a computed
 chemical benchmark.  See [`MANUAL.md`](MANUAL.md) for the complete
 installation, input, example, output, and troubleshooting guide.
+
+## Validation status
+
+This submission candidate has completed external collaborator validation.  Its
+publication gate also verifies clean installations with Python 3.11 and 3.13,
+all four input profiles, Gaussian 16 export, and consumption of the frozen
+SONIC contract by LINK and MORPHEUS.  Changes after the submission freeze must
+be released as a later version.

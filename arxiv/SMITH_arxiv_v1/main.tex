@@ -62,7 +62,8 @@ coordinates.  The \SMITH\ (Symmetry-Mapped Internal-coordinate Template
 Handler) implementation starts
 from Cartesian geometry and one of four provider-neutral input profiles: a
 complete frozen molecular state, user-supplied topology, user-supplied
-redundant primitives, or a minimal standalone topology/primitive construction.
+redundant primitives, or a standalone perception kernel that constructs
+ordinary topology, molecular point-group operations and primitive coordinates.
 It validates and classifies
 the ordinary primitive rows, augments them with chemically typed special or
 composite families, protects coordinates for rings and fragments, and reduces the coordinate space using analytic Wilson
@@ -81,6 +82,11 @@ construction.  The method
 therefore provides a constructive counterpart to natural internal coordinates:
 it preserves their locality and interpretability while extending them to the
 topological and symmetry cases that usually require manual intervention.
+In MATRIX, molecular symmetry and ordinary PICs are authoritative ORACLE input
+and are never reperceived by SMITH.  To remain independently installable, the
+standalone distribution embeds a revision-pinned subset of the same ORACLE
+perception kernel.  The duplication is therefore a packaging boundary, not a
+second symmetry method, and its provenance is recorded with the SONIC contract.
 The numerical evidence reported here validates the construction invariants,
 sparse first-derivative machinery and external serialization path.  Gaussian 16
 is used because its unusually general GIC language can evaluate the generated
@@ -137,12 +143,13 @@ Name & Role \\
 \midrule
 Input provider & Supplies Cartesian geometry and, optionally, topology,
 redundant primitives, symmetry operations, fragments, interaction centers and
-continuous chemical descriptors.  SMITH also includes a minimal standalone
-provider for ordinary molecular graphs and primitives. \\
+continuous chemical descriptors.  For plain Cartesian input, standalone SMITH
+embeds a revision-pinned perception subset for ordinary topology, point-group
+operations, atom permutations and primitive coordinates. \\
 \SMITH{}--\SONIC & Coordinate-construction tool and its coordinate
 contract.  \SMITH\ accepts a complete frozen state, a supplied topology, a
 supplied redundant primitive set, or plain Cartesian input through its bundled
-minimal frontend.  It performs SONIC construction, special/composite coordinate
+perception frontend.  It performs SONIC construction, special/composite coordinate
 generation, symmetry adaptation, analytic \(\Bmat\) evaluation, human-readable
 reporting, Gaussian-16-compatible export and provenance. \\
 Application layer & Consumes the frozen contract.  Internal-to-Cartesian
@@ -155,12 +162,20 @@ SMITH. \\
 
 Within the integrated MATRIX implementation these generic roles have one
 explicit mapping, stated here once to avoid coupling the standalone method to
-the suite architecture. ORACLE supplies the redundant primitives and their
-Wilson matrix; SMITH constructs SONIC; LINK owns finite internal-to-Cartesian
+the suite architecture. ORACLE supplies symmetry, atom permutations, redundant
+primitives and their Wilson matrix; SMITH consumes that frozen state and
+constructs SONIC without reperception; LINK owns finite internal-to-Cartesian
 realization for optimization, scans and externally proposed points; ARCHITECT
 constructs $\Bmat'$ on demand for nonstationary Hessian transformations;
 MORPHEUS delegates any coordinate realization to LINK; and SENTINEL exchanges
 SONIC points with LINK without consuming $\Bmat$.
+
+The standalone executable preserves this scientific boundary by copying only
+the required perception implementation into its release snapshot.  It can
+therefore infer symmetry from an XYZ file without installing ORACLE, but the
+algorithm, thresholds and schema remain those of the pinned ORACLE revision.
+If a complete frozen state or an explicit symmetry section is supplied, that
+record is authoritative and the embedded kernel does not replace it.
 
 \begin{figure}[htbp]
 \centering
@@ -201,7 +216,7 @@ SONIC points with LINK without consuming $\Bmat$.
   },
   arrow/.style={-{Latex[length=2.2mm]}, line width=0.45pt, draw=black!70}
 ]
-\node[stage=blue!7] (state) {Molecular state\\or standalone\\topology};
+\node[stage=blue!7] (state) {Frozen state\\or embedded\\perception};
 \node[stage=green!8, right=of state] (families) {Primitive/B\\source + SMITH\\family labels};
 \node[stage=orange!10, right=of families] (semantic) {Protected\\semantic, ring\\and fragment rows};
 \node[stage=purple!8, right=of semantic] (reduction) {Block-local\\rank reduction\\and symmetry};
@@ -383,8 +398,10 @@ reconstruct its Wilson B rows.  A complete molecular state may additionally
 contain rings, point-group operations, fragments, interaction centers and
 continuous chemical-perception descriptors.  If those data are already
 present in the \texttt{xyzin} file, \SONIC\ consumes them as part of the frozen
-state.  The provider may be the bundled minimal frontend, another program or a
-hand-audited input; its identity is not part of the SONIC theory.  A rich state
+state.  The provider may be the bundled perception frontend, another program or a
+hand-audited input; its identity is not part of the SONIC theory.  The bundled
+frontend includes the revision-pinned symmetry, topology and ordinary-PIC
+subset required for standalone construction.  A rich state
 can define the molecular graph and cycle basis, point-group operations and atom
 permutations, atom equivalence, effective atomic numbers, continuous charge,
 covalency, delocalization and strain descriptors, bond-order components and
@@ -408,17 +425,21 @@ are accepted.  A complete frozen state is consumed unchanged; a supplied
 \texttt{TOPOLOGY} section is used to generate the ordinary redundant
 primitives; a supplied \texttt{PRIMITIVES} section is validated against the
 Cartesian geometry and used directly; and a plain XYZ invokes a bundled
-minimal frontend that constructs both topology and ordinary primitives.  If
+perception frontend that constructs topology, a complete molecular point-group
+action with atom permutations, and ordinary primitives.  If
 topology and primitives are both supplied, their bond rows must agree.  The
 output records the selected profile as \texttt{FROZEN\_STATE},
 \texttt{STANDALONE\_TOPOLOGY}, \texttt{STANDALONE\_PRIMITIVES} or
 \texttt{STANDALONE\_MINIMAL}.  The minimal route is sufficient for ordinary
-molecules and the supplied examples; advanced continuous descriptors,
-interaction centers or externally validated symmetry can instead be supplied
-through the complete-state interface.  Thus SMITH is operationally standalone
-while preserving a precise boundary between optional molecular perception and
-coordinate construction.  The four complete input examples in the Supporting
-Information are executable specifications of this boundary.
+molecules and the supplied examples; the profile name is retained for schema
+compatibility even though molecular symmetry is included.  Advanced continuous
+descriptors, interaction centers, user-selected quasi-symmetry policies or an
+externally audited symmetry state can instead be supplied through the
+complete-state interface.  Thus SMITH is operationally standalone while
+preserving a precise boundary between perception and coordinate construction:
+the embedded subset provides the input state, and SMITH proper begins only
+after that state has been frozen.  The four complete input examples in the
+Supporting Information are executable specifications of this boundary.
 
 The richer optional descriptors follow continuous molecular perception
 introduced in Proxima,\cite{Lazzari2020Proxima} and molecular/spectral synthons developed for accurate structural
@@ -2342,12 +2363,14 @@ physical force constant and not a failure of SONIC construction.
 
 Standalone operation has a related, explicit scope boundary.  Supplied
 topology or primitive sections are authoritative and preserved, while the
-bundled minimal Cartesian frontend provides only the information needed to
-construct ordinary SONIC coordinates.  Results that depend on advanced
-continuous atom equivalence, externally validated point-group operations or
-special interaction centers require those data in the input state.  This is a
-capability distinction between input profiles, not a runtime dependency of
-SMITH on a separate application.
+bundled Cartesian frontend uses a revision-pinned ORACLE subset to construct
+ordinary topology, point-group operations, atom permutations and PICs.  Results
+that depend on advanced continuous atom equivalence, nondefault quasi-symmetry
+decisions or special interaction centers require those data in the input state.
+This is a capability distinction between input profiles, not a runtime
+dependency of SMITH on a separate application.  It also means that changes to
+the embedded perception subset require an explicit standalone version update
+and renewed equivalence tests against ORACLE.
 
 The priority-first rule is a chemically motivated modelling principle, not a
 mathematical uniqueness result over all possible coordinate bases.  Alternative
@@ -2378,6 +2401,15 @@ refinement are possible consumers, but their algorithms lie beyond this work.
 Nonlinear coordinate functions such as inverse or exponential distances,
 trigonometric angular terms and Cremer--Pople descriptors can be built on top of
 this base by analytic chain-rule differentiation.
+
+Molecular symmetry remains an input-state responsibility.  In MATRIX that
+state is produced once by ORACLE and consumed unchanged by SMITH.  The
+standalone package achieves independence by embedding a revision-pinned subset
+of the same ORACLE topology, symmetry and ordinary-PIC kernel.  A plain XYZ can
+therefore produce symmetry-adapted SONIC coordinates without a second
+installation, while a supplied frozen state remains authoritative.  This
+implementation duplication is deliberately versioned and tested so that it
+cannot become an undocumented alternative definition of symmetry.
 
 The present construction supports the intramolecular machinery needed for
 acyclic, cyclic, fused, bridged, spiro and high-symmetry molecules, together
@@ -2419,6 +2451,8 @@ local-pseudosymmetry data can be regenerated with
 \texttt{scripts/run\_local\_salc\_validation.py}; it records the descriptor and
 distance tolerances, all final ranks, the rigid-rotation check and the
 Fortran center-classification result.
+The plain-XYZ water regression additionally verifies the embedded perception
+boundary by requiring a $C_{2v}$ label and four serialized symmetry operations.
 
 \section*{Data and Code Availability}
 
@@ -2431,9 +2465,10 @@ installation instructions and water, norbornane, formic-acid--water,
 water-dimer, benzene--water and $\eta^3$ allyl--palladium examples.  Its
 \texttt{smith-sonic build} command accepts a complete validated \texttt{xyzin}
 state, an extended XYZ carrying \texttt{TOPOLOGY} or \texttt{PRIMITIVES}, or a
-plain Cartesian input through the bundled minimal frontend.  The provider-neutral
+plain Cartesian input through the bundled perception frontend.  The provider-neutral
 \texttt{--require-frozen-state} option requires the complete contract.  The
-standalone distribution includes the minimal topology/primitive frontend and
+standalone distribution includes the revision-pinned topology, point-group
+symmetry and ordinary-primitive frontend and
 optional Gaussian \texttt{ReadAllGIC} export; installing or running another
 application is not required.  The reproducible environment is tagged
 \texttt{v0.1.0rc5}. Repository revisions, the dependency lock and

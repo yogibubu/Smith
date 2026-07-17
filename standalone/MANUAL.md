@@ -9,7 +9,11 @@ manuscript.
 
 The standalone input boundary is provider-neutral: SMITH accepts supplied
 topology, supplied redundant primitive/Wilson-B definitions, a complete frozen
-state, or plain Cartesian geometry through a bundled minimal frontend.
+state, or plain Cartesian geometry through a bundled perception frontend.
+The bundled frontend is a revision-pinned subset of ORACLE and constructs
+ordinary topology, molecular point-group operations, atom permutations and
+primitive coordinates.  It is included so that standalone SMITH has no runtime
+dependency on another repository.
 
 An input provider may supply topology, cycles, symmetry, atom equivalence,
 continuous descriptors, interaction centres, and the redundant
@@ -21,8 +25,9 @@ Hessian transport and higher derivatives belong to applications consuming the
 contract.  In particular, B-prime is not required, constructed, or stored by
 SMITH; it is evaluated on demand by a second-order consumer when needed.
 
-The corresponding MATRIX ownership is: ORACLE provides primitive coordinates
-and B; SMITH builds SONIC; LINK realizes internal-coordinate changes in
+The corresponding MATRIX ownership is: ORACLE provides authoritative symmetry,
+primitive coordinates and B; SMITH consumes them without reperception and
+builds SONIC; LINK realizes internal-coordinate changes in
 Cartesian space; ARCHITECT evaluates B-prime and transforms nonstationary
 Hessians. MORPHEUS delegates realization to LINK, while SENTINEL proposes only
 SONIC points through the LINK protocol.
@@ -112,12 +117,14 @@ their covalent bond rows must agree.
 ### Minimal Cartesian profile
 
 A plain or extended XYZ is sufficient for small reproducibility examples.  The
-packaged path performs a minimal topology/primitive pass and records
-`PERCEPTION_PROFILE STANDALONE_MINIMAL`.  For disconnected components it also
+packaged path performs the embedded topology/symmetry/primitive pass and records
+`PERCEPTION_PROFILE STANDALONE_MINIMAL`; the profile name is retained for schema
+compatibility.  For disconnected components it also
 constructs fragment definitions and six intermolecular translation/orientation
 coordinates.  This profile is deliberately limited; advanced continuous
-descriptors, externally validated symmetry, and interaction centers must be
-supplied in the input when they affect the requested SONIC contract.
+descriptors, nondefault quasi-symmetry choices, externally audited symmetry and
+interaction centers must be supplied in the input when they affect the
+requested SONIC contract.
 
 Extended-XYZ directives follow the Cartesian block, for example:
 
@@ -190,7 +197,7 @@ rank when special fragment or centre coordinates are present.
 
 ## 7. Verification and problem reports
 
-For the complete standalone release-candidate verification, run:
+For the complete standalone publication verification, run:
 
 ```bash
 python -m pip install ./standalone
@@ -205,8 +212,8 @@ installation requirements for standalone SMITH.
 When reporting a problem, include the operating system and architecture,
 Python version, exact command, complete terminal output, input file, and
 generated `xyzin` if one was produced.  Do not include credentials or private
-tokens.  During the release-candidate phase, open an issue in the private
-repository or send the report directly to the project owner.
+tokens.  Open an issue in the repository or send the report directly to the
+project owner, and identify the frozen release version being tested.
 
 Execution of Gaussian jobs and all optimization or finite-displacement
 workflows remain outside this package.  SMITH generates the Gaussian 16 input

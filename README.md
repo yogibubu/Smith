@@ -80,10 +80,12 @@ default.
 ## Standalone publication package
 
 The `standalone/` directory is a self-contained, revision-pinned distribution
-of the SMITH/SONIC builder.  It includes the minimal topology and primitive
-frontend required for ordinary inputs and can consume richer topology,
-primitive, symmetry, descriptor, fragment, or interaction-centre sections from
-any provider.  No second repository is required to install or run it.
+of the SMITH/SONIC builder.  It embeds the ORACLE subset required to perceive
+ordinary topology, point-group operations, atom permutations and primitive
+coordinates from Cartesian input, and can consume richer frozen sections from
+any provider.  In MATRIX, ORACLE remains authoritative and SMITH performs no
+reperception.  No second repository is required to install or run the
+standalone package.
 
 Install a local checkout and run the supplied examples with:
 
@@ -104,7 +106,8 @@ GIC interpreter.  The commercial export translates native out-of-plane rows to
 improper dihedrals and cannot retain every special composite coordinate; the
 native SONIC contract and readable report remain authoritative.
 
-Plain extended XYZ input uses the labelled `STANDALONE_MINIMAL` profile.
+Plain extended XYZ input uses the historically labelled `STANDALONE_MINIMAL`
+profile; despite the name, this profile includes molecular symmetry perception.
 Inputs may instead carry `TOPOLOGY` or `PRIMITIVES`.  To require a complete,
 separately validated state, use:
 
@@ -116,3 +119,12 @@ Instructions for private release-candidate testing are in
 [`COLLABORATOR_TESTING.md`](COLLABORATOR_TESTING.md).
 The full standalone reference is in
 [`standalone/MANUAL.md`](standalone/MANUAL.md).
+
+## Submission freeze
+
+The present standalone candidate has completed external collaborator
+validation.  The frozen submission gate comprises a clean installation on
+Python 3.11 and 3.13, all four input profiles, the three non-covalent examples,
+the eta3 interaction-centre example, Gaussian 16 serialization, and downstream
+consumption by LINK and MORPHEUS.  Later methodological development must occur
+after this submission snapshot rather than changing it silently.

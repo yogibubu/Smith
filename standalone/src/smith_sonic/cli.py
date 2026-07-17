@@ -124,7 +124,8 @@ def _build(args: argparse.Namespace) -> int:
     print(f"Wrote Gaussian 16 input {gaussian_path}")
     if profile == "STANDALONE_MINIMAL":
         print(
-            "Note: the Cartesian input used the bundled minimal topology/primitive frontend. "
+            "Note: the Cartesian input used the bundled, revision-pinned "
+            "topology/symmetry/primitive perception frontend. "
             "Supply #TOPOLOGY or #PRIMITIVES to control that boundary, or use "
             "--require-frozen-state when a complete externally validated state is required."
         )

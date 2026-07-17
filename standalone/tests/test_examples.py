@@ -16,6 +16,16 @@ class PackagedExampleTests(unittest.TestCase):
         self.assertEqual(main(["example", name, str(output)]), 0)
         return output, read_sectioned_lines(output), scratch
 
+    def test_plain_xyz_uses_embedded_point_group_perception(self) -> None:
+        _, lines, scratch = self._run_example("water")
+        self.addCleanup(scratch.cleanup)
+        symmetry = section_content(lines, "SYMMETRY")
+        provenance = section_content(lines, "SMITH_PROVENANCE")
+
+        self.assertIn("POINT_GROUP C2v", symmetry)
+        self.assertIn("OPERATION_COUNT 4", symmetry)
+        self.assertIn("PERCEPTION_PROFILE STANDALONE_MINIMAL", provenance)
+
     def test_formic_acid_water_has_six_interfragment_coordinates(self) -> None:
         output, lines, scratch = self._run_example("formic-acid-water")
         self.addCleanup(scratch.cleanup)
