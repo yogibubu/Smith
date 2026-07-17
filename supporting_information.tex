@@ -123,7 +123,8 @@ optimized transition-metal benchmark.
 \lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input for the $\eta^3$ probe.  The Cartesian components of the ligand center are inactive helper functions and the Pd--center distance is the first active GIC.}]{si/eta3_allyl_palladium_g16.gjf}
 
 Both generated \texttt{xyzin} files were read directly by MORPHEUS without
-format translation.  LINK constructed SONIC optimizer direction matrices of
+format translation; any requested coordinate realization is delegated by
+MORPHEUS to LINK. LINK constructed SONIC optimizer direction matrices of
 dimensions \(18\times24\) and \(24\times30\), respectively, confirming that
 the serialized contracts are consumable by the two downstream workflows.
 
@@ -144,7 +145,9 @@ analytic-row errors of \(4.02\times10^{-10}\) for pagodane and
 \(4.77\times10^{-10}\) for indane.  The indane set contains stretch, bend,
 cyclic-bend, butterfly and ring-puckering-component families.  All 114 pagodane
 and all 51 indane motions are constructed in both signs from the pseudoinverse of the B matrix
-frozen at the reference geometry.  The resulting Cartesian frames are exactly
+frozen at the reference geometry. These small fixed-$B$ displacements are
+visualization artifacts, not finite internal-to-Cartesian realization services;
+the latter belong to LINK. The resulting Cartesian frames are exactly
 symmetric and are checked for the first-order SONIC displacement, unchanged
 connectivity, proper orientation, a maximum atom displacement not above
 0.10~\AA, and a maximum relative reference-bond change below 0.15.  Every

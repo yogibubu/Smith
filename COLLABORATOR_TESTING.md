@@ -2,18 +2,17 @@
 
 The purpose of this release-candidate test is to find installation, portability,
 command-line, and documentation problems before freezing the manuscript and
-standalone package.  The full ORACLE application is still in final testing and
-is not part of this test.
+standalone package.  No other application is part of this test.
 
 ## 1. Give the collaborator access
 
-Keep `yogibubu/Smith` and `yogibubu/MATRIX` private.  Federico needs read
-access to both repositories because the standalone wheel pins its MATRIX
-components to an exact private commit.  In GitHub open:
+Keep `yogibubu/Smith` private during release-candidate testing.  Federico needs
+read access only to this repository; all runtime sources are included.  In
+GitHub open:
 
 `Settings` -> `Collaborators` -> `Add people`
 
-Repeat the invitation in both repositories.  Invite Federico Lazzari
+Invite Federico Lazzari
 (`federico.lazzari@sns.it`).  If GitHub cannot resolve
 the email address, ask him for his GitHub username.  He must accept the
 invitation before cloning or installing the private repository.
@@ -59,6 +58,10 @@ smith-sonic example norbornane norbornane.xyzin
 smith-sonic inspect norbornane.xyzin
 smith-sonic example formic-acid-water formic-acid-water.xyzin
 smith-sonic inspect formic-acid-water.xyzin
+smith-sonic example water-dimer water-dimer.xyzin
+smith-sonic inspect water-dimer.xyzin
+smith-sonic example benzene-water benzene-water.xyzin
+smith-sonic inspect benzene-water.xyzin
 smith-sonic example eta3-allyl-palladium eta3-allyl-palladium.xyzin
 smith-sonic inspect eta3-allyl-palladium.xyzin
 ```
@@ -73,9 +76,13 @@ Expected summaries are:
 - norbornane: 51 GICs, rank 51;
 - formic-acid--water: 18 GICs, rank 18, including three fragment translations
   and three fragment orientations;
+- water dimer: 12 GICs, rank 12, including three fragment translations and
+  three fragment orientations;
+- benzene--water: 39 GICs, rank 39, including three fragment translations and
+  three fragment orientations;
 - eta3 allyl--palladium: 24 GICs, rank 24, including one protected
   centre--atom distance;
-- the first three outputs: `PERCEPTION_PROFILE STANDALONE_MINIMAL`;
+- the first five outputs: `PERCEPTION_PROFILE STANDALONE_MINIMAL`;
 - the eta3 output: `PERCEPTION_PROFILE FROZEN_STATE`.
 
 The source inputs are also visible under `standalone/examples/`.  Read
@@ -84,15 +91,15 @@ is an idealized interface probe and not a computed chemical benchmark.
 
 ## 4. Information to return
 
-Before returning the report, run the complete consumer test from the repository
-root:
+Before returning the report, run the complete standalone test from the
+repository root:
 
 ```bash
-SMITH_REQUIRE_DOWNSTREAM=1 python -m unittest discover -s standalone/tests -v
+python -m unittest discover -s standalone/tests -v
 ```
 
-This confirms that the two advanced contracts are read directly by MORPHEUS
-and converted into LINK SONIC coordinate models.
+This confirms the four input profiles, both output formats, the non-covalent
+examples and the supplied interaction-centre contract.
 
 Please report:
 
@@ -103,12 +110,13 @@ Please report:
 - whether the standalone topology/primitive boundary and SMITH/SONIC
   coordinate construction are understandable;
 - whether the commands and generated files are self-explanatory;
-- the summaries printed for all four examples;
+- the summaries printed for all six examples;
 - whether the non-covalent output clearly represents six intermolecular
   degrees of freedom;
-- whether the distinction between an ORACLE-supplied eta3 centre and the SMITH
-  coordinate built from it is clear.
+- whether the distinction between a supplied eta3 centre and the SMITH
+  coordinate built from it is clear;
+- whether the Gaussian 16 compatibility limitations and the authoritative
+  native/human outputs are clear.
 
-Do not broaden this test to the unreleased full ORACLE application.  Treat the
-two advanced cases as packaging and interface tests; their inclusion in the
-manuscript will be decided only after the collaborator's report.
+Treat the advanced cases as packaging and interface tests; do not add
+application-level optimization or scan tests to the standalone acceptance gate.

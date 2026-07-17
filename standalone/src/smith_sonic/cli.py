@@ -54,14 +54,16 @@ PRESERVED_STANDALONE_SECTIONS = (
     "FRAGMENTS",
     "INTERACTION_CENTERS",
 )
-PROVENANCE_SCHEMA = "matrix.smith.standalone.v1"
-MATRIX_REVISION = "4003cd7b8607446036134ca52386397138a9b957"
+PROVENANCE_SCHEMA = "smith.sonic.standalone.v1"
+IMPLEMENTATION_REVISION = "4003cd7b8607446036134ca52386397138a9b957"
 DEFAULT_G16_ROUTE = "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 EXAMPLES = {
     "water": ("water.smith.xyz", False),
     "norbornane": ("norbornane.smith.xyz", False),
     "formic-acid-water": ("formic_acid_water.smith.xyz", False),
-    "eta3-allyl-palladium": ("eta3_allyl_palladium.oracle.xyzin", True),
+    "water-dimer": ("water_dimer.smith.xyz", False),
+    "benzene-water": ("benzene_water.smith.xyz", False),
+    "eta3-allyl-palladium": ("eta3_allyl_palladium.frozen.xyzin", True),
 }
 
 
@@ -107,7 +109,7 @@ def _build(args: argparse.Namespace) -> int:
         [
             f"SCHEMA {PROVENANCE_SCHEMA}",
             f"SMITH_VERSION {__version__}",
-            f"MATRIX_REVISION {MATRIX_REVISION}",
+            f"IMPLEMENTATION_REVISION {IMPLEMENTATION_REVISION}",
             f"PERCEPTION_PROFILE {profile}",
             f"FRAGMENT_PROFILE {fragment_profile}",
             "STATE_INTERFACE TOPOLOGY_OR_PRIMITIVES_OR_CARTESIAN",
@@ -188,7 +190,7 @@ def _build_from_standalone_input(source: Path, target: Path):
 
 
 def _read_standalone_geometry_and_options(source: Path) -> tuple[list[str], dict[str, object]]:
-    """Read SMITH directives without treating appended MATRIX sections as options."""
+    """Read SMITH directives without treating appended contract sections as options."""
     raw_lines = source.read_text(encoding="utf-8").splitlines()
     if len(raw_lines) < 2:
         raise ValueError("SMITH input must start with a standard XYZ block")
@@ -343,7 +345,6 @@ def build_parser() -> argparse.ArgumentParser:
     build.add_argument("output", type=Path, nargs="?", help="Output xyzin path")
     build.add_argument(
         "--require-frozen-state",
-        "--require-oracle-state",
         dest="require_frozen_state",
         action="store_true",
         help=(

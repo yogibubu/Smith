@@ -36,7 +36,35 @@ class PackagedExampleTests(unittest.TestCase):
         )
         self.assertIn("FRAGMENT_PROFILE AUTO_CONNECTED_COMPONENTS", provenance)
 
-    def test_eta3_example_preserves_oracle_center_as_protected_coordinate(self) -> None:
+    def test_additional_non_covalent_examples_have_six_fragment_coordinates(self) -> None:
+        for name, target_rank in (("water-dimer", 12), ("benzene-water", 39)):
+            with self.subTest(example=name):
+                output, lines, scratch = self._run_example(name)
+                self.addCleanup(scratch.cleanup)
+                contract = section_content(lines, "GIC")
+                provenance = section_content(lines, "SMITH_PROVENANCE")
+
+                self.assertTrue(output.is_file())
+                self.assertIn(f"TARGET_RANK {target_rank}", contract)
+                self.assertIn(f"RANK {target_rank}", contract)
+                self.assertIn("FRAGMENT_MODE SPECIAL_COORDINATES", contract)
+                self.assertEqual(
+                    sum(
+                        row.startswith("P") and "FAMILY=FRAG_TRANSLATION" in row
+                        for row in contract
+                    ),
+                    3,
+                )
+                self.assertEqual(
+                    sum(
+                        row.startswith("P") and "FAMILY=FRAG_ORIENTATION" in row
+                        for row in contract
+                    ),
+                    3,
+                )
+                self.assertIn("FRAGMENT_PROFILE AUTO_CONNECTED_COMPONENTS", provenance)
+
+    def test_eta3_example_preserves_supplied_center_as_protected_coordinate(self) -> None:
         _, lines, scratch = self._run_example("eta3-allyl-palladium")
         self.addCleanup(scratch.cleanup)
         contract = section_content(lines, "GIC")
@@ -82,10 +110,10 @@ class PackagedExampleTests(unittest.TestCase):
     def test_eta3_fixture_generator_is_reproducible(self) -> None:
         standalone = Path(__file__).resolve().parents[1]
         source = standalone / "examples" / "eta3_allyl_palladium.source.xyz"
-        packaged = standalone / "examples" / "eta3_allyl_palladium.oracle.xyzin"
+        packaged = standalone / "examples" / "eta3_allyl_palladium.frozen.xyzin"
         self.assertTrue(source.is_file())
         self.assertTrue(packaged.is_file())
-        self.assertIn("SOURCE=ORACLE_EXPLICIT_TEST_FIXTURE", packaged.read_text(encoding="utf-8"))
+        self.assertIn("SOURCE=SUPPLIED_EXPLICIT_TEST_FIXTURE", packaged.read_text(encoding="utf-8"))
 
     def test_build_writes_merlino_style_report_and_g16_input_by_default(self) -> None:
         output, _, scratch = self._run_example("water")

@@ -15,9 +15,10 @@ The draft is intentionally source-close: the implementation-status table tracks
 the current SMITH/SONIC code paths, including the special-coordinate fragment
 model and the active pseudo-bond / pseudo-cycle branch.
 
-Hessian-locality, GF/PED scaling and the associated coordinate-comparison
-figure belong to the companion TRINITY Communication and are not duplicated in
-this SMITH repository.
+The manuscript is deliberately limited to coordinate construction, reporting,
+first derivatives, and external serialization.  Optimizers, finite
+internal-to-Cartesian realization, force fields, Hessian transport, and
+higher-order derivatives are outside the SMITH boundary.
 
 The construction and B-matrix timing microbenchmark is tracked in
 `data/construction_scaling_benchmark.json` and can be regenerated with:
@@ -40,8 +41,8 @@ export MATRIX_ROOT=/path/to/your/MATRIX
 python scripts/run_local_salc_validation.py
 ```
 
-The MATRIX regression suite additionally retains the supplied pagodane
-(`C20H20`) and indane (`C9H10`) structures as shared ORACLE/SMITH fixtures.
+The regression corpus additionally retains the supplied pagodane (`C20H20`)
+and indane (`C9H10`) structures as demanding ring fixtures.
 They test full-rank PIC/SONIC construction, the complete analytic-versus-finite-
 difference SONIC B matrix, fused/caged ring families, and representative
 positive/negative Cartesian motions.  The release gate now generates every one
@@ -76,16 +77,13 @@ The command also writes the coordinate report and the Gaussian 16 input beside
 the chosen output path.  The commercial Gaussian 16 profile is enabled by
 default.
 
-## Reduced standalone package
+## Standalone publication package
 
-The `standalone/` directory is an installable, revision-pinned distribution of
-the SMITH/SONIC builder with a deliberately smaller command surface than the
-full MATRIX framework.  It documents the scientific boundary explicitly:
-ORACLE, developed from PROXIMA, defines cycles, symmetry, atom equivalence,
-effective atomic numbers and the remaining continuous atom/synthon descriptors;
-SMITH consumes that state and constructs the SONIC contract.  Full ORACLE is a
-separately validated companion release candidate; it is not part of this
-reduced standalone SMITH distribution.
+The `standalone/` directory is a self-contained, revision-pinned distribution
+of the SMITH/SONIC builder.  It includes the minimal topology and primitive
+frontend required for ordinary inputs and can consume richer topology,
+primitive, symmetry, descriptor, fragment, or interaction-centre sections from
+any provider.  No second repository is required to install or run it.
 
 Install a local checkout and run the supplied examples with:
 
@@ -95,12 +93,16 @@ smith-sonic example water /tmp/water.xyzin
 smith-sonic inspect /tmp/water.xyzin
 smith-sonic example norbornane /tmp/norbornane.xyzin
 smith-sonic example formic-acid-water /tmp/formic-acid-water.xyzin
+smith-sonic example water-dimer /tmp/water-dimer.xyzin
+smith-sonic example benzene-water /tmp/benzene-water.xyzin
 smith-sonic example eta3-allyl-palladium /tmp/eta3-allyl-palladium.xyzin
 ```
 
 Each standalone command also writes a readable `.smith.out` coordinate report
-and a Gaussian 16 `.g16.gjf` input.  The two advanced `xyzin` contracts are
-regression-tested as direct MORPHEUS inputs and LINK SONIC coordinate models.
+and a Gaussian 16 `.g16.gjf` input.  Gaussian is used as an independent, general
+GIC interpreter.  The commercial export translates native out-of-plane rows to
+improper dihedrals and cannot retain every special composite coordinate; the
+native SONIC contract and readable report remain authoritative.
 
 Plain extended XYZ input uses the labelled `STANDALONE_MINIMAL` profile.
 Inputs may instead carry `TOPOLOGY` or `PRIMITIVES`.  To require a complete,

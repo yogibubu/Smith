@@ -1,10 +1,10 @@
 # Standalone SMITH / SONIC
 
-This package builds a frozen SONIC internal-coordinate contract without
-installing or exposing the full MATRIX command suite.  It pins the MATRIX
-implementation used by the manuscript and installs only the core, chemical
-perception, engine-interface, and SMITH coordinate packages needed by the
-builder.
+This package is the self-contained publication distribution of SMITH.  It
+builds a frozen SONIC internal-coordinate contract without installing or
+accessing any other repository.  The small topology, primitive-coordinate and
+Gaussian-export libraries required by the release are included in the source
+distribution.
 
 SMITH uses a provider-neutral input boundary.  It can start from Cartesian
 geometry plus a supplied topology, from a supplied redundant primitive/Wilson-B
@@ -12,17 +12,25 @@ contract, or from a complete frozen molecular state.  With plain Cartesian
 input, a bundled minimal frontend constructs the topology and ordinary
 primitives needed by SONIC.
 
-In the integrated MATRIX workflow, SMITH and ORACLE have separate scientific responsibilities:
+The permanent boundary is:
 
-- ORACLE performs continuous molecular perception.  It owns the molecular
-  graph and cycle basis, point-group operations and atom permutations, atom
-  equivalence, effective atomic number, and the charge, covalency,
-  delocalization, strain, bond-order, and synthon descriptors, together with
-  the redundant primitive/Wilson-B source.  ORACLE develops the ideas
-  introduced in PROXIMA and is validated as an independent release candidate.
-- SMITH consumes that frozen molecular and primitive state and constructs the SONIC
-  coordinate families, protected rows, rank reduction, homogeneous symmetry
-  adaptation, analytic Wilson rows, and serialized coordinate contract.
+- an input provider supplies Cartesian geometry and may also supply topology,
+  redundant primitives, symmetry, fragments, interaction centres, or
+  continuous descriptors;
+- SMITH constructs and validates SONIC, writes its analytic Wilson B matrix,
+  symmetry/rank diagnostics, human-readable report, and optional Gaussian 16
+  serialization;
+- optimization, scans, finite internal-to-Cartesian realization, force fields,
+  Hessian transport, and higher derivatives are application responsibilities.
+
+In particular, SMITH does not construct or serialize B-prime.  A program that
+transforms Hessians away from a stationary point can evaluate B-prime on demand
+from the frozen coordinate definitions.
+
+In the complete MATRIX suite, ORACLE is the provider of primitives and B, LINK
+owns all finite internal-to-Cartesian realization, and ARCHITECT owns B-prime
+and nonstationary Hessian transformation. MORPHEUS and SENTINEL do not perform
+their own B inversion; they request geometry services from LINK.
 
 Four input profiles are available: `FROZEN_STATE`,
 `STANDALONE_TOPOLOGY`, `STANDALONE_PRIMITIVES`, and
@@ -64,6 +72,8 @@ smith-sonic example water water.xyzin
 smith-sonic inspect water.xyzin
 smith-sonic example norbornane norbornane.xyzin
 smith-sonic example formic-acid-water formic-acid-water.xyzin
+smith-sonic example water-dimer water-dimer.xyzin
+smith-sonic example benzene-water benzene-water.xyzin
 smith-sonic example eta3-allyl-palladium eta3-allyl-palladium.xyzin
 ```
 
@@ -78,12 +88,17 @@ smith-sonic build molecule.xyzin molecule.sonic.xyzin --require-frozen-state
 
 Every output receives a `#SMITH_PROVENANCE` section recording whether SMITH
 consumed a complete state, supplied topology, supplied primitives, or its
-minimal Cartesian frontend.  Gaussian export and the wider validation/optimizer commands remain
-available in the full MATRIX distribution; the standalone package deliberately
-limits its surface to SONIC contract construction and inspection.  Each build
+minimal Cartesian frontend.  The package deliberately limits its surface to
+SONIC contract construction and inspection.  Each build
 also writes a `.smith.out` coordinate report and a `.g16.gjf` Gaussian 16 input.
-The G16 profile is the default, and non-totally symmetric coordinates are
-written as `Frozen`.
+Gaussian 16 is used because `ReadAllGIC` provides a general independent
+interpreter for SONIC expressions.  The G16 profile is the default, and
+non-totally symmetric coordinates are written as `Frozen`.  Because commercial
+G16 has no native SONIC out-of-plane primitive and cannot safely represent every
+special or multi-periodic composite coordinate, the exporter translates
+out-of-plane rows to improper dihedrals and emits supported component
+coordinates where necessary.  The native SONIC contract and human report are
+never altered by this terminal compatibility translation.
 
 With `--require-frozen-state`, the required production boundary is
 `VALIDATION`, `TOPOLOGY`, `SYNTHONS`, `SYMMETRY`, and `PRIMITIVES`. The last
@@ -93,8 +108,9 @@ a file carrying only `TOPOLOGY` causes SMITH to generate the ordinary redundant
 primitives, while a file carrying `PRIMITIVES` uses those rows directly after
 geometry and topology-consistency checks.
 
-The formic-acid–water example exercises all six intermolecular fragment
-coordinates.  The eta3 allyl–palladium example consumes an explicit, frozen
-ORACLE interaction centre; its idealized geometry is an interface test, not a
-computed chemical benchmark.  See [`MANUAL.md`](MANUAL.md) for the complete
+The formic-acid–water, water-dimer, and benzene–water examples exercise all six
+intermolecular fragment coordinates in hydrogen-bonded and aromatic–polar
+complexes.  The eta3 allyl–palladium example consumes an explicitly supplied
+interaction centre; its idealized geometry is an interface test, not a computed
+chemical benchmark.  See [`MANUAL.md`](MANUAL.md) for the complete
 installation, input, example, output, and troubleshooting guide.

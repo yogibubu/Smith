@@ -34,45 +34,6 @@ Wilson,~E.~B.; Decius,~J.~C.; Cross,~P.~C. \emph{Molecular Vibrations: The
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Lazzari \latin{et~al.}(2020)Lazzari, Salvadori, Mancini, and
-  Barone]{Lazzari2020Proxima}
-Lazzari,~F.; Salvadori,~A.; Mancini,~G.; Barone,~V. Molecular Perception for
-  Visualization and Computation: The {Proxima} Library. \emph{J. Chem. Inf.
-  Model.} \textbf{2020}, \emph{60}, 2668--2672\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Gambi \latin{et~al.}(2019)Gambi, Pietropolli~Charmet, Stoppa,
-  Tasinato, Ceselin, and Barone]{Gambi2019Synthons}
-Gambi,~A.; Pietropolli~Charmet,~A.; Stoppa,~P.; Tasinato,~N.; Ceselin,~G.;
-  Barone,~V. Molecular Synthons for Accurate Structural Determinations: The
-  Equilibrium Geometry of 1-Chloro-1-Fluoroethene. \emph{Phys. Chem. Chem.
-  Phys.} \textbf{2019}, \emph{21}, 3615--3625\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Lazzari \latin{et~al.}(2024)Lazzari, Mendolicchio, and
-  Barone]{Lazzari2024SynthonPCS}
-Lazzari,~F.; Mendolicchio,~M.; Barone,~V. Accurate Geometries of Large
-  Molecules by Integration of the Pisa Composite Scheme and the Templating
-  Synthon Approach. \emph{J. Phys. Chem. A} \textbf{2024}, \emph{128},
-  1385--1395\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Lazzari \latin{et~al.}(2025)Lazzari, Di~Grande, Crisci, Mendolicchio,
-  and Barone]{Lazzari2025PCS141}
-Lazzari,~F.; Di~Grande,~S.; Crisci,~L.; Mendolicchio,~M.; Barone,~V. Molecular
-  Structures with Spectroscopic Accuracy at {DFT} Cost by the Templating
-  Synthon Approach and the {PCS141} Database. \emph{J. Chem. Phys.}
-  \textbf{2025}, \emph{162}, 114310\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
 \bibitem[Baker and Hehre(1991)Baker, and Hehre]{BakerHehre1991ZMatrix}
 Baker,~J.; Hehre,~W.~J. Geometry Optimization in Cartesian Coordinates: The End
   of the Z-Matrix? \emph{J. Comput. Chem.} \textbf{1991}, \emph{12},
@@ -152,6 +113,45 @@ Wang,~L.-P.; Song,~C. Geometry Optimization Made Simple with Translation and
 Marenich,~A.~V.; Brothers,~E.~N.; Hratchian,~H.~P.; Frisch,~M.~J. Generalized
   Internal Coordinates for Creative Exploration of Interatomic Geometries.
   \emph{J. Chem. Theory Comput.} \textbf{2025}, \emph{21}, 10930--10944\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Lazzari \latin{et~al.}(2020)Lazzari, Salvadori, Mancini, and
+  Barone]{Lazzari2020Proxima}
+Lazzari,~F.; Salvadori,~A.; Mancini,~G.; Barone,~V. Molecular Perception for
+  Visualization and Computation: The {Proxima} Library. \emph{J. Chem. Inf.
+  Model.} \textbf{2020}, \emph{60}, 2668--2672\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Gambi \latin{et~al.}(2019)Gambi, Pietropolli~Charmet, Stoppa,
+  Tasinato, Ceselin, and Barone]{Gambi2019Synthons}
+Gambi,~A.; Pietropolli~Charmet,~A.; Stoppa,~P.; Tasinato,~N.; Ceselin,~G.;
+  Barone,~V. Molecular Synthons for Accurate Structural Determinations: The
+  Equilibrium Geometry of 1-Chloro-1-Fluoroethene. \emph{Phys. Chem. Chem.
+  Phys.} \textbf{2019}, \emph{21}, 3615--3625\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Lazzari \latin{et~al.}(2024)Lazzari, Mendolicchio, and
+  Barone]{Lazzari2024SynthonPCS}
+Lazzari,~F.; Mendolicchio,~M.; Barone,~V. Accurate Geometries of Large
+  Molecules by Integration of the Pisa Composite Scheme and the Templating
+  Synthon Approach. \emph{J. Phys. Chem. A} \textbf{2024}, \emph{128},
+  1385--1395\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Lazzari \latin{et~al.}(2025)Lazzari, Di~Grande, Crisci, Mendolicchio,
+  and Barone]{Lazzari2025PCS141}
+Lazzari,~F.; Di~Grande,~S.; Crisci,~L.; Mendolicchio,~M.; Barone,~V. Molecular
+  Structures with Spectroscopic Accuracy at {DFT} Cost by the Templating
+  Synthon Approach and the {PCS141} Database. \emph{J. Chem. Phys.}
+  \textbf{2025}, \emph{162}, 114310\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax

@@ -16,14 +16,14 @@ from matrix_fragments import (
 
 
 def build_fixture(source: Path, output: Path) -> Path:
-    """Create an ORACLE-state eta3 fixture from an idealized Cartesian geometry."""
+    """Create a complete frozen eta3 fixture from an idealized Cartesian geometry."""
     preprocess_to_enriched_xyz(source, output, source_kind="xyz")
     geometry = read_enriched_xyz(output)
     ligand_atoms = (3, 4, 5)
     coordinates = np.asarray(geometry.coordinates_angstrom, dtype=float)
     center = tuple(float(value) for value in coordinates[[idx - 1 for idx in ligand_atoms]].mean(axis=0))
     definition = InteractionCenterDefinition(
-        strategy="ORACLE_EXPLICIT_ETA_CENTER",
+        strategy="SUPPLIED_EXPLICIT_ETA_CENTER",
         centers=(
             InteractionCenterRecord(
                 identifier="C001",
@@ -31,7 +31,7 @@ def build_fixture(source: Path, output: Path) -> Path:
                 label="allyl_eta3",
                 atoms=ligand_atoms,
                 center=center,
-                source="ORACLE_EXPLICIT_TEST_FIXTURE",
+                source="SUPPLIED_EXPLICIT_TEST_FIXTURE",
             ),
         ),
         interactions=(
@@ -41,7 +41,7 @@ def build_fixture(source: Path, output: Path) -> Path:
                 atom=1,
                 center_id="C001",
                 score=1.0,
-                source="ORACLE_EXPLICIT_TEST_FIXTURE",
+                source="SUPPLIED_EXPLICIT_TEST_FIXTURE",
             ),
         ),
     )
