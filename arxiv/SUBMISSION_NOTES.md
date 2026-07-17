@@ -13,9 +13,9 @@ seven-page Supporting Information PDF. After arXiv compiles the source, compare
 the generated PDF with the local `main.pdf`, paying particular attention to the
 tables, figures, bibliography, and final TOC graphic.
 
-The rc5 archive was compiled independently from its own source tree and yields
+The rc6 archive was compiled independently from its own source tree and yields
 the same 64-page content as the working manuscript. SHA256:
-`1abf97d16d0a444f85a68931daf956d99234729b1c7eb81d30a49cff3f854041`.
+`4810ebc7cf30c534ad63d0790875d553b3c956614402b641463740ae34f7283a`.
 
 The corresponding standalone candidate completed external collaborator
 validation before this submission freeze.  Clean-install and consumer gates

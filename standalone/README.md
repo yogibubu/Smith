@@ -52,7 +52,7 @@ python -m venv "$SMITH_ENV"
 source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip
 python -m pip install \
-  "smith-sonic @ git+https://github.com/yogibubu/Smith.git@v0.1.0rc5#subdirectory=standalone"
+  "smith-sonic @ git+https://github.com/yogibubu/Smith.git@v0.1.0rc6#subdirectory=standalone"
 ```
 
 The environment directory is selected by the installer.  The package contains

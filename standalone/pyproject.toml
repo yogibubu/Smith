@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smith-sonic"
-version = "0.1.0rc5"
+version = "0.1.0rc6"
 description = "Standalone SMITH builder for SONIC internal-coordinate contracts"
 readme = "README.md"
 requires-python = ">=3.11"
