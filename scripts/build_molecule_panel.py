@@ -18,9 +18,12 @@ ATOM_COLORS = {
     "C": "#333333",
     "O": "#d94738",
     "Fe": "#d08a20",
+    "Cl": "#3aa657",
+    "Pd": "#8a86a8",
+    "X": "#26a6a1",
 }
-ATOM_SIZES = {"H": 18, "C": 44, "O": 54, "Fe": 90}
-COVALENT_RADII = {"H": 0.31, "C": 0.76, "O": 0.66, "Fe": 1.32}
+ATOM_SIZES = {"H": 18, "C": 44, "O": 54, "Fe": 90, "Cl": 64, "Pd": 92, "X": 42}
+COVALENT_RADII = {"H": 0.31, "C": 0.76, "O": 0.66, "Fe": 1.32, "Cl": 1.02, "Pd": 1.39}
 
 
 def read_xyz_like(path: Path) -> tuple[list[str], np.ndarray]:
@@ -84,19 +87,26 @@ def draw_molecule(
     title: str,
     subtitle: str = "",
     orientation: str = "pca",
+    special_bonds: list[tuple[int, int]] | None = None,
 ) -> None:
     xyz = orient(coords, orientation)
+    special = {tuple(sorted(pair)) for pair in (special_bonds or [])}
     for i, j in bonds:
+        is_special = tuple(sorted((i, j))) in special
         ax.plot(
             [xyz[i, 0], xyz[j, 0]],
             [xyz[i, 1], xyz[j, 1]],
             [xyz[i, 2], xyz[j, 2]],
-            color="#626262",
-            lw=1.35,
+            color="#138f8a" if is_special else "#626262",
+            lw=1.55 if is_special else 1.35,
+            ls="--" if is_special else "-",
             solid_capstyle="round",
             zorder=1,
         )
-    for symbol in sorted(set(symbols), key=lambda s: {"Fe": 0, "O": 1, "C": 2, "H": 3}.get(s, 9)):
+    for symbol in sorted(
+        set(symbols),
+        key=lambda s: {"Pd": 0, "Fe": 1, "Cl": 2, "O": 3, "C": 4, "X": 5, "H": 6}.get(s, 9),
+    ):
         idx = [i for i, atom in enumerate(symbols) if atom == symbol]
         ax.scatter(
             xyz[idx, 0],
@@ -104,7 +114,7 @@ def draw_molecule(
             xyz[idx, 2],
             s=ATOM_SIZES.get(symbol, 26),
             c=ATOM_COLORS.get(symbol, "#7a7a7a"),
-            edgecolors="#1e1e1e" if symbol != "H" else "#aaaaaa",
+            edgecolors="#1e1e1e" if symbol not in {"H", "X"} else "#16837f" if symbol == "X" else "#aaaaaa",
             linewidths=0.35,
             depthshade=True,
             zorder=2,
@@ -131,11 +141,13 @@ def main() -> None:
             "bridged C$_{2v}$ test",
             ROOT / "calculations/gdv_oop_probe/norbornane.xyzin",
             None,
+            None,
         ),
         (
             "Camphor",
             "rigid bridged ketone",
             ROOT / "calculations/g16_improper_fix/camphor.xyzin",
+            None,
             None,
         ),
         (
@@ -143,40 +155,80 @@ def main() -> None:
             "special-center coordinates",
             ROOT / "calculations/special_coordinate_example/ferrocene.xyzin",
             None,
+            None,
+        ),
+        (
+            "Formic acid--water",
+            "interfragment coordinates",
+            ROOT / "standalone/examples/formic_acid_water.xyzin",
+            None,
+            "weak_complex",
+        ),
+        (
+            "$\\eta^3$-Allyl--PdCl",
+            "ORACLE ligand center",
+            ROOT / "standalone/examples/eta3_allyl_palladium.oracle.xyzin",
+            None,
+            "eta3_center",
         ),
         (
             "Cyclohexane",
             "$\\lambda=0.00$ chair",
             ROOT / "calculations/cyclohexane_puckering_equivalence/p00/cyclohexane_p00.xyz",
             "cyclohexane",
+            None,
         ),
         (
             "Cyclohexane",
             "$\\lambda=0.50$ path",
             ROOT / "calculations/cyclohexane_puckering_equivalence/p02/cyclohexane_p02.xyz",
             "cyclohexane",
+            None,
         ),
         (
             "Cyclohexane",
             "$\\lambda=1.00$ boat",
             ROOT / "calculations/cyclohexane_puckering_equivalence/p04/cyclohexane_p04.xyz",
             "cyclohexane",
+            None,
         ),
     ]
-    fig = plt.figure(figsize=(7.45, 5.95), dpi=320)
-    axes = [fig.add_subplot(2, 3, index + 1, projection="3d") for index in range(6)]
-    for ax, (title, subtitle, path, projection) in zip(axes, panels, strict=True):
+    fig = plt.figure(figsize=(9.6, 5.55), dpi=320)
+    axes = [fig.add_subplot(2, 4, index + 1, projection="3d") for index in range(8)]
+    for ax, (title, subtitle, path, projection, special_kind) in zip(axes, panels, strict=True):
         symbols, coords = read_xyz_like(path)
         bonds = infer_bonds(symbols, coords) if projection == "cyclohexane" else read_bonds(path)
-        draw_molecule(ax, symbols, coords, bonds, title, subtitle, projection)
+        special_bonds: list[tuple[int, int]] = []
+        if special_kind == "weak_complex":
+            # The two dashed contacts identify the intermolecular relation;
+            # the protected contract itself contains relative translations and rotations.
+            special_bonds = [(4, 5), (2, 7)]
+            bonds.extend(special_bonds)
+        elif special_kind == "eta3_center":
+            # ORACLE supplies the centroid of the three allylic carbon atoms.
+            center_index = len(symbols)
+            symbols.append("X")
+            coords = np.vstack((coords, coords[[2, 3, 4]].mean(axis=0)))
+            special_bonds = [(0, center_index)]
+            bonds.extend(special_bonds)
+        draw_molecule(
+            ax,
+            symbols,
+            coords,
+            bonds,
+            title,
+            subtitle,
+            projection,
+            special_bonds=special_bonds,
+        )
 
     fig.suptitle(
         "Representative molecular validation systems",
-        fontsize=10.5,
+        fontsize=10.2,
         fontweight="bold",
         y=0.985,
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.94), h_pad=2.25, w_pad=0.15)
+    fig.tight_layout(rect=(0, 0, 1, 0.94), h_pad=1.85, w_pad=0.08)
     fig.savefig(FIGURES / "validation_molecule_panel.png", bbox_inches="tight", pad_inches=0.03)
 
 
