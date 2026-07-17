@@ -7,7 +7,11 @@ molecular state into a rank-complete SONIC internal-coordinate contract.  It is
 the small, reproducible interface associated with the SMITH manuscript, not a
 distribution of the complete MATRIX framework.
 
-ORACLE and SMITH have distinct roles.  ORACLE performs continuous molecular
+The standalone input boundary is provider-neutral: SMITH accepts supplied
+topology, supplied redundant primitive/Wilson-B definitions, a complete frozen
+state, or plain Cartesian geometry through a bundled minimal frontend.
+
+In the integrated workflow, ORACLE and SMITH have distinct roles.  ORACLE performs continuous molecular
 perception, including topology and cycles, symmetry and atom equivalence,
 effective atomic numbers, synthons, interaction centres, and the redundant
 primitive/Wilson-B source.  It develops the ideas introduced in PROXIMA and is
@@ -46,12 +50,13 @@ intentional and fixes both the standalone wrapper and its MATRIX dependency.
 ```text
 smith-sonic --version
 smith-sonic example NAME [OUTPUT]
-smith-sonic build INPUT [OUTPUT] [--require-oracle-state]
+smith-sonic build INPUT [OUTPUT] [--require-frozen-state]
 smith-sonic inspect FILE
 ```
 
-`example` runs an input installed with the package.  `build` accepts either a
-plain extended XYZ input or an ORACLE-enriched `xyzin`.  `inspect` reports the
+`example` runs an input installed with the package.  `build` accepts a plain
+extended XYZ input, an XYZ carrying `TOPOLOGY` or `PRIMITIVES`, or a complete
+frozen `xyzin`.  `inspect` reports the
 presence of the frozen state, GIC section, and provenance profile.
 
 Every `build` or `example` command writes three files with the same stem:
@@ -66,33 +71,41 @@ improper dihedrals and marks every non-totally symmetric coordinate as
 `Frozen`; totally symmetric coordinates remain active.  Fragment and
 interaction-center helper functions are serialized as `Inactive` definitions.
 
-For a production state prepared and validated by ORACLE, require the boundary
-explicitly:
+For a complete externally prepared and validated state, require the boundary explicitly:
 
 ```bash
-smith-sonic build molecule.oracle.xyzin molecule.sonic.xyzin --require-oracle-state
+smith-sonic build molecule.xyzin molecule.sonic.xyzin --require-frozen-state
 ```
 
 This option refuses an input missing any of `VALIDATION`, `TOPOLOGY`,
-`SYNTHONS`, `SYMMETRY`, or `PRIMITIVES`. The latter contains ORACLE's ordered
+`SYNTHONS`, `SYMMETRY`, or `PRIMITIVES`. The latter contains the ordered
 redundant coordinates, reference values and Wilson-B fingerprint.
 
 ## 4. Input profiles
 
-### Frozen ORACLE state
+### Complete frozen state
 
 This is the production interface.  SMITH preserves the molecular perception
 and primitive/B sections and adds the SONIC construction.  The output provenance contains
-`PERCEPTION_PROFILE ORACLE_STATE`.
+`PERCEPTION_PROFILE FROZEN_STATE`.
 
-### Reduced ORACLE convenience profile
+### Supplied topology or primitives
+
+An input carrying `TOPOLOGY` records `STANDALONE_TOPOLOGY` and generates the
+ordinary redundant primitive set from that graph.  An input carrying
+`PRIMITIVES` records `STANDALONE_PRIMITIVES` and validates the supplied
+reference values and Wilson-B fingerprint.  If both sections are present,
+their covalent bond rows must agree.
+
+### Minimal Cartesian profile
 
 A plain or extended XYZ is sufficient for small reproducibility examples.  The
-packaged path performs a reduced perception pass and records
-`PERCEPTION_PROFILE REDUCED_ORACLE`.  For disconnected components it also
+packaged path performs a minimal topology/primitive pass and records
+`PERCEPTION_PROFILE STANDALONE_MINIMAL`.  For disconnected components it also
 constructs fragment definitions and six intermolecular translation/orientation
-coordinates.  This profile is deliberately limited and is not a substitute for
-the forthcoming ORACLE application.
+coordinates.  This profile is deliberately limited; advanced continuous
+descriptors, externally validated symmetry, and interaction centers must be
+supplied in the input when they affect the requested SONIC contract.
 
 Extended-XYZ directives follow the Cartesian block, for example:
 
@@ -123,10 +136,10 @@ Expected results are:
 
 | Example | Input profile | Target rank | Purpose |
 |---|---:|---:|---|
-| water | reduced | 3 | minimal nonlinear molecule |
-| norbornane | reduced | 51 | bridged and cyclic topology |
-| formic-acid-water | reduced + fragments | 18 | non-covalent two-fragment contract |
-| eta3-allyl-palladium | frozen ORACLE state | 24 | protected metal-to-η3-centre coordinate |
+| water | standalone minimal | 3 | minimal nonlinear molecule |
+| norbornane | standalone minimal | 51 | bridged and cyclic topology |
+| formic-acid-water | standalone minimal + fragments | 18 | non-covalent two-fragment contract |
+| eta3-allyl-palladium | complete frozen state | 24 | protected metal-to-η3-centre coordinate |
 
 The formic-acid–water output must contain three `FRAG_TRANSLATION` and three
 `FRAG_ORIENTATION` primitives.  The η3 probe must retain an `ETA3_CENTER` over

@@ -62,7 +62,10 @@ coordinates.  The \SMITH\ (Symmetry-Mapped Internal-coordinate Template
 Handler) implementation starts
 from a frozen molecular state containing geometry, topology, atom equivalence,
 point-group operations, fragments, optional interaction centers and an
-ORACLE-frozen redundant primitive/B source space.  It validates and classifies
+ordered redundant primitive/B source space.  In an integrated MATRIX workflow
+the complete state is supplied by ORACLE; standalone \SMITH\ can instead consume
+user-supplied topology or primitive definitions, or construct the minimal
+topology and ordinary primitives required by \SONIC\ from Cartesian input.  It validates and classifies
 the ordinary primitive rows, augments them with chemically typed special or
 composite families, protects coordinates for rings and fragments, and reduces the coordinate space using analytic Wilson
 \(\Bmat\)-row rank tests.  A local-pseudosymmetry layer first orders
@@ -133,7 +136,7 @@ coordinates enter a fit, force field, scan or surface model.
 \toprule
 Name & Role \\
 \midrule
-ORACLE molecular-state layer & Input/perception layer that either reads saved topology,
+ORACLE molecular-state layer (integrated workflow) & Input/perception layer that either reads saved topology,
 symmetry and synthon sections from the \texttt{xyzin} file or constructs them
 from Cartesian coordinates.  ORACLE owns cycle perception, point-group
 operations and atom permutations, atom equivalence, effective atomic numbers,
@@ -142,8 +145,9 @@ primitive coordinates with their Wilson B matrix.  It develops Proxima
 and is defined in the companion ORACLE methodological manuscript; its production
 implementation remains in final validation before release.\cite{Lazzari2020Proxima,Gambi2019Synthons,Lazzari2024SynthonPCS,Lazzari2025PCS141} \\
 \SMITH{}--\SONIC & Coordinate-construction tool and its coordinate
-contract.  \SMITH\ consumes the frozen ORACLE state; it does not rediscover
-cycles, symmetry, atomic descriptors or ordinary primitive definitions.  It performs SONIC construction, special/composite coordinate generation, symmetry-adapted
+contract.  \SMITH\ accepts a complete frozen state, a supplied topology, a
+supplied redundant primitive set, or plain Cartesian input through its bundled
+minimal frontend.  It performs SONIC construction, special/composite coordinate generation, symmetry-adapted
 Cartesian reference spaces, analytic \(\Bmat\) rows, symmetry labels and
 provenance. \\
 GF/PED, DVR & Wilson GF/potential-energy-distribution analysis and discrete
@@ -194,8 +198,8 @@ electronic-structure backend handling remain outside \SMITH. \\
   },
   arrow/.style={-{Latex[length=2.2mm]}, line width=0.45pt, draw=black!70}
 ]
-\node[stage=blue!7] (state) {ORACLE molecular\\state};
-\node[stage=green!8, right=of state] (families) {ORACLE primitive/B\\source + SMITH\\family labels};
+\node[stage=blue!7] (state) {Molecular state\\or standalone\\topology};
+\node[stage=green!8, right=of state] (families) {Primitive/B\\source + SMITH\\family labels};
 \node[stage=orange!10, right=of families] (semantic) {Protected\\semantic, ring\\and fragment rows};
 \node[stage=purple!8, right=of semantic] (reduction) {Block-local\\rank reduction\\and symmetry};
 \node[contract, right=of reduction] (contract) {Frozen\\coordinate\\contract};
@@ -218,7 +222,9 @@ electronic-structure backend handling remain outside \SMITH. \\
 \end{tikzpicture}
 }
 \caption{Constructive workflow implemented by \SMITH\ for \SONIC\ coordinates,
-starting from the ORACLE molecular and redundant primitive/B contracts.
+starting from a molecular-state and redundant primitive/B contract.  The
+integrated route may consume the full ORACLE state, whereas standalone SMITH
+can construct or accept the topology/primitive boundary directly.
 The model-building stage
 ends at the frozen coordinate contract; downstream modules reuse that object
 and update only the numerical quantities required for their task, such as
@@ -369,13 +375,15 @@ semantic coordinate rather than as an opaque handwritten expression.
 
 \section{Molecular State and Atom Equivalence}
 
-\SONIC\ does not rediscover the molecule at every downstream step.  Its input is
-a validated molecular state containing Cartesian geometry, covalent bonds,
-rings, point-group operations, optional fragments, optional interaction centers,
-continuous chemical perception descriptors and redundant ordinary primitives
-with their Wilson B rows.  If those data are already
+\SONIC\ does not rediscover the molecule at every downstream step.  Its formal
+input boundary is provider-neutral: Cartesian geometry plus either a frozen
+topology or an ordered redundant primitive set with the information needed to
+reconstruct its Wilson B rows.  A complete molecular state may additionally
+contain rings, point-group operations, fragments, interaction centers and
+continuous chemical-perception descriptors.  If those data are already
 present in the \texttt{xyzin} file, \SONIC\ consumes them as part of the frozen
-state.  Their definition belongs to ORACLE (Operator for Recognition,
+state.  In the integrated MATRIX workflow their full definition belongs to
+ORACLE (Operator for Recognition,
 Atom-typing and Continuous Local Equivalence), the continuous-perception
 development of Proxima.  Its state contract and perception methods are defined
 in the companion ORACLE manuscript, while the production application remains
@@ -385,8 +393,8 @@ operations and atom permutations, atom equivalence, effective atomic numbers,
 the charge, covalency, delocalization and strain, the topological edge order,
 the distinct Mayer/Pauling multiplicity, and separate
 $\sigma$, first-$\pi$ and second-$\pi$ ($\pi\pi$) synthon indices used below.
-\SMITH\ consumes these objects and does not recompute
-them.  ORACLE also supplies the ordinary stretch, bend, linear-bend, dihedral
+\SMITH\ consumes these objects when present and does not recompute them.  The
+complete state also supplies the ordinary stretch, bend, linear-bend, dihedral
 and out-of-plane source definitions and their reference B matrix.  \SMITH\ may
 add fragment exponential-map, pseudo-bond, ring-puckering, interaction-center
 or protected semantic rows because these belong to the requested SONIC chart,
@@ -397,22 +405,26 @@ representations, total-symmetric subsets and the metadata required to
 reconstruct analytic \(\Bmat\) rows.  Downstream modules consume this state;
 they do not rebuild topology, ring sets or coordinate rows.
 
-For standalone use the same information can be supplied in a single
+For standalone use the required boundary can be supplied in a single
 \SMITH\ extended-XYZ input file with schema \texttt{matrix.smith.input.v1}.  The file begins as a standard XYZ block: atom count, comment line and Cartesian
 coordinates.  Optional SMITH directives follow after the atom list, so the same
 file can still be opened by ordinary XYZ viewers while carrying construction
 options such as symmetrization, \texttt{SYCART} export, fragment treatment,
-X--H policies and an optional reduced working
-subgroup.  The reduced standalone distribution invokes a pinned, limited
-ORACLE perception profile for this plain-XYZ convenience path and records
-\texttt{PERCEPTION\_PROFILE REDUCED\_ORACLE} in the output.  This mode is
-intended for the supplied examples and ordinary molecular inputs, not as a
-substitute for the full ORACLE application, which is validated and distributed
-as an independent release candidate.  Production calculations can
-instead require a separately validated ORACLE \texttt{xyzin} state, which is
-recorded as \texttt{ORACLE\_STATE}.  Thus the package is runnable on its own
-while preserving an explicit scientific boundary between perception and
-coordinate construction.
+X--H policies and an optional reduced working subgroup.  Four input profiles
+are accepted.  A complete frozen state is consumed unchanged; a supplied
+\texttt{TOPOLOGY} section is used to generate the ordinary redundant
+primitives; a supplied \texttt{PRIMITIVES} section is validated against the
+Cartesian geometry and used directly; and a plain XYZ invokes a bundled
+minimal frontend that constructs both topology and ordinary primitives.  If
+topology and primitives are both supplied, their bond rows must agree.  The
+output records the selected profile as \texttt{FROZEN\_STATE},
+\texttt{STANDALONE\_TOPOLOGY}, \texttt{STANDALONE\_PRIMITIVES} or
+\texttt{STANDALONE\_MINIMAL}.  The minimal route is sufficient for ordinary
+molecules and the supplied examples; advanced continuous descriptors,
+interaction centers or externally validated symmetry can instead be supplied
+through the complete-state interface.  Thus SMITH is operationally standalone
+without erasing the scientific boundary between perception and coordinate
+construction.
 
 The ORACLE perception layer develops published chemical descriptors:
 continuous molecular perception introduced in
@@ -1568,7 +1580,26 @@ chain rule is accumulated directly from the sparse slices,
  C_{ab}=\sum_i g_i^{(q)}\mathcal D_{iab},
  \label{eq:sparse-b-curvature}
 \end{equation}
-and symmetrized only after the contraction. The same frozen-coordinate API is
+and symmetrized only after the contraction.  If \(\mathbf g^{(q)}\) and
+\(\mathbf H^{(q)}\) are the internal-coordinate gradient and Hessian, the exact
+Cartesian derivatives are
+\begin{align}
+ \mathbf g^{(x)} &= \Bmat^T\mathbf g^{(q)},\\
+ \mathbf H^{(x)} &= \Bmat^T\mathbf H^{(q)}\Bmat+\mathbf C.
+ \label{eq:hessian-chain-rule}
+\end{align}
+Conversely, on the full-row-rank active coordinate space,
+\begin{equation}
+ \mathbf H^{(q)}=(\Bmat^+)^T\bigl(\mathbf H^{(x)}-\mathbf C\bigr)\Bmat^+.
+ \label{eq:hessian-back-transformation}
+\end{equation}
+Thus \(\Bmat'\) is not an auxiliary coordinate-selection device: it is the
+geometric-curvature term required to transform Hessians at a nonstationary or
+constrained geometry.  At an unconstrained stationary point
+\(\mathbf g^{(q)}=0\), so \(\mathbf C=0\) and the familiar first-order
+transformation is recovered.  The distinction matters for scans, constrained
+optimizations, force-field construction away from equilibrium and any
+trajectory on which Cartesian and internal Hessians are exchanged.  The same frozen-coordinate API is
 used for primitive PIC rows and for their local SONIC combinations.  The
 analytic path covers stretches, valence and linear bends, dihedrals,
 out-of-plane coordinates, ring combinations, fragment translations and
@@ -2190,6 +2221,20 @@ Cartesian nullspace that is not built from GIC primitives; agreement shows that
 the chemical conclusion depends on topology, symmetry and rank, not on a hidden
 generator choice.
 
+The stored first derivative of the Wilson matrix completes this audit at
+second order.  The ordinary Wilson matrix describes the tangent map
+\(d\mathbf q=\Bmat\,d\mathbf x\); its derivative describes how that tangent map
+curves as the geometry changes.  Equations~\eqref{eq:hessian-chain-rule} and
+\eqref{eq:hessian-back-transformation} separate physical force-constant
+curvature from coordinate curvature instead of folding the latter into an
+apparent Hessian.  This distinction is immaterial for an exactly stationary
+harmonic GF calculation, where the gradient contraction vanishes, but it is
+essential for constrained stationary points, scans, partial optimizations and
+Hessian transport along a path.  Because SONIC rows are frozen linear
+combinations of typed source rows, their \(\Bmat'\) slices are assembled with
+the same coefficients; no dense three-index tensor or numerical refit is
+introduced.
+
 Table~\ref{tab:local-salc-validation} adds a complementary check that is not
 available from molecular point-group tests alone: a chemically useful local
 totally symmetric coordinate remains identifiable in a \(C_1\) molecule, but
@@ -2236,6 +2281,12 @@ matrix.  Once the definition is stored, each optimization, scan, GF/PED or
 refinement step evaluates sparse Wilson rows with cost \(O(z)\), plus sparse
 chain-rule work for derived functions.  This separation is the reason the code
 keeps coordinate construction and \(\Bmat\) evaluation as distinct services.
+The corresponding \(\Bmat'\) service is evaluated only when a second-order
+transformation is requested.  Its work follows the stored nonzero entries of
+the participating primitive Hessians and the contraction in
+Eq.~\eqref{eq:sparse-b-curvature}; Table~\ref{tab:construction-cost} times
+\(\Bmat\), not this optional second-order service, and should not be read as a
+benchmark of \(\Bmat'\).
 
 Table~\ref{tab:construction-cost} and Figure~\ref{fig:construction-scaling}
 give a first scaling study for the present implementation.  The values are
@@ -2367,6 +2418,24 @@ that change topology, fragment membership or symmetry stratum still require a
 new contract; adaptive interpolation between such discrete molecular states is
 outside the present scope.
 
+The same locality qualification applies to \(\Bmat'\).  Analytic second
+derivatives are available for every supported primitive and are propagated to
+PIC and SONIC rows by the exact chain rule.  Singular or unsupported primitive
+charts trigger an explicitly reported numerical fallback; they are never
+silently mixed into the analytic path.  Near linear-angle singularities,
+fragment-rotation chart boundaries or a topology change, the appropriate
+remedy is to switch or rebase the coordinate chart and rebuild the contract,
+not to interpret a divergent \(\Bmat'\) as physical curvature.
+
+Standalone operation has a related, explicit scope boundary.  Supplied
+topology or primitive sections are authoritative and preserved, while the
+bundled minimal Cartesian frontend provides only the information needed to
+construct ordinary SONIC coordinates.  Results that depend on advanced
+continuous atom equivalence, externally validated point-group operations or
+special interaction centers require those data in the input state.  This is a
+capability distinction between input profiles, not a runtime dependency of
+SMITH on a separate application.
+
 The priority-first rule is a chemically motivated modelling principle, not a
 mathematical uniqueness result over all possible coordinate bases.  Alternative
 priority orders would define different, still reproducible contracts.  The
@@ -2383,7 +2452,7 @@ provenance rather than hidden in an implementation choice.
 
 \section{Conclusions}
 
-Starting from an ORACLE redundant primitive/B contract, \SONIC\ provides a general, frozen and symmetry-aware construction of
+Starting from a frozen topology and redundant primitive/B contract, \SONIC\ provides a general, frozen and symmetry-aware construction of
 non-redundant internal coordinates.  Its main contribution is a
 reproducible coordinate object that integrates ingredients usually treated
 separately: natural-coordinate locality, analytic Wilson-\(\Bmat\) rank control,
@@ -2449,13 +2518,14 @@ plots, including \texttt{data/local\_salc\_validation.json} and its generating
 script.  The same repository contains a reduced standalone Python package,
 installation instructions and water, norbornane, formic-acid--water and
 $\eta^3$ allyl--palladium examples.  Its
-\texttt{smith-sonic build} command accepts either a validated ORACLE
-\texttt{xyzin} state or a single extended-XYZ input; the latter invokes the
-explicitly labelled reduced ORACLE profile.  SMITH, including optional Gaussian
+\texttt{smith-sonic build} command accepts a complete validated \texttt{xyzin}
+state, an extended XYZ carrying \texttt{TOPOLOGY} or \texttt{PRIMITIVES}, or a
+plain Cartesian input through the bundled minimal frontend.  The provider-neutral
+\texttt{--require-frozen-state} option requires the complete contract.  SMITH, including optional Gaussian
 \texttt{ReadAllGIC} export, is developed at
 \url{https://github.com/yogibubu/MATRIX}.  The package pins only reduced-perception
-components; full ORACLE is described in its companion manuscript and is
-validated as an independent release candidate.
+components; a complete ORACLE state is one optional integrated provider and is
+described in its companion manuscript.
 The reproducible standalone environment is tagged \texttt{v0.1.0rc5} in the
 SMITH repository and pins the exact MATRIX commit stated above. Repository
 revisions and \texttt{\#SMITH\_PROVENANCE} record the code and

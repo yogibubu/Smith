@@ -6,7 +6,13 @@ implementation used by the manuscript and installs only the core, chemical
 perception, engine-interface, and SMITH coordinate packages needed by the
 builder.
 
-SMITH and ORACLE have separate scientific responsibilities:
+SMITH uses a provider-neutral input boundary.  It can start from Cartesian
+geometry plus a supplied topology, from a supplied redundant primitive/Wilson-B
+contract, or from a complete frozen molecular state.  With plain Cartesian
+input, a bundled minimal frontend constructs the topology and ordinary
+primitives needed by SONIC.
+
+In the integrated MATRIX workflow, SMITH and ORACLE have separate scientific responsibilities:
 
 - ORACLE performs continuous molecular perception.  It owns the molecular
   graph and cycle basis, point-group operations and atom permutations, atom
@@ -18,11 +24,11 @@ SMITH and ORACLE have separate scientific responsibilities:
   coordinate families, protected rows, rank reduction, homogeneous symmetry
   adaptation, analytic Wilson rows, and serialized coordinate contract.
 
-Two input profiles are available.  An ORACLE-enriched `xyzin` file is the
-recommended production input.  A plain SMITH extended XYZ is accepted through
-a reduced bundled ORACLE profile so that the paper examples can be reproduced
-with one small input file.  This convenience profile is not presented as a
-replacement or release of the full ORACLE application.
+Four input profiles are available: `FROZEN_STATE`,
+`STANDALONE_TOPOLOGY`, `STANDALONE_PRIMITIVES`, and
+`STANDALONE_MINIMAL`.  The last profile is sufficient for ordinary inputs and
+the paper examples; advanced descriptors, symmetry operations, fragments, or
+interaction centers can be supplied in a complete frozen state.
 
 ## Install from GitHub
 
@@ -64,26 +70,28 @@ smith-sonic example eta3-allyl-palladium eta3-allyl-palladium.xyzin
 The same input files are visible under `examples/` in the GitHub repository and
 can be passed explicitly to `smith-sonic build`.
 
-For a production state prepared and validated by ORACLE, make the boundary
-explicit:
+To require a complete externally validated state, make the boundary explicit:
 
 ```bash
-smith-sonic build molecule.oracle.xyzin molecule.sonic.xyzin --require-oracle-state
+smith-sonic build molecule.xyzin molecule.sonic.xyzin --require-frozen-state
 ```
 
 Every output receives a `#SMITH_PROVENANCE` section recording whether SMITH
-consumed a complete `ORACLE_STATE` or invoked the `REDUCED_ORACLE` convenience
-profile.  Gaussian export and the wider validation/optimizer commands remain
+consumed a complete state, supplied topology, supplied primitives, or its
+minimal Cartesian frontend.  Gaussian export and the wider validation/optimizer commands remain
 available in the full MATRIX distribution; the standalone package deliberately
 limits its surface to SONIC contract construction and inspection.  Each build
 also writes a `.smith.out` coordinate report and a `.g16.gjf` Gaussian 16 input.
 The G16 profile is the default, and non-totally symmetric coordinates are
 written as `Frozen`.
 
-With `--require-oracle-state`, the required production boundary is
+With `--require-frozen-state`, the required production boundary is
 `VALIDATION`, `TOPOLOGY`, `SYNTHONS`, `SYMMETRY`, and `PRIMITIVES`. The last
 section freezes the primitive ordering, reference values and Wilson-B
-fingerprint that SMITH consumes before constructing SONIC.
+fingerprint that SMITH consumes before constructing SONIC.  Without this flag,
+a file carrying only `TOPOLOGY` causes SMITH to generate the ordinary redundant
+primitives, while a file carrying `PRIMITIVES` uses those rows directly after
+geometry and topology-consistency checks.
 
 The formic-acid–water example exercises all six intermolecular fragment
 coordinates.  The eta3 allyl–palladium example consumes an explicit, frozen

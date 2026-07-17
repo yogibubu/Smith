@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+import shutil
 import tempfile
 import unittest
 
-from matrix_core import read_sectioned_lines, section_content
+from matrix_core import read_sectioned_lines, replace_section, section_content
 from smith_sonic.cli import main
 
 
@@ -55,7 +56,28 @@ class PackagedExampleTests(unittest.TestCase):
                 for row in contract
             )
         )
-        self.assertIn("PERCEPTION_PROFILE ORACLE_STATE", provenance)
+        self.assertIn("PERCEPTION_PROFILE FROZEN_STATE", provenance)
+
+    def test_standalone_accepts_supplied_topology_or_primitives(self) -> None:
+        _seed, seed_lines, scratch = self._run_example("water")
+        self.addCleanup(scratch.cleanup)
+        standalone = Path(__file__).resolve().parents[1]
+
+        for section_name, profile in (
+            ("TOPOLOGY", "STANDALONE_TOPOLOGY"),
+            ("PRIMITIVES", "STANDALONE_PRIMITIVES"),
+        ):
+            with self.subTest(section=section_name):
+                source = Path(scratch.name) / f"water-{section_name.lower()}.smith.xyz"
+                target = Path(scratch.name) / f"water-{section_name.lower()}.xyzin"
+                shutil.copyfile(standalone / "examples" / "water.smith.xyz", source)
+                replace_section(source, section_name, section_content(seed_lines, section_name))
+                self.assertEqual(main(["build", str(source), str(target)]), 0)
+                built = read_sectioned_lines(target)
+                provenance = section_content(built, "SMITH_PROVENANCE")
+                self.assertIn(f"PERCEPTION_PROFILE {profile}", provenance)
+                self.assertTrue(section_content(built, "TOPOLOGY"))
+                self.assertTrue(section_content(built, "PRIMITIVES"))
 
     def test_eta3_fixture_generator_is_reproducible(self) -> None:
         standalone = Path(__file__).resolve().parents[1]

@@ -75,8 +75,8 @@ Expected summaries are:
   and three fragment orientations;
 - eta3 allyl--palladium: 24 GICs, rank 24, including one protected
   centre--atom distance;
-- the first three outputs: `PERCEPTION_PROFILE REDUCED_ORACLE`;
-- the eta3 output: `PERCEPTION_PROFILE ORACLE_STATE`.
+- the first three outputs: `PERCEPTION_PROFILE STANDALONE_MINIMAL`;
+- the eta3 output: `PERCEPTION_PROFILE FROZEN_STATE`.
 
 The source inputs are also visible under `standalone/examples/`.  Read
 `standalone/MANUAL.md` before running the advanced examples.  The eta3 geometry
@@ -100,8 +100,8 @@ Please report:
 - whether authentication, cloning, and installation completed without manual
   intervention;
 - the complete terminal output if a command fails;
-- whether the distinction between reduced ORACLE perception and SMITH/SONIC
-  coordinate construction is understandable;
+- whether the standalone topology/primitive boundary and SMITH/SONIC
+  coordinate construction are understandable;
 - whether the commands and generated files are self-explanatory;
 - the summaries printed for all four examples;
 - whether the non-covalent output clearly represents six intermolecular

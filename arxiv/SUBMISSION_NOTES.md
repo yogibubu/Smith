@@ -14,8 +14,8 @@ the generated PDF with the local `main.pdf`, paying particular attention to the
 tables, figures, bibliography, and final TOC graphic.
 
 The rc5 archive was compiled independently from its own source tree and yields
-the same 64-page content as the working manuscript. SHA256:
-`6d4be796d466f6b70b01b7c52625bd0c6ee36cca54ce730971f8b8aea26b5dde`.
+the same 66-page content as the working manuscript. SHA256:
+`b717225d7ab1b8a0626244a68798ad6f62453673cfe479b3bc3ea265a31ccad1`.
 
 The first-submission workflow may ask for endorsement in `physics.chem-ph`.
 This is an account/category requirement and is separate from manuscript

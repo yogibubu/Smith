@@ -102,11 +102,12 @@ Each standalone command also writes a readable `.smith.out` coordinate report
 and a Gaussian 16 `.g16.gjf` input.  The two advanced `xyzin` contracts are
 regression-tested as direct MORPHEUS inputs and LINK SONIC coordinate models.
 
-Plain extended XYZ input uses the labelled `REDUCED_ORACLE` convenience
-profile.  To require a complete, separately validated ORACLE state, use:
+Plain extended XYZ input uses the labelled `STANDALONE_MINIMAL` profile.
+Inputs may instead carry `TOPOLOGY` or `PRIMITIVES`.  To require a complete,
+separately validated state, use:
 
 ```bash
-smith-sonic build molecule.oracle.xyzin molecule.sonic.xyzin --require-oracle-state
+smith-sonic build molecule.xyzin molecule.sonic.xyzin --require-frozen-state
 ```
 
 Instructions for private release-candidate testing are in

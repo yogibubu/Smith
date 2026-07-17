@@ -40,14 +40,14 @@ contains only a standard XYZ geometry followed by the minimum SMITH directives
 needed for this Gaussian-compatible export.  The standalone workflow selects
 the commercial Gaussian 16 profile by default, including Gaussian-style
 improper-dihedral construction in place of native \SONIC\ out-of-plane rows.
-For this one-file example, the standalone package
-uses its pinned reduced ORACLE profile to supply the graph, cycles, symmetry,
-ordinary redundant primitives and their Wilson B source matrix, and
-continuous atom descriptors needed by \SMITH.  This convenience profile is
-recorded in the generated provenance and is distinct from the full ORACLE
-perception application, a development of PROXIMA that will be described
-separately.  The full application is currently in final testing and will be
-released when ready.
+For this one-file example, the standalone package uses its pinned minimal
+frontend to supply the graph, cycles, ordinary redundant primitives and their
+Wilson B source matrix.  The generated provenance records
+\texttt{PERCEPTION\_PROFILE STANDALONE\_MINIMAL}.  The same executable can
+instead consume a supplied \texttt{TOPOLOGY} section, a supplied
+\texttt{PRIMITIVES} section or a complete externally validated molecular state;
+these are input profiles of standalone SMITH rather than dependencies on a
+separate application.
 
 The exact standalone workflow is:
 \begin{lstlisting}
@@ -58,7 +58,7 @@ python -m matrix smith gaussian-input norbornane.xyzin norbornane_g16_readallgic
 \end{lstlisting}
 Equivalently, after installation of MATRIX the console-script shorthand is
 \texttt{smith standalone ...} followed by \texttt{smith gaussian-input ...}.
-The reduced package distributed with the manuscript constructs the same
+The standalone package distributed with the manuscript constructs the same
 contract with \texttt{smith-sonic build norbornane.smith.xyz norbornane.xyzin}
 and automatically writes both \texttt{norbornane.smith.out} and
 \texttt{norbornane.g16.gjf}.  The default Gaussian 16 profile suppresses active
