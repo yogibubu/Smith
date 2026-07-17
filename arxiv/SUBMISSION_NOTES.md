@@ -15,7 +15,7 @@ tables, figures, bibliography, and final TOC graphic.
 
 The rc5 archive was compiled independently from its own source tree and yields
 the same 64-page content as the working manuscript. SHA256:
-`68429fd493a89170738f504e3c0d0ff8e64e869ef9b421a606032798bab9cf8a`.
+`68a81665dadfbe1680b4237dfaeee2283396ce14e2ab8fb5a183c61f866f316d`.
 
 The first-submission workflow may ask for endorsement in `physics.chem-ph`.
 This is an account/category requirement and is separate from manuscript

@@ -1550,14 +1550,17 @@ The first Wilson-matrix derivative is represented as
  \mathcal D_{iab}=\frac{\partial B_{ia}}{\partial x_b}.
  \label{eq:sparse-b-first-derivative}
 \end{equation}
-The production implementation evaluates the Cartesian Hessian of each local
-primitive by second-order forward algorithmic differentiation.  The frozen
+The production implementation evaluates the first Wilson-matrix derivative
+analytically by applying second-order forward-mode automatic differentiation
+to each local primitive.  Equivalently, the Cartesian Hessian of every
+supported primitive is obtained by exact chain-rule propagation, without
+finite differences.  The frozen
 linear coefficients defining a PIC or SONIC then assemble these primitive
 Hessians directly into $\partial\Bmat/\partial x_b$ slices, each retaining only
-its nonzero row--column map.  A parallel fourth-order centered differentiation
-of the analytic $\Bmat$ rows is retained as an independent audit and is invoked
-explicitly as a reported fallback at a singular or unsupported primitive; it
-is not the production route. Consequently neither PIC nor SONIC use a dense
+its nonzero row--column map.  A parallel fourth-order centered finite-difference
+evaluation of the analytic $\Bmat$ rows is retained only as an independent audit
+and as an explicitly reported fallback at a singular or unsupported primitive;
+it is not the production route. Consequently neither PIC nor SONIC use a dense
 $n_q\times(3N)^2$ object. At a
 nonstationary geometry the curvature contribution required by the Hessian
 chain rule is accumulated directly from the sparse slices,
