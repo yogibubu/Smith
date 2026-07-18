@@ -44,7 +44,7 @@ export SMITH_CHECKOUT=/path/to/your/Smith
 export SMITH_ENV=/path/to/your/smith-venv
 git clone https://github.com/yogibubu/Smith.git "$SMITH_CHECKOUT"
 cd "$SMITH_CHECKOUT"
-git switch --detach v0.1.0rc6
+git switch --detach v0.1.0rc7
 python3 -m venv "$SMITH_ENV"
 source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip
@@ -200,14 +200,23 @@ rank when special fragment or centre coordinates are present.
 For the complete standalone publication verification, run:
 
 ```bash
-python -m pip install ./standalone
-python -m unittest discover -s standalone/tests -v
+python -m pip install "./standalone[test]"
+python -m pytest standalone/tests/test_examples.py
 ```
 
 The public gate checks all input profiles, both output formats, the three
 non-covalent examples, and the supplied interaction-centre fixture.
 Cross-application integration tests remain development checks and are not
 installation requirements for standalone SMITH.
+
+The LINK/MORPHEUS integration probe is intentionally separate because those
+applications are not standalone dependencies.  Developers can run it against
+a compatible clean MATRIX checkout with:
+
+```bash
+MATRIX_ROOT=/absolute/path/to/MATRIX SMITH_REQUIRE_DOWNSTREAM=1 \
+  python -m pytest standalone/tests/test_downstream_consumers.py
+```
 
 When reporting a problem, include the operating system and architecture,
 Python version, exact command, complete terminal output, input file, and

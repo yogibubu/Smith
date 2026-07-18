@@ -52,7 +52,7 @@ python -m venv "$SMITH_ENV"
 source "$SMITH_ENV/bin/activate"
 python -m pip install --upgrade pip
 python -m pip install \
-  "smith-sonic @ git+https://github.com/yogibubu/Smith.git@v0.1.0rc6#subdirectory=standalone"
+  "smith-sonic @ git+https://github.com/yogibubu/Smith.git@v0.1.0rc7#subdirectory=standalone"
 ```
 
 The environment directory is selected by the installer.  The package contains
@@ -127,3 +127,11 @@ publication gate also verifies clean installations with Python 3.11 and 3.13,
 all four input profiles, Gaussian 16 export, and consumption of the frozen
 SONIC contract by LINK and MORPHEUS.  Changes after the submission freeze must
 be released as a later version.
+
+The downstream probe is a development integration gate, not a runtime
+dependency of the standalone package:
+
+```bash
+MATRIX_ROOT=/absolute/path/to/MATRIX SMITH_REQUIRE_DOWNSTREAM=1 \
+  python -m pytest standalone/tests/test_downstream_consumers.py
+```

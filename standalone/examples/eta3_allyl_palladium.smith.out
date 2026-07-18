@@ -97,26 +97,74 @@ Skipped dependent details: P008:STRETCH:Str0008, P015:LINEAR_BEND:LinB0002, P016
 Coordinate Definitions
 ----------------------
    1 GIC001 CnAt0001 family=CENTER_ATOM_DISTANCE class=SPECIAL_PROTECTED irrep=UNASSIGNED state=ACTIVE value=1.8 unit=angstrom components=P012:+1
+     Human formula: CnAt0001 = +1*P012
+       +1 * P012: center atom distance; function=CENTER_ATOM_DIST atoms=(3,4,5)
    2 GIC002 Str0001 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.3 unit=angstrom components=P001:+1
+     Human formula: Str0001 = +1*P001
+       +1 * P001: distance R(1,2)
    3 GIC003 Str0002 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.140093456 unit=angstrom components=P002:+1
+     Human formula: Str0002 = +1*P002
+       +1 * P002: distance R(1,3)
    4 GIC004 Str0003 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2 unit=angstrom components=P003:+1
+     Human formula: Str0003 = +1*P003
+       +1 * P003: distance R(1,4)
    5 GIC005 Str0004 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.140093456 unit=angstrom components=P004:+1
+     Human formula: Str0004 = +1*P004
+       +1 * P004: distance R(1,5)
    6 GIC006 Str0005 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.334166406 unit=angstrom components=P005:+1
+     Human formula: Str0005 = +1*P005
+       +1 * P005: distance R(3,4)
    7 GIC007 Str0006 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.070046728 unit=angstrom components=P006:+1
+     Human formula: Str0006 = +1*P006
+       +1 * P006: distance R(3,6)
    8 GIC008 Str0007 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.087428159 unit=angstrom components=P007:+1
+     Human formula: Str0007 = +1*P007
+       +1 * P007: distance R(3,7)
    9 GIC009 Str0009 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.09 unit=angstrom components=P009:+1
+     Human formula: Str0009 = +1*P009
+       +1 * P009: distance R(4,8)
   10 GIC010 Str0010 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.070046728 unit=angstrom components=P010:+1
+     Human formula: Str0010 = +1*P010
+       +1 * P010: distance R(5,9)
   11 GIC011 Str0011 family=STRETCH class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.087428159 unit=angstrom components=P011:+1
+     Human formula: Str0011 = +1*P011
+       +1 * P011: distance R(5,10)
   12 GIC012 Bend0001 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.488746022 unit=radian components=P013:+1
+     Human formula: Bend0001 = +1*P013
+       +1 * P013: bond angle A(2,1,3)
   13 GIC013 LinB0001 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P014:+1
+     Human formula: LinB0001 = +1*P014
+       +1 * P014: linear-bend component L(2,1,4, mode=-1)
   14 GIC014 LinB0003 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P021:+1
+     Human formula: LinB0003 = +1*P021
+       +1 * P021: linear-bend component L(1,3,6, mode=-1)
   15 GIC015 LinB0004 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P022:+1
+     Human formula: LinB0004 = +1*P022
+       +1 * P022: linear-bend component L(1,3,6, mode=-2)
   16 GIC016 Bend0007 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.400238589 unit=radian components=P023:+1
+     Human formula: Bend0007 = +1*P023
+       +1 * P023: bond angle A(1,3,7)
   17 GIC017 Bend0009 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.000947705 unit=radian components=P025:+1
+     Human formula: Bend0009 = +1*P025
+       +1 * P025: bond angle A(4,3,7)
   18 GIC018 LinB0005 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P029:+1
+     Human formula: LinB0005 = +1*P029
+       +1 * P029: linear-bend component L(1,4,8, mode=-1)
   19 GIC019 LinB0006 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P030:+1
+     Human formula: LinB0006 = +1*P030
+       +1 * P030: linear-bend component L(1,4,8, mode=-2)
   20 GIC020 LinB0007 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P035:+1
+     Human formula: LinB0007 = +1*P035
+       +1 * P035: linear-bend component L(1,5,9, mode=-1)
   21 GIC021 LinB0008 family=LINEAR_BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P036:+1
+     Human formula: LinB0008 = +1*P036
+       +1 * P036: linear-bend component L(1,5,9, mode=-2)
   22 GIC022 Bend0017 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=1.400238589 unit=radian components=P037:+1
+     Human formula: Bend0017 = +1*P037
+       +1 * P037: bond angle A(1,5,10)
   23 GIC023 Bend0019 family=BEND class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=2.000947705 unit=radian components=P039:+1
+     Human formula: Bend0019 = +1*P039
+       +1 * P039: bond angle A(4,5,10)
   24 GIC024 Tors0005 family=TORSION class=ORDINARY irrep=UNASSIGNED state=ACTIVE value=0 unit=radian components=P045:+1
+     Human formula: Tors0005 = +1*P045
+       +1 * P045: torsion D(4,3,1,5)

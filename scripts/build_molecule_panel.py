@@ -166,8 +166,8 @@ def main() -> None:
         ),
         (
             "$\\eta^3$-Allyl--PdCl",
-            "ORACLE ligand center",
-            ROOT / "standalone/examples/eta3_allyl_palladium.oracle.xyzin",
+            "supplied ligand center",
+            ROOT / "standalone/examples/eta3_allyl_palladium.source.xyz",
             None,
             "eta3_center",
         ),

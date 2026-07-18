@@ -309,7 +309,61 @@ Point & ORCA \(E_h\) & ORCA \(\Delta E\) & Molpro \(E_h\) & Molpro \(\Delta E\) 
 
 \section{Pagodane, Indane and Saccharin Ring-Coordinate Fixtures}
 
-Two Cartesian structures are retained verbatim as publication fixtures.  The
+The complete internal validation corpus underlying the representative
+main-text table is collected in Table~\ref{tab:si-validation-full}.
+Horizontal rules separate the individual systems so that rank closure,
+coordinate family and numerical audit can be followed independently.
+
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{@{}p{0.14\linewidth}p{0.24\linewidth}p{0.07\linewidth}p{0.15\linewidth}p{0.31\linewidth}@{}}
+\caption{Complete internal validation of the SONIC construction.  Symbols and
+numerical diagnostics are defined in the main text.}\label{tab:si-validation-full}\\
+\toprule
+System & Stress test & PG & Rank/closure & Numerical check \\
+\midrule
+\endfirsthead
+\toprule
+System & Stress test & PG & Rank/closure & Numerical check \\
+\midrule
+\endhead
+Benzene & Aromatic ring projector & \(D_{6h}\) & 30/30; 3 \(RPck\) & \(\Delta_\mathrm{PF}=6.67\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+\midrule
+Pyrrole & Heteroaromatic ring projector & \(C_{2v}\) & 24/24; 2 \(RPck\) & \(\Delta_\mathrm{PF}=6.92\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+\midrule
+Azulene & Non-benzenoid fused ring, butterfly & \(C_{2v}\) & 48/48; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.44\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+\midrule
+Norbornane & Bridged saturated ring & \(C_{2v}\) & 51/51; 3 \(RPck\) & \(\Delta_\mathrm{PF}=6.22\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+\midrule
+Cubane & High-symmetry cage & \(O_h\) & 42/42; cyclic bends & \(\Delta_\mathrm{PF}=6.41\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+\midrule
+Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\mathrm{PF}=6.71\times10^{-9}\); \(\epsilon_\mathrm{SALC}=3.33\times10^{-16}\) \\
+\midrule
+Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+\midrule
+Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+\midrule
+Pagodane & Cage and fused-ring source spaces & \(D_{2h}\) & 114/114 & \(\epsilon_\mathrm{FD}=4.02\times10^{-10}\); stretches and cyclic bends covered \\
+\midrule
+Indane & Fused aromatic/alicyclic rings & \(C_s\) & 51/51 & \(\epsilon_\mathrm{FD}=4.77\times10^{-10}\); butterfly and \(RPck\) rows covered \\
+\midrule
+Saccharin & Planar fused heterocycle, butterfly--puckering phase & \(C_s\) & 45/45; 5 \(RPck\) & \(\epsilon_\mathrm{FD}=3.91\times10^{-10}\); full post-projector \(\Bmat\) rank 45 \\
+\midrule
+Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 6 protected & three translations plus three orientations; direct \(\Bmat\)-rank \(=18\) \\
+\midrule
+Water dimer & Hydrogen-bonded fragment model & \(C_1\) & 12/12; 6 protected & standalone Cartesian input; three translations plus three orientations \\
+\midrule
+Benzene--water & Aromatic--polar fragment model & \(C_1\) & 39/39; 6 protected & standalone Cartesian input; ring coordinates coexist with the fragment block \\
+\midrule
+\(\eta^3\) allyl--PdCl & Supplied \(\eta^3\) ligand center & \(C_1\) & 24/24; 1 protected & \(q_{\eta^3}=1.8000\)~\AA; analytic center--atom row retained \\
+\midrule
+Weak-complex pseudo-cycles & Intermolecular and intramolecular pseudo-bond contacts & \(C_s\), \(C_{3v}\), \(C_1\) & rank closed & formic acid--water, water dimer, Li\(_2\)--Ar, borane--ammonia and glycine I/II fixtures validate the current baseline \\
+\midrule
+Semantic layer & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probes & duplicate protected row rejected; row-equivalent substitution recorded; protected-rank excess fails fast \\
+\bottomrule
+\end{longtable}
+
+Three Cartesian structures are retained verbatim as publication fixtures.  The
 first is pagodane, \(\mathrm{C}_{20}\mathrm{H}_{20}\): the pinned standalone
 frontend finds 50 covalent bonds, 11 rings, no aromatic atoms and a
 \(D_{2h}\) reference assignment.  The redundant primitive contract and SONIC
@@ -330,6 +384,18 @@ five \(RPck\) rows.  Replacing it by the corresponding sum lowers the rank of
 these six rows from six to five.  The regression therefore checks the complete
 post-symmetry Cartesian \(\Bmat\), rather than accepting six individually
 well-formed but collectively dependent expressions.
+
+The distributed native-GDV input below is generated from this corrected
+contract with the commercial-G16 compatibility translation disabled.  It
+therefore retains all signed \(U\) out-of-plane primitives: five composite
+ring-puckering rows and six local out-of-plane rows.  The file contains exactly
+45 SONIC definitions, has analytic Cartesian rank 45 at the reference
+geometry, and uses the accompanying \texttt{3F12red.gbs} basis file.  The
+electronic-structure route is the same one used for the end-to-end optimization
+and frequency calculation; its completed output is treated separately from
+the construction evidence and will be archived only after normal termination.
+
+\lstinputlisting[caption={Native-GDV saccharin input generated from the corrected full-rank SONIC contract.}]{si/saccharin_native_gdv.gjf}
 
 Central finite differences of every final SONIC row give maximum absolute
 analytic-row errors of \(4.02\times10^{-10}\) for pagodane and
@@ -362,9 +428,11 @@ version-1 manifests.
 
 \section{Reproducibility Details}
 
-The standalone manuscript snapshot is tag \texttt{v0.1.0rc6}, commit
-\texttt{9a9e64c39ed8}.  The regenerated local-pseudosymmetry record uses clean
-MATRIX commit \texttt{bc6d62140aab}.  The declared standalone
+The standalone manuscript snapshot is tag \texttt{v0.1.0rc7}.  Its scientific
+implementation provenance points to clean MATRIX commit
+\texttt{bc6d62140aab}, which contains the oriented native-out-of-plane
+projector and global post-projection rank audit used for the saccharin
+regression.  The declared standalone
 requirements are Python~\(\geq3.11\), NumPy~\(\geq1.26\), and
 setuptools~\(\geq68\); the validation environment used Python 3.13.11, NumPy
 2.4.2 and setuptools 80.9.0.
@@ -394,11 +462,13 @@ Representative SHA-256 fingerprints are:
 \toprule
 Artifact & SHA-256 \\
 \midrule
-\texttt{standalone/pyproject.toml} & \nolinkurl{1323d458b42f90d2c2d150e0a84b139a6de0c3bea5e80a7e8deb0ac3239d3997} \\
+\texttt{standalone/pyproject.toml} & \nolinkurl{beca83a4eeacd91995b6cedc41fb6af14f1e378c785119b5a5af544c6b2a5f25} \\
 \texttt{data/local\_salc\_validation.json} & \nolinkurl{aa3208ae1c904f476968d1df00312d1c5c5cbf93caecc4fc1269b4762bb691f9} \\
 \texttt{si/norbornane\_smith\_input.xyzin} & \nolinkurl{e5feb34cf4c2b1114b65456704342e0c22b687fce85bdb7d4c1e45bbd05885c6} \\
 \texttt{si/norbornane\_g16\_readallgic.gjf} & \nolinkurl{140742865ae2662c5f74099d78d099e83ab3b65c2a27c75b5d1c4a15996e3857} \\
 \texttt{si/norbornane\_g16\_output\_excerpt.txt} & \nolinkurl{93e21fe46c4d197079221fc5875d1994e5cfcadad2f0c252dd7789709107c4f5} \\
+\texttt{si/saccharin\_native\_gdv.gjf} & \nolinkurl{6bc29dfdda6a013be2df13f7a645db406a629ba954c99400cb1f6d0c8f28eab8} \\
+\texttt{si/3F12red.gbs} & \nolinkurl{2d7ebacd714e73a56f0695a0be1e7f5a18fabf32e2f851e22926f05acf4f2ecb} \\
 \bottomrule
 \end{tabularx}
 \end{table}

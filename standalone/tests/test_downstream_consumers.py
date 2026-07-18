@@ -2,8 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 import os
+import sys
 import tempfile
 import unittest
+
+MATRIX_ROOT = os.environ.get("MATRIX_ROOT")
+if MATRIX_ROOT:
+    packages = Path(MATRIX_ROOT).expanduser().resolve() / "packages"
+    for source_root in sorted(packages.glob("*/src")):
+        sys.path.append(str(source_root))
 
 try:
     from matrix_morpheus import prepare_semiexperimental_xyzin, read_geometry_input
@@ -28,8 +35,8 @@ class DownstreamConsumerTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         if not DOWNSTREAM_AVAILABLE:
             raise RuntimeError(
-                "SMITH RC verification requires the test extra: "
-                "python -m pip install './standalone[test]'"
+                "SMITH downstream verification requires MATRIX_ROOT to name "
+                "a compatible clean MATRIX checkout"
             )
 
     def test_advanced_examples_are_consumed_without_translation(self) -> None:

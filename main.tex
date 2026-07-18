@@ -105,7 +105,7 @@ intended scope of the method and its current limitations.
 
 \begin{tocentry}
 \centering
-\includegraphics[width=0.9\linewidth]{figures/graphical_toc.png}
+\includegraphics[width=0.96\linewidth]{figures/graphical_toc.png}
 \end{tocentry}
 
 \section{Introduction}
@@ -146,12 +146,14 @@ redundant primitives, symmetry operations, fragments, interaction centers and
 continuous chemical descriptors.  For plain Cartesian input, standalone SMITH
 embeds a revision-pinned perception subset for ordinary topology, point-group
 operations, atom permutations and primitive coordinates. \\
+\midrule
 \SMITH{}--\SONIC & Coordinate-construction tool and its coordinate
 contract.  \SMITH\ accepts a complete frozen state, a supplied topology, a
 supplied redundant primitive set, or plain Cartesian input through its bundled
 perception frontend.  It performs SONIC construction, special/composite coordinate
 generation, symmetry adaptation, analytic \(\Bmat\) evaluation, human-readable
 reporting, Gaussian-16-compatible export and provenance. \\
+\midrule
 Application layer & Consumes the frozen contract.  Internal-to-Cartesian
 realization, optimization, scanning, force-field construction, property
 models, Hessian transport and higher derivatives are deliberately outside
@@ -247,6 +249,25 @@ The model-building stage
 ends at the frozen coordinate contract; downstream modules reuse that object
 but their algorithms are not part of SMITH.}
 \label{fig:workflow}
+\end{figure}
+
+Figure~\ref{fig:coordinate-atlas} anchors the construction in four recurring
+geometrical motifs.  Ordinary stretches and bends, curvilinear ring
+out-of-plane sources, fused-ring puckering/butterfly rows and relative
+fragment pose coordinates enter different homogeneous source families.  Their
+separation is preserved during reduction even when two rows carry the same
+global irreducible-representation label.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/sonic_coordinate_atlas.png}
+\caption{Visual atlas of representative \SONIC\ source families, drawn on the
+actual molecular geometries used by the implementation fixtures.  Amber marks
+stretching or butterfly-like displacement, teal a valence-angle or weak-contact
+relation, violet the signed curvilinear out-of-plane/puckering family, and blue
+relative fragment translation.  The overlays identify coordinate differentials;
+they are not a prescription for a finite internal-to-Cartesian step.}
+\label{fig:coordinate-atlas}
 \end{figure}
 
 The novelty is not a new coordinate formula, but a deterministic constructive
@@ -1318,6 +1339,26 @@ that define it.  This gives a practical route to coordination complexes,
 metallocenes and eta-like interactions without pretending that a metal-ring
 centroid is a covalent atom in the molecular graph.
 
+The molecular structures behind these constructions are collected in
+Fig.~\ref{fig:special-coordinate-structures}.  This dedicated view distinguishes
+stored centers and center/contact rows from the ordinary covalent skeleton and
+makes explicit that special coordinates are exercised for metallocenes,
+hydrogen-bonded dimers, aromatic--polar complexes and a supplied
+$\eta^3$ ligand center.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/special_coordinate_structures.png}
+\caption{Structures used to exercise protected special coordinates.  Diamonds
+denote stored ring, ligand or fragment centers; dashed teal segments denote
+center--atom or selected contact coordinates; blue elements denote relative
+fragment pose.  Ferrocene uses two Cp centers, formic-acid--water and the water
+dimer use disconnected-fragment rows, benzene--water combines a ring center
+with a fragment pose, and $\eta^3$ allyl--PdCl retains the supplied allyl center
+without introducing a fictitious atom into the covalent topology.}
+\label{fig:special-coordinate-structures}
+\end{figure}
+
 Ferrocene provides a compact example.  If the two cyclopentadienyl ring
 centers are
 \[
@@ -1642,9 +1683,10 @@ explicit multi-atom ligand center.  Weak-complex tests protect the
 fragment-coordinate policy and the analytic \(\Bmat\) rows of interfragment
 translation and orientation coordinates.
 
-Table~\ref{tab:validation} gives the self-consistency slice used for
-this draft.  The first eight rows compare the present construction with a
-separate Fortran control implementation; the reported residual is the
+Table~\ref{tab:validation} gives a representative self-consistency slice; the
+complete validation table is reported in SI Sec.~S6.  The first three molecular
+rows shown here include comparisons with a separate Fortran control
+implementation; the reported residual is the
 Wilson-row-space residual between two internally maintained non-redundant bases
 that share the same scientific specification but not the same implementation
 path.
@@ -1659,8 +1701,9 @@ control reference is not the relevant comparison; there the table reports direct
 analytic \(\Bmat\)-rank closure and the number of protected special coordinates.
 Because this weak-complex probe is \(C_1\), \(\epsilon_\mathrm{SALC}=0\) is
 trivial by construction and should be read only as the absence of nontrivial
-SALC blocks, not as a symmetry-adaptation test.  The semantic-layer row is
-a unit-level contract test of the \texttt{PROTECT}/\texttt{OBSERVABLE} layer
+SALC blocks, not as a symmetry-adaptation test.  The semantic-layer row in the
+complete SI table is a unit-level contract test of the
+\texttt{PROTECT}/\texttt{OBSERVABLE} layer
 introduced in the section on coordinate functions and downstream models; it
 exercises duplicate rejection, row-equivalent substitution and the fail-fast
 protected-prefix rule.
@@ -1681,26 +1724,21 @@ difference.}
 \toprule
 System & Stress test & PG & Rank/closure & Numerical check \\
 \midrule
-Benzene & Aromatic ring projector & \(D_{6h}\) & 30/30; 3 \(RPck\) & \(\Delta_\mathrm{PF}=6.67\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
-Pyrrole & Heteroaromatic ring projector & \(C_{2v}\) & 24/24; 2 \(RPck\) & \(\Delta_\mathrm{PF}=6.92\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Azulene & Non-benzenoid fused ring, butterfly & \(C_{2v}\) & 48/48; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.44\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+\midrule
 Norbornane & Bridged saturated ring & \(C_{2v}\) & 51/51; 3 \(RPck\) & \(\Delta_\mathrm{PF}=6.22\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
+\midrule
 Cubane & High-symmetry cage & \(O_h\) & 42/42; cyclic bends & \(\Delta_\mathrm{PF}=6.41\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
-Ferrocene & \(D_{5h}\) metallocene projector & \(D_{5h}\) & 57/57 & \(\Delta_\mathrm{PF}=6.71\times10^{-9}\); \(\epsilon_\mathrm{SALC}=3.33\times10^{-16}\) \\
-Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta_\mathrm{PF}=6.97\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
-Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
-Pagodane & Cage and fused-ring source spaces & \(D_{2h}\) & 114/114 & \(\epsilon_\mathrm{FD}=4.02\times10^{-10}\); stretches and cyclic bends covered \\
+\midrule
 Indane & Fused aromatic/alicyclic rings & \(C_s\) & 51/51 & \(\epsilon_\mathrm{FD}=4.77\times10^{-10}\); butterfly and \(RPck\) rows covered \\
+\midrule
 Saccharin & Planar fused heterocycle, butterfly--puckering phase & \(C_s\) & 45/45; 5 \(RPck\) & \(\epsilon_\mathrm{FD}=3.91\times10^{-10}\); full post-projector \(\Bmat\) rank 45 \\
+\midrule
 Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 6 protected & three translations plus three orientations; direct \(\Bmat\)-rank \(=18\) \\
-Water dimer & Hydrogen-bonded fragment model & \(C_1\) & 12/12; 6 protected & standalone Cartesian input; three translations plus three orientations \\
+\midrule
 Benzene--water & Aromatic--polar fragment model & \(C_1\) & 39/39; 6 protected & standalone Cartesian input; ring coordinates coexist with the fragment block \\
+\midrule
 $\eta^3$ allyl--PdCl & Supplied $\eta^3$ ligand center & \(C_1\) & 24/24; 1 protected & \(q_{\eta^3}=1.8000\)~\AA; analytic center--atom row retained \\
-Weak-complex pseudo-cycles & Intermolecular and intramolecular pseudo-bond
-contacts & \(C_s\), \(C_{3v}\), \(C_1\) & rank closed & formic acid--water,
-water dimer, Li\(_2\)--Ar, borane--ammonia and glycine I/II fixtures validate
-the current pseudo-cycle/interfragment baseline \\
-Semantic layer & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probes & duplicate protected row rejected; row-equivalent substitution recorded; protected rank excess fails fast \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1723,7 +1761,8 @@ rather than the rank-deficient sum, of its two oriented source rows.  The
 \(U\)-based form is the version validated throughout this work, including the
 indane and saccharin entries of Table~\ref{tab:validation}.
 
-The finite-difference audit in the pagodane and indane rows is applied after
+The finite-difference audit in the pagodane and indane rows of the complete SI
+table is applied after
 the complete stored SONIC chain rule, rather than separately to selected
 primitive formulas.  It therefore covers local SALCs and the linear
 combinations defining cyclic, butterfly and puckering coordinates.  For all 114
@@ -1853,19 +1892,17 @@ SI motif & \SONIC\ object & Check \\
 Formamide proton transfer & Generated \(R_{\mathrm{NH}}\), \(R_{\mathrm{OH}}\)
 primitive signatures plus \(\Sigma r\) and \(\Delta r\) functions & Function
 values and sparse chain-rule rows reproduce the sum and difference derivatives. \\
+\midrule
 Ferrocene Cp torsion & Ring-center/Fe special coordinates retained through a
 \(0,9,18,27,36^\circ\) Cp rotation scan & Each grid point has rank
 \(57/57\), analytic \(\Bmat\) rank \(57\), stable ring-center identities and
 sparse \(\Bmat\) density \(0.095\)--\(0.101\). \\
+\midrule
 Cyclohexane ring flip coordinate & Automatically generated \(D_{3d}\)
 ring-puckering block \(\mathrm{A}_{2g}RPck001+\mathrm{E}_uRPck001/002\) &
 No hand-written \texttt{Gcyc}, \texttt{Ccyc} or \texttt{Scn0} input is supplied;
 the model closes rank \(48/48\) and exports a Gaussian-readable puckering
 model. \\
-Reduced path subgroup & Same cyclohexane source state rebuilt with a requested
-\(C_1\) working subgroup & The rank remains \(48/48\), while labels and
-totally symmetric export are computed in the reduced group; this is the
-intended path mode when a scan leaves the high-symmetry stratum. \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -2391,7 +2428,7 @@ naturally be built.
 \section*{Reproducibility}
 
 All reported construction tests use fixed inputs and no stochastic seeds.  The
-immutable standalone snapshot is tagged \texttt{v0.1.0rc6}; methods and basis
+immutable standalone snapshot is tagged \texttt{v0.1.0rc7}; methods and basis
 sets are stated with each external probe.  Complete commands, dependency
 versions, revision identifiers, checksums and regeneration instructions are
 given in SI Sec.~S7.  The Python implementation is checked against a separate
@@ -2414,7 +2451,7 @@ standalone distribution includes the revision-pinned topology, point-group
 symmetry and ordinary-primitive frontend and
 optional Gaussian \texttt{ReadAllGIC} export; installing or running another
 application is not required.  The reproducible standalone environment is tagged
-\texttt{v0.1.0rc6}. Repository revisions, the dependency lock and
+\texttt{v0.1.0rc7}. Repository revisions, the dependency lock and
 \texttt{\#SMITH\_PROVENANCE} record the code and input profile.
 
 \section*{Author Contributions}

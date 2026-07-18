@@ -4,7 +4,7 @@ MATRIX SMITH/SONIC Report
 Backend: oracle-native-primitive.v1
 Point group: C1
 Symmetry group: C1
-Totally symmetric GICs: Str0001, Str0002, Str0003, Str0004, Str0005, Str0006, Bend0001, Bend0002, ImpD0001, Bend0004, Bend0005, Tors0001, FTrn0001, FTrn0002, FTrn0003, FRot0001, FRot0002, FRot0003
+Totally symmetric GICs: Str0001, Str0002, Str0003, Str0004, Str0005, Str0006, Bend0001, Bend0002, OuPl0001, Bend0004, Bend0005, Tors0001, FTrn0001, FTrn0002, FTrn0003, FRot0001, FRot0002, FRot0003
 Symmetrize requested: False
 Target rank: 18
 Target rank rationale: 3N-6 non-linear vibrational rank for N=8
@@ -45,7 +45,7 @@ Selected Families
 BEND: 4 (ORDINARY)
 FRAG_ORIENTATION: 3 (SPECIAL_PROTECTED)
 FRAG_TRANSLATION: 3 (SPECIAL_PROTECTED)
-IMPROPER_DIHEDRAL: 1 (ORDINARY)
+OUT_OF_PLANE: 1 (ORDINARY)
 STRETCH: 6 (ORDINARY)
 TORSION: 1 (ORDINARY)
 
@@ -62,7 +62,7 @@ Symmetry Source Blocks
 ----------------------
 STRETCH: family=STRETCH class=ORDINARY count=6
 BEND: family=BEND class=ORDINARY count=4
-OUT_OF_PLANE: family=IMPROPER_DIHEDRAL class=ORDINARY count=1
+OUT_OF_PLANE: family=OUT_OF_PLANE class=ORDINARY count=1
 TORSION: family=TORSION class=ORDINARY count=1
 SPECIAL_FRAGMENT_TRANSLATION: family=FRAG_TRANSLATION class=SPECIAL_PROTECTED count=3
 SPECIAL_FRAGMENT_ORIENTATION: family=FRAG_ORIENTATION class=SPECIAL_PROTECTED count=3
@@ -97,7 +97,7 @@ NONE
 Reduction Diagnostics
 ---------------------
 Selected: P001, P002, P003, P004, P005, P006, P016, P017, P023, P019, P020, P021, P008, P009, P010, P011, P012, P013
-Selected by family: BEND:4, FRAG_ORIENTATION:3, FRAG_TRANSLATION:3, IMPROPER_DIHEDRAL:1, STRETCH:6, TORSION:1
+Selected by family: BEND:4, FRAG_ORIENTATION:3, FRAG_TRANSLATION:3, OUT_OF_PLANE:1, STRETCH:6, TORSION:1
 Skipped singular: NONE
 Skipped dependent: P018, P022, P007
 Skipped singular details: NONE
@@ -106,20 +106,56 @@ Skipped dependent details: P018:BEND:Bend0003, P022:TORSION:Tors0002, P007:FRAG_
 Coordinate Definitions
 ----------------------
    1 GIC001 Str0001 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=1.095460024 unit=angstrom components=P001:+1
+     Human formula: Str0001 = +1*P001
+       +1 * P001: distance R(1,2)
    2 GIC002 Str0002 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=1.211503996 unit=angstrom components=P002:+1
+     Human formula: Str0002 = +1*P002
+       +1 * P002: distance R(1,3)
    3 GIC003 Str0003 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=1.325944816 unit=angstrom components=P003:+1
+     Human formula: Str0003 = +1*P003
+       +1 * P003: distance R(1,4)
    4 GIC004 Str0004 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=0.985874998 unit=angstrom components=P004:+1
+     Human formula: Str0004 = +1*P004
+       +1 * P004: distance R(4,5)
    5 GIC005 Str0005 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=0.9603233822 unit=angstrom components=P005:+1
+     Human formula: Str0005 = +1*P005
+       +1 * P005: distance R(6,7)
    6 GIC006 Str0006 family=STRETCH class=ORDINARY irrep=A state=ACTIVE value=0.9705527871 unit=angstrom components=P006:+1
+     Human formula: Str0006 = +1*P006
+       +1 * P006: distance R(6,8)
    7 GIC007 Bend0001 family=BEND class=ORDINARY irrep=A state=ACTIVE value=2.151557636 unit=radian components=P016:+1
+     Human formula: Bend0001 = +1*P016
+       +1 * P016: bond angle A(2,1,3)
    8 GIC008 Bend0002 family=BEND class=ORDINARY irrep=A state=ACTIVE value=1.936214312 unit=radian components=P017:+1
-   9 GIC009 ImpD0001 family=IMPROPER_DIHEDRAL class=ORDINARY irrep=A state=ACTIVE value=3.141106217 unit=radian components=P023:+1
+     Human formula: Bend0002 = +1*P017
+       +1 * P017: bond angle A(2,1,4)
+   9 GIC009 OuPl0001 family=OUT_OF_PLANE class=ORDINARY irrep=A state=ACTIVE value=0.0004543189049 unit=radian components=P023:+1
+     Human formula: OuPl0001 = +1*P023
+       +1 * P023: out-of-plane coordinate U(1,2,3,4)
   10 GIC010 Bend0004 family=BEND class=ORDINARY irrep=A state=ACTIVE value=1.886705122 unit=radian components=P019:+1
+     Human formula: Bend0004 = +1*P019
+       +1 * P019: bond angle A(1,4,5)
   11 GIC011 Bend0005 family=BEND class=ORDINARY irrep=A state=ACTIVE value=1.856621311 unit=radian components=P020:+1
+     Human formula: Bend0005 = +1*P020
+       +1 * P020: bond angle A(7,6,8)
   12 GIC012 Tors0001 family=TORSION class=ORDINARY irrep=A state=ACTIVE value=-3.141071603 unit=radian components=P021:+1
+     Human formula: Tors0001 = +1*P021
+       +1 * P021: torsion D(2,1,4,5)
   13 GIC013 FTrn0001 family=FRAG_TRANSLATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=2.794364267 unit=angstrom components=P008:+1
+     Human formula: FTrn0001 = +1*P008
+       +1 * P008: relative fragment translation component 0; fragment atoms (6,7,8), reference atoms (1,2,3,4,5)
   14 GIC014 FTrn0002 family=FRAG_TRANSLATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=-0.5396128667 unit=angstrom components=P009:+1
+     Human formula: FTrn0002 = +1*P009
+       +1 * P009: relative fragment translation component 1; fragment atoms (6,7,8), reference atoms (1,2,3,4,5)
   15 GIC015 FTrn0003 family=FRAG_TRANSLATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=0.1935490667 unit=angstrom components=P010:+1
+     Human formula: FTrn0003 = +1*P010
+       +1 * P010: relative fragment translation component 2; fragment atoms (6,7,8), reference atoms (1,2,3,4,5)
   16 GIC016 FRot0001 family=FRAG_ORIENTATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=0 unit=radian components=P011:+1
+     Human formula: FRot0001 = +1*P011
+       +1 * P011: relative fragment exponential-map rotation component 0; fragment atoms (6,7,8), reference atoms (1,2,3,4,5)
   17 GIC017 FRot0002 family=FRAG_ORIENTATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=0 unit=radian components=P012:+1
+     Human formula: FRot0002 = +1*P012
+       +1 * P012: relative fragment exponential-map rotation component 1; fragment atoms (6,7,8), reference atoms (1,2,3,4,5)
   18 GIC018 FRot0003 family=FRAG_ORIENTATION class=SPECIAL_PROTECTED irrep=A state=ACTIVE value=0 unit=radian components=P013:+1
+     Human formula: FRot0003 = +1*P013
+       +1 * P013: relative fragment exponential-map rotation component 2; fragment atoms (6,7,8), reference atoms (1,2,3,4,5)
