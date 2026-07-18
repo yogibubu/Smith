@@ -78,6 +78,7 @@ smith-sonic example norbornane norbornane.xyzin
 smith-sonic example formic-acid-water formic-acid-water.xyzin
 smith-sonic example water-dimer water-dimer.xyzin
 smith-sonic example benzene-water benzene-water.xyzin
+smith-sonic example saccharin saccharin.xyzin
 smith-sonic example eta3-allyl-palladium eta3-allyl-palladium.xyzin
 ```
 

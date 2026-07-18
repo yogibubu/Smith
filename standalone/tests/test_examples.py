@@ -5,7 +5,10 @@ import shutil
 import tempfile
 import unittest
 
+import numpy as np
+
 from matrix_core import read_sectioned_lines, replace_section, section_content
+from matrix_smith import build_gic_b_matrix_from_xyzin, read_gic_definition_from_xyzin
 from smith_sonic.cli import main
 
 
@@ -95,6 +98,23 @@ class PackagedExampleTests(unittest.TestCase):
             )
         )
         self.assertIn("PERCEPTION_PROFILE FROZEN_STATE", provenance)
+
+    def test_saccharin_preserves_all_fused_ring_rows_and_global_rank(self) -> None:
+        output, _, scratch = self._run_example("saccharin")
+        self.addCleanup(scratch.cleanup)
+        definition = read_gic_definition_from_xyzin(output)
+        rows = np.asarray(build_gic_b_matrix_from_xyzin(output).rows, dtype=float)
+        butterfly = [gic for gic in definition.gics if gic.family == "BUTTERFLY"]
+        puckering = [
+            gic for gic in definition.gics if gic.family == "RING_PUCKER_COMPONENT"
+        ]
+
+        self.assertEqual(definition.point_group, "Cs")
+        self.assertEqual((len(definition.gics), definition.rank, definition.target_rank), (45, 45, 45))
+        self.assertEqual(np.linalg.matrix_rank(rows, tol=1.0e-8), 45)
+        self.assertEqual(len(butterfly), 1)
+        self.assertEqual(len(puckering), 5)
+        self.assertLess(butterfly[0].coefficients[0][1] * butterfly[0].coefficients[1][1], 0.0)
 
     def test_standalone_accepts_supplied_topology_or_primitives(self) -> None:
         _seed, seed_lines, scratch = self._run_example("water")

@@ -4,10 +4,21 @@
 \usepackage{lmodern}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage{siunitx}
 \usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black}
 
 \newcommand{\SONIC}{SONIC}
 \newcommand{\SMITH}{\textsc{SMITH}}
+\newcommand{\Bmat}{\mathbf{B}}
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\AtBeginDocument{\renewcommand{\thelstlisting}{S\arabic{lstlisting}}}
 
 \lstset{
   basicstyle=\ttfamily\scriptsize,
@@ -28,161 +39,371 @@ SONIC: Symmetry-Oriented Non-redundant Internal Coordinates}
 
 \begin{document}
 \maketitle
+\tableofcontents
 
-\section*{Norbornane SMITH/SONIC Standalone Input and Gaussian 16 Export}
+\section{Standalone Input and Output Reference}
 
-This Supporting Information records the minimal standalone input required to
-generate the norbornane \SONIC\ coordinate contract and the corresponding
-commercial Gaussian 16 \texttt{ReadAllGIC} input used in the compatibility
-test.  The first listing is intentionally not the enriched \texttt{xyzin}
-container written after molecular perception and coordinate construction.  It
-contains only a standard XYZ geometry followed by the minimum SMITH directives
-needed for this Gaussian-compatible export.  The standalone workflow selects
-the commercial Gaussian 16 profile by default, including Gaussian-style
-improper-dihedral construction in place of native \SONIC\ out-of-plane rows.
-For this one-file example, the standalone package uses its pinned minimal
-frontend to supply the graph, cycles, ordinary redundant primitives and their
-Wilson B source matrix.  The generated provenance records
-\texttt{PERCEPTION\_PROFILE STANDALONE\_MINIMAL}.  The same executable can
-instead consume a supplied \texttt{TOPOLOGY} section, a supplied
-\texttt{PRIMITIVES} section or a complete externally validated molecular state;
-these are input profiles of standalone SMITH rather than dependencies on a
-separate application.
+\subsection{Input schema \texttt{matrix.smith.input.v1}}
 
-The exact standalone workflow is:
+The standalone boundary is a standard Cartesian XYZ block followed by optional
+\SMITH\ directives.  Four provider-neutral profiles are accepted.  Their
+meaning is fixed by the input contract rather than by the program that created
+the data.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{The four standalone input profiles.}
+\begin{tabularx}{\linewidth}{@{}p{0.24\linewidth}X@{}}
+\toprule
+Profile & Required content and action \\
+\midrule
+\texttt{FROZEN\_STATE} & A complete validated molecular state.  Topology,
+symmetry operations, atom permutations, primitive rows and provenance are
+consumed unchanged. \\
+\texttt{STANDALONE\_TOPOLOGY} & Cartesian geometry and a supplied
+\texttt{TOPOLOGY} section.  The pinned standalone frontend constructs the
+ordinary redundant primitives. \\
+\texttt{STANDALONE\_PRIMITIVES} & Cartesian geometry and a supplied
+\texttt{PRIMITIVES} section.  Values, atom indices, Wilson rows and geometry
+fingerprints are validated before SONIC construction. \\
+\texttt{STANDALONE\_MINIMAL} & Plain Cartesian geometry.  The pinned frontend
+constructs covalent topology, cycles, point-group operations with atom
+permutations and ordinary primitives. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+If \texttt{TOPOLOGY} and \texttt{PRIMITIVES} are both present, their bond rows
+must agree.  The output records the selected profile, the source fingerprints
+and the accepted construction options.  The minimal route is sufficient for
+ordinary molecules; interaction centers, externally audited quasi-symmetry or
+special primitives can be supplied through the richer profiles.  This keeps
+\SMITH\ operationally standalone while making the perception/construction
+boundary explicit.
+
+\subsection{Norbornane input and Gaussian 16 \texttt{ReadAllGIC} export}
+
+The first listing contains only the XYZ geometry and the minimum directives
+needed for the compatibility export.  It is not the enriched \texttt{xyzin}
+container written after construction.  The complete workflow is
+
 \begin{lstlisting}
 python -m matrix smith standalone norbornane_smith_input.xyzin norbornane.xyzin
 python -m matrix smith gaussian-input norbornane.xyzin norbornane_g16_readallgic.gjf \
   --title "norbornane SONIC ReadAllGIC optimization" \
   --route "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 \end{lstlisting}
-Equivalently, after installation of MATRIX the console-script shorthand is
-\texttt{smith standalone ...} followed by \texttt{smith gaussian-input ...}.
-The standalone package distributed with the manuscript constructs the same
-contract with \texttt{smith-sonic build norbornane.smith.xyz norbornane.xyzin}
-and automatically writes both \texttt{norbornane.smith.out} and
-\texttt{norbornane.g16.gjf}.  The default Gaussian 16 profile suppresses active
-composite, U-based ring-puckering \SONIC\ rows in the Gaussian file and writes
-their terminally translated component periodic \texttt{D(...)} coordinates
-instead; the non-redundant \SONIC\ rows remain in
-the \texttt{xyzin} contract used for post-processing.
 
-\subsection*{SMITH/SONIC input}
+The reduced standalone distribution provides the equivalent command
+\begin{lstlisting}
+smith-sonic build norbornane.smith.xyz norbornane.xyzin
+\end{lstlisting}
+and writes a human-readable \texttt{.smith.out} report together with the
+Gaussian input.
 
-\lstinputlisting[caption={Minimal norbornane SMITH/SONIC standalone input: standard XYZ block plus the required export directives.}]{si/norbornane_smith_input.xyzin}
+\lstinputlisting[caption={Minimal norbornane SMITH/SONIC standalone input.}]{si/norbornane_smith_input.xyzin}
 
-\subsection*{Generated Gaussian 16 input}
+\lstinputlisting[caption={Complete commercial Gaussian 16-compatible \texttt{ReadAllGIC} input generated from the norbornane contract.}]{si/norbornane_g16_readallgic.gjf}
 
-\lstinputlisting[caption={Commercial Gaussian 16-compatible \texttt{ReadAllGIC} input generated automatically from the SMITH/SONIC contract.  Composite U-based \SONIC\ ring-puckering rows are absent by construction; their terminally translated component periodic dihedrals appear as \texttt{V0001}, \texttt{V0002}, \ldots.}]{si/norbornane_g16_readallgic.gjf}
+\subsection{Formic-acid--water fragment contract}
 
-\subsection*{Gaussian 16 output excerpt}
+The eight-atom complex is processed with an automatic connected-component
+fragment definition and closes at rank \(18/18\).  Six protected rows describe
+the three relative translations and three relative orientations; the remaining
+twelve rows span the intramolecular motions.  Every build writes the frozen
+\texttt{xyzin}, a readable coordinate report and the optional Gaussian input.
 
-The complete Gaussian log is retained in the reproducibility archive.  The
-excerpt below records the optimization progress and termination diagnostics.
+\lstinputlisting[firstline=106,lastline=125,caption={Coordinate-definition excerpt for the formic-acid--water complex.}]{si/formic_acid_water_smith_report.txt}
+
+\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input for formic-acid--water.}]{si/formic_acid_water_g16.gjf}
+
+\subsection{\texorpdfstring{$\eta^3$}{eta3} allyl--palladium interaction-center contract}
+
+The ten-atom allyl--PdCl probe consumes a frozen interaction-center record with
+identifier \texttt{C001}, kind \texttt{ETA3\_CENTER}, and atoms 3--5.  \SMITH
+retains the Pd--center distance as a protected
+\texttt{CENTER\_ATOM\_DISTANCE}; the contract closes at rank \(24/24\) and the
+reference value is 1.8000~\AA.  This is a coordinate-interface test, not an
+optimized transition-metal benchmark.
+
+\lstinputlisting[firstline=97,lastline=122,caption={Coordinate-definition excerpt for the $\eta^3$ allyl--palladium probe.}]{si/eta3_allyl_palladium_smith_report.txt}
+
+\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input for the $\eta^3$ probe.}]{si/eta3_allyl_palladium_g16.gjf}
+
+The two generated contracts were also read without format translation by the
+downstream consumers used in the integration tests.  Their coordinate
+realization service constructed direction matrices of dimensions
+\(18\times24\) and \(24\times30\), respectively.
+
+\section{Gaussian 16 Serialization Details}
+
+\subsection{\texttt{ReadAllGIC} route and generated syntax}
+
+Gaussian 16 is used as an external interpreter because its GIC syntax accepts
+general symbolic coordinate expressions.  The compatibility route has the
+form
+
+\begin{lstlisting}
+#p method/basis opt=(readallgic,calcfc,maxcycle=80)
+\end{lstlisting}
+
+\texttt{CalcFC} is optional and was used for the direct coordinate-choice
+comparison, whereas the three-system solver-consumption table in the main text
+uses no initial force-constant calculation.  The generated block is dependency
+closed: helper centers and fragment axes precede every expression that uses
+them, inactive helpers are emitted as frozen functions, and the complete
+rank-closing coordinate set is retained.
+
+\subsection{Terminal translation of native out-of-plane rows}
+
+The native SONIC contract uses the signed curvilinear out-of-plane coordinate
+
+\[
+U(j;a,b,c)=\arcsin\!\left[
+\frac{\hat r_{ja}\cdot(\hat r_{jb}\times\hat r_{jc})}
+{|\hat r_{jb}\times\hat r_{jc}|}\right],
+\]
+
+with the stored atom order fixing the sign.  Commercial Gaussian 16 has no
+native \(U\) primitive, so serialization alone applies
+\(U(I,J,K,L)\mapsto D(J,I,L,K)\).  Multi-\(U\) ring-puckering combinations
+remain in the frozen SONIC contract, while the Gaussian file receives their
+component periodic dihedrals.  The translation does not redefine the native
+coordinate model.  When molecular symmetry is retained, all non-totally
+symmetric SONIC rows are written with \texttt{Frozen}; for norbornane this
+leaves 15 active \(A_1\) rows and 36 frozen rows in the full 51-coordinate
+contract.
+
+\subsection{Gaussian output excerpt}
+
+The complete log is retained in the reproducibility archive.  The following
+excerpt records the optimization progress and normal-termination diagnostics.
 
 \lstinputlisting[caption={Selected Gaussian 16 output lines for the norbornane \texttt{ReadAllGIC} run.}]{si/norbornane_g16_output_excerpt.txt}
 
-\section*{Advanced Standalone Interface Probes}
+\section{Local-Pseudosymmetry Extended Validation}
 
-The standalone distribution also contains two examples that exercise the
-interfaces not covered by a single covalent molecule.  Every build writes
-three coordinated artifacts: the frozen \texttt{xyzin} contract, a readable
-\texttt{.smith.out} report modeled on the essential coordinate section of the
-former Merlino output, and a commercial Gaussian 16 \texttt{ReadAllGIC} input.
-The report records the family, reduction class, irrep, active/frozen status,
-reference value, native unit, and primitive coefficients of each selected
-coordinate.  Non-totally symmetric coordinates are present in the Gaussian
-file with the \texttt{Frozen} option; helper center and fragment definitions are
-written as inactive Gaussian functions.
+The accepted template score is denoted \(s\), its separation from the
+second-best template by \(\Delta s\), the acceptance ceiling by
+\(s_{\max}=0.12\), and the minimum separation by
+\(\Delta s_{\min}=0.02\).  Table~S2 contains all 20 ideal/distorted CN 5--9
+models.  Python and the independent Fortran control path agree on every local
+group, place the local totally symmetric row first, and close the target rank.
 
-\subsection*{Formic-acid--water non-covalent complex}
+\begin{landscape}
+\scriptsize
+\begin{longtable}{@{}ccp{0.27\linewidth}ccrrrr@{}}
+\caption{Complete high-coordination local-template validation.}\label{tab:si-local-full}\\
+\toprule
+CN & Local group & Template & Geometry & \(s\) & \(\Delta s\) & \(s_{\max}\) & \(\Delta s_{\min}\) & Rank \\
+\midrule
+\endfirsthead
+\toprule
+CN & Local group & Template & Geometry & \(s\) & \(\Delta s\) & \(s_{\max}\) & \(\Delta s_{\min}\) & Rank \\
+\midrule
+\endhead
+5 & \(D_{3h}\) & trigonal bipyramidal & ideal & \(2.48\times10^{-17}\) & 0.217962 & 0.12 & 0.02 & 12 \\
+5 & \(D_{3h}\) & trigonal bipyramidal & distorted & 0.007152 & 0.206418 & 0.12 & 0.02 & 12 \\
+5 & \(C_{4v}\) & square pyramidal & ideal & \(5.30\times10^{-17}\) & 0.217962 & 0.12 & 0.02 & 12 \\
+5 & \(C_{4v}\) & square pyramidal & distorted & 0.012670 & 0.202571 & 0.12 & 0.02 & 12 \\
+6 & \(O_h\) & octahedral & ideal & 0 & 0.375781 & 0.12 & 0.02 & 15 \\
+6 & \(O_h\) & octahedral & distorted & 0.006421 & 0.364851 & 0.12 & 0.02 & 15 \\
+6 & \(D_{3h}\) & trigonal prismatic & ideal & \(9.72\times10^{-17}\) & 0.375781 & 0.12 & 0.02 & 15 \\
+6 & \(D_{3h}\) & trigonal prismatic & distorted & 0.005769 & 0.368504 & 0.12 & 0.02 & 15 \\
+7 & \(D_{5h}\) & pentagonal bipyramidal & ideal & 0 & 0.174704 & 0.12 & 0.02 & 18 \\
+7 & \(D_{5h}\) & pentagonal bipyramidal & distorted & 0.005878 & 0.165714 & 0.12 & 0.02 & 18 \\
+7 & \(C_{3v}\) & capped octahedral & ideal & \(5.93\times10^{-17}\) & 0.174704 & 0.12 & 0.02 & 18 \\
+7 & \(C_{3v}\) & capped octahedral & distorted & 0.005464 & 0.167037 & 0.12 & 0.02 & 18 \\
+8 & \(D_{4d}\) & square antiprismatic & ideal & \(3.85\times10^{-17}\) & 0.296745 & 0.12 & 0.02 & 21 \\
+8 & \(D_{4d}\) & square antiprismatic & distorted & 0.004965 & 0.290042 & 0.12 & 0.02 & 21 \\
+8 & \(D_{2d}\) & dodecahedral-like & ideal & \(1.33\times10^{-16}\) & 0.296745 & 0.12 & 0.02 & 21 \\
+8 & \(D_{2d}\) & dodecahedral-like & distorted & 0.008716 & 0.284759 & 0.12 & 0.02 & 21 \\
+9 & \(D_{3h}\) & tricapped trigonal prismatic & ideal & \(2.62\times10^{-17}\) & 0.112154 & 0.12 & 0.02 & 24 \\
+9 & \(D_{3h}\) & tricapped trigonal prismatic & distorted & 0.004833 & 0.105571 & 0.12 & 0.02 & 24 \\
+9 & \(C_{4v}\) & capped square antiprismatic & ideal & 0 & 0.112154 & 0.12 & 0.02 & 24 \\
+9 & \(C_{4v}\) & capped square antiprismatic & distorted & 0.004434 & 0.106386 & 0.12 & 0.02 & 24 \\
+\bottomrule
+\end{longtable}
+\end{landscape}
 
-The eight-atom complex is processed with the reduced perception profile and an
-automatic connected-component fragment definition.  It closes at rank
-\(18/18\).  The final six protected rows are three relative fragment
-translations and three relative fragment orientations; the other twelve rows
-span the intramolecular motions.  The excerpt below is generated, not manually
-transcribed.
+Two named chemical controls use the same frozen decision record.  Distorted
+\(\mathrm{SF_6}\) requires deliberately relaxed effective-atomic-number and
+distance thresholds, demonstrating that pseudosymmetry is an explicit user
+choice rather than an implicit relabelling.
 
-\lstinputlisting[firstline=106,lastline=125,caption={Coordinate-definition excerpt for the formic-acid--water complex.  The complete report is supplied as \texttt{si/formic\_acid\_water\_smith\_report.txt}.}]{si/formic_acid_water_smith_report.txt}
+\begin{table}[htbp]
+\centering
+\scriptsize
+\caption{Named high-coordination controls and their declared thresholds.}
+\begin{tabular}{@{}lccrrrrr@{}}
+\toprule
+System & Template & Group & \(s\) & \(\Delta s\) & \(\tau_Z\) & \(\tau_r\)/\textup{\AA} & Rank \\
+\midrule
+Distorted \(\mathrm{SF_6}\) & octahedral & \(O_h\) & 0.006472 & 0.364380 & 0.1 & 0.05 & 15/15 \\
+\([\mathrm{ZrF_8}]^{4-}\) & square antiprismatic & \(D_{4d}\) & 0.000017 & 0.296729 & 0.0005 & 0.001 & 21/21 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input generated for the formic-acid--water fragment contract.  Fragment objects and body-frame helpers are declared before the 18 active rows.}]{si/formic_acid_water_g16.gjf}
+The complete record, including CN 10/12 generic fallbacks and the ambiguous
+near-tie control, is regenerated with
 
-\subsection*{$\eta^3$ allyl--palladium interaction center}
+\begin{lstlisting}
+export MATRIX_ROOT=/absolute/path/to/MATRIX
+python scripts/run_local_salc_validation.py
+\end{lstlisting}
 
-The ten-atom idealized allyl--PdCl probe consumes a frozen ORACLE-state fixture.
-Its center record has identifier \texttt{C001}, kind
-\texttt{ETA3\_CENTER}, and atoms 3--5.  \SMITH\ retains the
-Pd--center distance as a protected \texttt{CENTER\_ATOM\_DISTANCE}; the
-contract closes at rank \(24/24\) and gives a reference value of
-1.8000~\AA.  This is a perception/coordinate interface test rather than an
-optimized transition-metal benchmark.
+The resulting \texttt{data/local\_salc\_validation.json} records the template
+scores, margins, thresholds, ranks, rotation/permutation checks and the
+Python--Fortran row-space residuals.
 
-\lstinputlisting[firstline=97,lastline=122,caption={Coordinate-definition excerpt for the $\eta^3$ allyl--palladium probe.  The complete report is supplied as \texttt{si/eta3\_allyl\_palladium\_smith\_report.txt}.}]{si/eta3_allyl_palladium_smith_report.txt}
+\section{Gaussian-GIC Motif Tests: Extended Table}
 
-\lstinputlisting[caption={Gaussian 16 \texttt{ReadAllGIC} input for the $\eta^3$ probe.  The Cartesian components of the ligand center are inactive helper functions and the Pd--center distance is the first active GIC.}]{si/eta3_allyl_palladium_g16.gjf}
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Complete numerical checks for the Gaussian-GIC-inspired motif tests.}
+\begin{tabularx}{\linewidth}{@{}p{0.20\linewidth}p{0.30\linewidth}X@{}}
+\toprule
+Motif & Generated SONIC object & Numerical contract \\
+\midrule
+Formamide transfer & \(R_{\rm NH}\), \(R_{\rm OH}\), \(\Sigma r\), \(\Delta r\) & For \(R_{\rm NH}=1.02\) and \(R_{\rm OH}=1.21\)~\AA, \(\Sigma r=2.23\) and \(\Delta r=-0.19\)~\AA; sparse rows equal the exact sum/difference. \\
+Li\(_2\)--Ar scan & Two protected translation axes, polar radius and elliptic quadratic & At \((x,y)=(3,4)\), \(R=5.000000\), \((x/7.084)^2+(y/4.718)^2=0.898137\), and the elliptic row has six nonzero Cartesian entries. \\
+\(XY_3\) local block & Projected homogeneous \(C_{3v}\) bend block & Rank 3/3; ordered rows are \(A_1\), \(E\), \(E\), with exactly one totally symmetric row. \\
+Weak-complex rotor & Protected fragment translations and orientations & Water-dimer contract rank 12/12; Wilson matrix shape \(12\times18\); finite rigid-step residual below 0.02 in the six protected variables. \\
+Ferrocene Cp torsion & Ring-center/Fe coordinates over \(0,9,18,27,36^\circ\) & Rank and analytic-\(\Bmat\) rank are 57 at all five points; two ring centers persist; sparse density is 0.095--0.101 and the smallest singular value remains above \(10^{-8}\). \\
+Cyclohexane ring flip & Generated \(A_{2g}RPck001+E_uRPck001/002\) block & Rank 48/48, three puckering rows, three frozen Gaussian expressions, and no hand-written \texttt{Gcyc}, \texttt{Ccyc} or \texttt{Scn0}. \\
+Reduced path subgroup & Same cyclohexane source rebuilt with retained group \(C_1\) & Rank remains 48/48; global high-symmetry labels are not imposed along the path and scan torsions remain uncombined. \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
-Both generated \texttt{xyzin} files were read directly by MORPHEUS without
-format translation; any requested coordinate realization is delegated by
-MORPHEUS to LINK. LINK constructed SONIC optimizer direction matrices of
-dimensions \(18\times24\) and \(24\times30\), respectively, confirming that
-the serialized contracts are consumable by the two downstream workflows.
+These checks concern automatic construction and analytic rows, not relative
+optimizer performance.
 
-\section*{Pagodane and Indane Ring-Coordinate Fixtures}
+\section{Cross-Code Verification (ORCA/Molpro)}
 
-Two supplied Cartesian structures are retained verbatim as publication
-fixtures in the MATRIX test distribution.  The first is pagodane,
-\(\mathrm{C}_{20}\mathrm{H}_{20}\); ORACLE perceives 50 covalent bonds, 11 rings, no aromatic atoms
-and a \(D_{2h}\) reference assignment.  Its redundant PIC contract and the
-SMITH SONIC basis both have Cartesian rank 114.  The second structure is
-indane, \(\mathrm{C}_{9}\mathrm{H}_{10}\); ORACLE perceives 20 bonds, two fused rings, six aromatic
-atoms and a \(C_s\) reference assignment, while SMITH closes at rank 51.
-The name ``indane'' follows the fused benzene--cyclopentane connectivity of the
-provided structure rather than its original generic filename.
+The cyclohexane chair-to-boat fixture was exported as ordinary Cartesian
+geometry and evaluated independently with ORCA and Molpro at PBE0/def2-SVP.
+The three points are the same fixed-frame interpolation used in the main-text
+figure: \(p00\), \(p02\), and \(p04\) correspond to
+\(\lambda=0.00,0.50,1.00\).  Absolute energies differ because the programs
+have independent implementations and defaults, but their relative profiles
+agree within 0.13~kJ~mol\(^{-1}\).
+
+\begin{table}[htbp]
+\centering
+\caption{PBE0/def2-SVP single-point energies on SONIC-generated cyclohexane geometries.}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Point & ORCA \(E_h\) & ORCA \(\Delta E\) & Molpro \(E_h\) & Molpro \(\Delta E\) \\
+\midrule
+\(p00\) & -235.422463982 & 0.000 & -235.422142275 & 0.000 \\
+\(p02\) & -235.321345943 & 265.485 & -235.321038853 & 265.447 \\
+\(p04\) & -235.103704314 & 836.903 & -235.103335256 & 837.028 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Pagodane, Indane and Saccharin Ring-Coordinate Fixtures}
+
+Two Cartesian structures are retained verbatim as publication fixtures.  The
+first is pagodane, \(\mathrm{C}_{20}\mathrm{H}_{20}\): the pinned standalone
+frontend finds 50 covalent bonds, 11 rings, no aromatic atoms and a
+\(D_{2h}\) reference assignment.  The redundant primitive contract and SONIC
+basis both have Cartesian rank 114.  The second is indane,
+\(\mathrm{C}_{9}\mathrm{H}_{10}\): the frontend finds 20 bonds, two fused
+rings, six aromatic atoms and a \(C_s\) reference assignment, while SONIC closes
+at rank 51.
+
+The third fixture is planar saccharin, retained specifically as a fused-ring
+phase and global-rank regression.  Its \(C_s\) contract contains one butterfly
+and five ring-puckering coordinates, all in \(A''\), and closes at rank 45/45.
+The generated butterfly is
+\begin{equation}
+ AppBtFl001=2^{-1/2}\!\left[D(6,1,2,13)-D(16,1,2,3)\right],
+\end{equation}
+whose relative minus sign supplies the inter-ring direction missing from the
+five \(RPck\) rows.  Replacing it by the corresponding sum lowers the rank of
+these six rows from six to five.  The regression therefore checks the complete
+post-symmetry Cartesian \(\Bmat\), rather than accepting six individually
+well-formed but collectively dependent expressions.
 
 Central finite differences of every final SONIC row give maximum absolute
 analytic-row errors of \(4.02\times10^{-10}\) for pagodane and
-\(4.77\times10^{-10}\) for indane.  The indane set contains stretch, bend,
+\(4.77\times10^{-10}\) for indane, and \(3.91\times10^{-10}\) for saccharin.
+The indane and saccharin sets contain stretch, bend,
 cyclic-bend, butterfly and ring-puckering-component families.  All 114 pagodane
-and all 51 indane motions are constructed in both signs from the pseudoinverse of the B matrix
-frozen at the reference geometry. These small fixed-$B$ displacements are
-visualization artifacts, not finite internal-to-Cartesian realization services;
-the latter belong to LINK. The resulting Cartesian frames are exactly
-symmetric and are checked for the first-order SONIC displacement, unchanged
-connectivity, proper orientation, a maximum atom displacement not above
-0.10~\AA, and a maximum relative reference-bond change below 0.15.  Every
-three-frame XYZ file and Cartesian-vector table is parsed by the GUI data
-contract.  The version-2 manifest also records the optional Euclidean or
-mass-weighted right-inverse metric, the explicit average/default-isotope/
-Hessian/isotopologue mass provenance, coordinate conditioning and localization,
-the number of complete ORACLE topology evaluations, local-domain and
-local/global total-symmetry labels, and canonical ring order with primitive
+and 51 indane display motions are constructed in both signs with the Wilson
+matrix frozen at the reference geometry.  They are first-order visualization
+artifacts rather than nonlinear internal-to-Cartesian realization services.
+
+Extended independent use by collaborators exposed an important earlier
+failure mode.  A dihedral-based representation of endocyclic out-of-plane
+deformation did not converge in the back-transformation of a near-planar fused
+indane/indene-type scaffold containing one \(sp^3\) CH\(_2\) center.  The
+ill-conditioning belonged to the collectively redundant cyclic-dihedral chart
+at planarity, not to SONIC rank or symmetry construction.  A native signed
+\(U\) source has a finite first-order row at the planar reference and avoids
+the dihedral branch ambiguity.  Symmetry projection acts on this oriented
+row space and retains both source and target phases; the complete \(\Bmat\)
+rank is then checked across all coordinate families.  The indane and
+saccharin fixtures are therefore complementary regressions for the change
+prompted by independent use.
+
+The version-2 diagnostic manifest records the right-inverse metric, mass
+provenance, coordinate conditioning, local domain and pseudogroup, independent
+local/global total-symmetry labels, canonical ring order and primitive
 coefficients.  A distributed JSON Schema and dependency-free validator define
-the current machine contract, while the reader accepts archived version-1
-manifests.  Animation amplitude is independent of the mathematical step and is
-normalized to a selected maximum atom displacement.  The GUI can filter the
-resulting set by family, local domain, local pseudogroup and local or global
-total-symmetry character.
+the machine contract, and the reader remains compatible with archived
+version-1 manifests.
 
-\enlargethispage{2\baselineskip}
-\begingroup
-\small
-\section*{Local-Pseudosymmetry Validation}
+\section{Reproducibility Details}
 
-The machine-readable results in
-\nolinkurl{data/local_salc_validation.json} can be regenerated from an
-explicitly selected MATRIX checkout:
+The standalone manuscript snapshot is tag \texttt{v0.1.0rc6}, commit
+\texttt{9a9e64c39ed8}.  The regenerated local-pseudosymmetry record uses clean
+MATRIX commit \texttt{bc6d62140aab}.  The declared standalone
+requirements are Python~\(\geq3.11\), NumPy~\(\geq1.26\), and
+setuptools~\(\geq68\); the validation environment used Python 3.13.11, NumPy
+2.4.2 and setuptools 80.9.0.
+
 \begin{lstlisting}
-export MATRIX_ROOT=/path/to/your/MATRIX
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install ./standalone
+python -m pytest standalone/tests
+smith-sonic build standalone/examples/norbornane.smith.xyz norbornane.xyzin
+
+export MATRIX_ROOT=/absolute/path/to/MATRIX
 python scripts/run_local_salc_validation.py
+
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+latexmk -pdf -interaction=nonstopmode -halt-on-error supporting_information.tex
 \end{lstlisting}
-The cases comprise the \(C_1/C_{3v}\) methyl probe, benzene, toluene, azulene,
-20 ideal/distorted CN 5--9 templates, generic CN 10/12 centers, distorted
-\(\mathrm{SF_6}\), and square-antiprismatic \([\mathrm{ZrF_8}]^{4-}\).
-Recorded checks include rank, rotation/permutation invariance, template
-score/margin and ambiguity fallback, ring/fused-edge behavior, and
-Python--Fortran row-space residuals.  Local labels apply only to domains; the
-molecular point-group projector remains final.
-\endgroup
+
+Representative SHA-256 fingerprints are:
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\caption{Checksums of the standalone boundary and principal validation artifacts.}
+\begin{tabularx}{\linewidth}{@{}p{0.38\linewidth}X@{}}
+\toprule
+Artifact & SHA-256 \\
+\midrule
+\texttt{standalone/pyproject.toml} & \nolinkurl{1323d458b42f90d2c2d150e0a84b139a6de0c3bea5e80a7e8deb0ac3239d3997} \\
+\texttt{data/local\_salc\_validation.json} & \nolinkurl{aa3208ae1c904f476968d1df00312d1c5c5cbf93caecc4fc1269b4762bb691f9} \\
+\texttt{si/norbornane\_smith\_input.xyzin} & \nolinkurl{e5feb34cf4c2b1114b65456704342e0c22b687fce85bdb7d4c1e45bbd05885c6} \\
+\texttt{si/norbornane\_g16\_readallgic.gjf} & \nolinkurl{140742865ae2662c5f74099d78d099e83ab3b65c2a27c75b5d1c4a15996e3857} \\
+\texttt{si/norbornane\_g16\_output\_excerpt.txt} & \nolinkurl{93e21fe46c4d197079221fc5875d1994e5cfcadad2f0c252dd7789709107c4f5} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+No command or input file requires a path from the author's workstation; users
+select the MATRIX checkout, environment and output directories explicitly.
 
 \end{document}

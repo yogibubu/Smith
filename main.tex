@@ -415,31 +415,15 @@ final generalized coordinates, coefficients, family labels, irreducible
 representations, total-symmetric subsets and the metadata required to
 reconstruct analytic \(\Bmat\) rows.  This is the end of the SMITH contract.
 
-For standalone use the required boundary can be supplied in a single
-\SMITH\ extended-XYZ input file with schema \texttt{matrix.smith.input.v1}.  The file begins as a standard XYZ block: atom count, comment line and Cartesian
-coordinates.  Optional SMITH directives follow after the atom list, so the same
-file can still be opened by ordinary XYZ viewers while carrying construction
-options such as symmetrization, \texttt{SYCART} export, fragment treatment,
-X--H policies and an optional reduced working subgroup.  Four input profiles
-are accepted.  A complete frozen state is consumed unchanged; a supplied
-\texttt{TOPOLOGY} section is used to generate the ordinary redundant
-primitives; a supplied \texttt{PRIMITIVES} section is validated against the
-Cartesian geometry and used directly; and a plain XYZ invokes a bundled
-perception frontend that constructs topology, a complete molecular point-group
-action with atom permutations, and ordinary primitives.  If
-topology and primitives are both supplied, their bond rows must agree.  The
-output records the selected profile as \texttt{FROZEN\_STATE},
-\texttt{STANDALONE\_TOPOLOGY}, \texttt{STANDALONE\_PRIMITIVES} or
-\texttt{STANDALONE\_MINIMAL}.  The minimal route is sufficient for ordinary
-molecules and the supplied examples; the profile name is retained for schema
-compatibility even though molecular symmetry is included.  Advanced continuous
-descriptors, interaction centers, user-selected quasi-symmetry policies or an
-externally audited symmetry state can instead be supplied through the
-complete-state interface.  Thus SMITH is operationally standalone while
-preserving a precise boundary between perception and coordinate construction:
-the embedded subset provides the input state, and SMITH proper begins only
-after that state has been frozen.  The four complete input examples in the
-Supporting Information are executable specifications of this boundary.
+For standalone use the required boundary can be supplied in one extended-XYZ
+file conforming to \texttt{matrix.smith.input.v1}.  Four provider-neutral
+profiles are accepted: a complete frozen state, supplied topology, supplied
+primitives or a minimal Cartesian geometry processed by the bundled perception
+frontend.  Their exact syntax, validation rules and executable examples are
+given in Supporting Information Sec.~S1.  Thus SMITH is operationally
+standalone while preserving a precise boundary between perception and
+coordinate construction: the embedded subset provides the frozen input state,
+and SMITH proper constructs the SONIC chart from that state.
 
 The richer optional descriptors follow continuous molecular perception
 introduced in Proxima,\cite{Lazzari2020Proxima} and molecular/spectral synthons developed for accurate structural
@@ -841,7 +825,18 @@ and a direct local definition for planar and nonplanar rings.  This is a
 geometric analogy, not an identification: Cremer--Pople coordinates describe
 global ring-shape amplitudes and phases, whereas the (U) rows are local,
 signed curvilinear sources from which the active (RPck) combinations are
-constructed.  The polar
+constructed.  This distinction is essential at a planar reference.  A cyclic
+list of proper dihedrals is constrained by ring closure, and its branch phases
+and first-order rows can become linearly dependent when all ring atoms share a
+plane.  The resulting failure belongs to the collective dihedral chart, even
+though an isolated proper dihedral need not itself be singular.  By contrast,
+\(U\) is the signed displacement of one atom from a local three-atom plane: it
+is zero at planarity but has a finite, directly oriented Wilson row there.
+The native construction therefore projects the \(U\)-row space and verifies
+the rank of the complete Cartesian \(\Bmat\) after symmetry adaptation.  The
+proper-dihedral stencil is retained only to define cyclic ordering, and an
+improper dihedral is introduced only by a terminal serializer that cannot
+represent \(U\).  The polar
 Cremer--Pople-like descriptors \(Q\) and \(\phi\) are useful for
 interpretation, but the active coordinate basis stores linear \(RPck\) rows
 because their \(\Bmat\) rows are analytic linear combinations of out-of-plane
@@ -911,7 +906,7 @@ Stored row & Symmetry & Linear form \\
 \(A_{1g}RDef001\) & \(A_{1g}\) &
 \(\left(2A_1-A_2-A_3+2A_4-A_5-A_6\right)/\sqrt{12}\) \\
 \midrule
-\(A_{1g}RPck001\) & \(A_{1g}\) &
+\(A_{2g}RPck001\) & \(A_{2g}\) &
 \(\left(2u_1-u_2-u_3+2u_4-u_5-u_6\right)/\sqrt{12}\) \\
 \midrule
 \(E_uRPck001\) & \(E_u\) &
@@ -1248,9 +1243,12 @@ that fallback in the symmetry diagnostics.
 Fragment translations transform as polar vectors; fragment orientations
 transform as axial vectors.  Torsions and out-of-plane coordinates carry the
 appropriate sign changes under atom permutation and inversion.  Ring puckering
-coordinates are projected through the underlying dihedral source vectors so
-that the symmetry labels refer to the same analytic \(\Bmat\) rows used later
-by GF, fitting and optimization.
+coordinates are projected through the Cartesian row space of the native
+oriented \(U\) sources.  Their source and target phases are both retained under
+each atom permutation, and a final global rank test prevents blockwise
+symmetry adaptation from introducing a cross-family dependence.  Thus the
+symmetry labels refer to the same analytic \(\Bmat\) rows serialized in the
+frozen contract.
 
 \section{Intermolecular and Special Coordinates}
 
@@ -1594,7 +1592,7 @@ Whether a commercial Gaussian 16 parser and optimizer can consume the generated
 coordinate block. & A universal iteration-count advantage for every molecule. \\
 \midrule
 Puckering and portable-export probes, Figs.~\ref{fig:puckering-scan} and
-\ref{fig:cyclohexane-puckering-equivalence}, Table~\ref{tab:external-codes} & Reuse of
+\ref{fig:cyclohexane-puckering-equivalence}, with cross-code values in SI Sec.~S5 & Reuse of
 the same generated coordinate path as Gaussian GIC input or ordinary Cartesian
 geometries for other electronic-structure codes. & A full DVR application. \\
 \midrule
@@ -1693,6 +1691,7 @@ Spiro system & Spiro ring source spaces & \(D_2\) & 87/87; 6 \(RPck\) & \(\Delta
 Cyclooctane & Large-ring puckering & \(D_2\) & 66/66; 5 \(RPck\) & \(\Delta_\mathrm{PF}=9.84\times10^{-9}\); \(\epsilon_\mathrm{SALC}=2.22\times10^{-16}\) \\
 Pagodane & Cage and fused-ring source spaces & \(D_{2h}\) & 114/114 & \(\epsilon_\mathrm{FD}=4.02\times10^{-10}\); stretches and cyclic bends covered \\
 Indane & Fused aromatic/alicyclic rings & \(C_s\) & 51/51 & \(\epsilon_\mathrm{FD}=4.77\times10^{-10}\); butterfly and \(RPck\) rows covered \\
+Saccharin & Planar fused heterocycle, butterfly--puckering phase & \(C_s\) & 45/45; 5 \(RPck\) & \(\epsilon_\mathrm{FD}=3.91\times10^{-10}\); full post-projector \(\Bmat\) rank 45 \\
 Formic acid--water & Weak-complex fragment model & \(C_1\) & 18/18; 6 protected & three translations plus three orientations; direct \(\Bmat\)-rank \(=18\) \\
 Water dimer & Hydrogen-bonded fragment model & \(C_1\) & 12/12; 6 protected & standalone Cartesian input; three translations plus three orientations \\
 Benzene--water & Aromatic--polar fragment model & \(C_1\) & 39/39; 6 protected & standalone Cartesian input; ring coordinates coexist with the fragment block \\
@@ -1705,6 +1704,24 @@ Semantic layer & \texttt{PROTECT}/\texttt{OBSERVABLE} contract & -- & unit probe
 \bottomrule
 \end{tabular}
 \end{table}
+
+A related case emerged during extended independent use of the code by
+collaborators.  An earlier dihedral-based representation of endocyclic
+out-of-plane deformations caused the internal-to-Cartesian
+back-transformation to fail to converge for near-planar fused-ring systems,
+including an indane/indene-type scaffold with an sp\(^3\) CH\(_2\) center in
+the five-membered ring.  This behavior is consistent with the collective
+dihedral redundancy and branch problem discussed in Sec.~7.5: the ill-
+conditioned ring chart reflected the coordinate choice, not a failure of
+SONIC rank or symmetry construction.  The independent test therefore
+motivated the replacement by the curvilinear \(U\) out-of-plane source, which
+retains a finite signed row at planarity.  A second regression, saccharin,
+tests the coupled case in which one fused-ring butterfly and five \(RPck\)
+rows all transform as \(A''\).  Phase-covariant projection now preserves all
+45 coordinates and gives Cartesian rank 45; the butterfly is the difference,
+rather than the rank-deficient sum, of its two oriented source rows.  The
+\(U\)-based form is the version validated throughout this work, including the
+indane and saccharin entries of Table~\ref{tab:validation}.
 
 The finite-difference audit in the pagodane and indane rows is applied after
 the complete stored SONIC chain rule, rather than separately to selected
@@ -1745,8 +1762,10 @@ loader remains compatible with archived version-1 manifests.  For large
 coordinate sets the same viewer can filter by coordinate family, local domain,
 local pseudogroup and local or global total-symmetry character.
 
-The local-pseudosymmetry validation is summarized separately in
-Table~\ref{tab:local-salc-validation}.  The first probe is intentionally
+The local-pseudosymmetry validation is summarized in
+Table~\ref{tab:local-salc-validation}; the complete 20-model CN 5--9 table,
+including template scores, margins and thresholds, is given in SI Sec.~S3.
+The first probe is intentionally
 globally \(C_1\): it contains three equivalent C--H bonds at one carbon and an
 asymmetric C--F/C--O substituent framework.  The purpose is to verify that a
 local \(C_{3v}\) methyl domain can be used to place its symmetric stretch and
@@ -1791,26 +1810,21 @@ System & PG & Local domain & Rank & Diagnostic check \\
 \midrule
 \(C_1\) methyl probe & \(C_1\) & center \(C_{3v}\) & 18/18 & identical after rigid rotation; Python and Fortran put local \(A_1\) first \\
 \midrule
-Benzene & \(D_{6h}\) & ring \(D_6\) & 30/30 & 12 color-preserving cyclic operations \\
-\midrule
-Toluene & \(C_s\) & substituted ring \(C_1\) & 39/39 & one cyclic operation at the default descriptor/distance tolerances \\
-\midrule
 Azulene & \(C_{2v}\) & two fused-ring domains & 48/48 & ring domains 1 and 2 recorded; one shared edge assigned once \\
 \midrule
 CN 5--9 centers & \(C_1\) & ten local polyhedral templates & 12--24 & 20 ideal/distorted models; Python--Fortran group and rank agreement \\
-\midrule
-CN 10/12 centers & \(C_1\) & generic equivalence fallback & 27/33 & Python--Fortran row-space residual below \(1.1\times10^{-8}\) \\
 \midrule
 \(\mathrm{SF_6}\), \([\mathrm{ZrF_8}]^{4-}\) & \(C_1\), \(D_{4d}\) & octahedral and square-antiprismatic domains & 15/15, 21/21 & frozen template, score, margin and thresholds recorded \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:frisch-si} gives the first validation slice aimed directly at
+Table~\ref{tab:frisch-si} gives a representative validation slice aimed directly at
 the recent Gaussian GIC examples.  These are not comparisons of optimizer
 performance; they test whether the chemically meaningful variables illustrated
 in the Supporting Information can be produced as \SONIC\ contract objects or
 coordinate functions without hand-writing a molecule-specific GIC input block.
+The complete motif table and numerical checks are reported in SI Sec.~S4.
 For the ferrocene row, the lower cyclopentadienyl ring is rotated through a
 five-point torsional scan from the eclipsed \(D_{5h}\) form to the staggered
 \(D_{5d}\) form.  The unprojected \SONIC\ contract closes the full rank at every
@@ -1839,22 +1853,12 @@ SI motif & \SONIC\ object & Check \\
 Formamide proton transfer & Generated \(R_{\mathrm{NH}}\), \(R_{\mathrm{OH}}\)
 primitive signatures plus \(\Sigma r\) and \(\Delta r\) functions & Function
 values and sparse chain-rule rows reproduce the sum and difference derivatives. \\
-Li\(_2\)--Ar scan variables & Protected interfragment translation axes plus
-polar radius and elliptic quadratic functions & \(R=\sqrt{x^2+y^2}\) and the
-elliptic constraint propagate sparse derivatives from generated axes. \\
-\(XY_3\) local block & Homogeneous \(C_{3v}\) bend block projected by the stored
-point-group representation & The block gives one \(A_1\) and one degenerate
-\(E\) pair without mixing with other coordinate families. \\
-Weak-complex rotor variables & Protected fragment translations, fragment
-orientations and fragment-center distances & The weak-complex model contains
-automatic \(FTRANS\), \(FROT\) and \(FC\_DIST\) rows with nonzero sparse
-orientation derivatives. \\
 Ferrocene Cp torsion & Ring-center/Fe special coordinates retained through a
 \(0,9,18,27,36^\circ\) Cp rotation scan & Each grid point has rank
 \(57/57\), analytic \(\Bmat\) rank \(57\), stable ring-center identities and
 sparse \(\Bmat\) density \(0.095\)--\(0.101\). \\
 Cyclohexane ring flip coordinate & Automatically generated \(D_{3d}\)
-ring-puckering block \(\mathrm{A}_{1g}RPck001+\mathrm{E}_uRPck001/002\) &
+ring-puckering block \(\mathrm{A}_{2g}RPck001+\mathrm{E}_uRPck001/002\) &
 No hand-written \texttt{Gcyc}, \texttt{Ccyc} or \texttt{Scn0} input is supplied;
 the model closes rank \(48/48\) and exports a Gaussian-readable puckering
 model. \\
@@ -1887,20 +1891,14 @@ and therefore tests SONIC definitions directly rather than through a bespoke
 adapter.  No hand-written surrogate coordinates are introduced.  The three
 systems in Table~\ref{tab:readallgic-opt} were chosen because they exercise
 ring and cage coordinates while remaining small enough for repeated external
-checks.  The native \SONIC\ contract can represent signed out-of-plane rows and
-block-local multi-\(U\) \(RPck\) puckering rows.  Commercial Gaussian 16 has no native \(U\) out-of-plane
-primitive, and the official Gaussian GIC documentation warns that active
-generic coordinates combining multiple periodic dihedrals can behave poorly
-because the periodicity of the component torsions is not applied inside the
-composite expression.\cite{GaussianGICManual}  The commercial
-\texttt{ReadAllGIC} export therefore uses the Gaussian 16 profile by default:
-\(U\) rows are replaced by the corresponding
-Gaussian improper dihedrals, composite \(RPck\) rows are not written to the
-Gaussian input, and all terminally translated component \(D(\cdots)\) terms are added as active
-redundant periodic coordinates.  After the Gaussian optimization, \SMITH\ reads
-the optimized Cartesian structure and evaluates it again in the frozen
-non-redundant \SONIC\ contract.  The calculations reported here used Gaussian
-16 at HF/STO-3G.
+checks.  The native \SONIC\ contract includes signed out-of-plane rows and
+block-local multi-\(U\) \(RPck\) coordinates.  Because commercial Gaussian 16
+cannot represent these objects natively, they are translated only at the
+terminal serialization boundary; the optimized Cartesian structure is then
+re-evaluated in the frozen native contract.  Exact \texttt{ReadAllGIC} route
+syntax, the \(U\)-to-improper convention and the treatment of non-totally
+symmetric rows are documented in SI Sec.~S2.  The calculations reported here
+used Gaussian 16 at HF/STO-3G.
 
 The relevant observations are that Gaussian 16 accepts the automatically
 generated coordinate block and reaches a stationary point in three to nine
@@ -1929,14 +1927,10 @@ A separate comparison using \texttt{CalcFC}, reported below and reproduced in
 the Supporting Information for norbornane, is distinct from this
 no-\texttt{CalcFC} solver-consumption table.
 
-A symmetry-enabled Gaussian 16 variant was run for norbornane without
-\texttt{NoSymm}.  The
-Gaussian input contains the full rank-complete \SONIC\ block required by
-\texttt{ReadAllGIC}, but all non-totally symmetric rows are marked
-\texttt{Frozen}.  Thus only the 15 \(A_1\) coordinates are active while the
-remaining rows define the redundant-to-nonredundant transformation.  Gaussian
-16 accepts this input and reaches a \(C_{2v}\)-preserving stationary point in
-eight steps.
+A symmetry-enabled norbornane variant contains the complete rank-closing block
+but activates only its 15 \(A_1\) rows.  Gaussian 16 accepts this serialization
+and reaches a \(C_{2v}\)-preserving stationary point in eight steps; the full
+input and output excerpts are given in SI Secs.~S1--S2.
 
 The same export path was then compared directly with three standard Gaussian
 optimization choices.  Two very small systems verify that no special handling
@@ -1986,37 +1980,16 @@ Camphor & \(C_1\) & 75/75 & 8 & 14 & 33 & 4 \\
 \end{tabular}
 \end{table}
 
-A separate internal native-coordinate check was carried out with the \(U\)
-out-of-plane representation retained.  This is not a commercial Gaussian 16
-input: G16 requires its terminal translation to an improper dihedral.  For a three-coordinate center \(j\)
-with ligands \(a,b,c\), the signed coordinate is
-\begin{equation}
-\label{eq:native-out-of-plane-u}
-  U(j;a,b,c)=
-  \arcsin\!\left[
-  \frac{\hat r_{ja}\cdot(\hat r_{jb}\times\hat r_{jc})}
-       {|\hat r_{jb}\times\hat r_{jc}|}
-  \right],
-\end{equation}
-with the stored atom ordering fixing the sign convention.  In the native mode
-camphor contains one native \(U(6,4,7,8)\) row and converges in eight
-HF/STO-3G optimization steps with the internal test evaluator.  The commercial Gaussian 16 compatibility input
-uses the Fortran/G16 improper-dihedral convention
-\(U(I,J,K,L)\mapsto D(J,I,L,K)\), giving \(D(4,6,8,7)\) for the same local
-non-planarity.  For ring puckering, commercial Gaussian 16 receives the
-individual periodic dihedrals obtained by terminal translation of the
-\(U\) sources of each \(RPck\) row as active redundant
-coordinates; the original \(RPck\) combinations are retained only in the
-\SMITH\ contract and do not appear in the commercial Gaussian 16 input.  The
-optimized structure is then projected back onto the native \SONIC\ contract.
-This compatibility export is less compact than the native
-form, but it allows standard Gaussian 16 to be used without relying on
-development-only primitives.  The native \SONIC\ contract still defines \(U\),
-multi-\(U\) \(RPck\), \(QPck\) and \(\Phi P\).
-For the symmetry-enabled norbornane export, the full rank-complete contract
-contains 51 generated rows, of which 36 non-totally symmetric rows are marked
-\texttt{Frozen}.  This directly tests frozen-irrep handling through the
-commercial Gaussian 16 parser without requiring a nonstandard executable.
+A separate native-coordinate check retains the curvilinear \(U\)
+representation throughout.  Camphor contains one native \(U(6,4,7,8)\) row
+and converges in eight HF/STO-3G steps with the internal test evaluator.  The
+corresponding commercial-Gaussian input is necessarily less compact because
+\(U\) and multi-\(U\) ring combinations are terminally translated into
+supported improper and periodic-dihedral objects.  This translation does not
+redefine the scientific contract: \(U\), multi-\(U\) \(RPck\), \(QPck\) and
+\(\Phi P\) remain the native coordinates against which the resulting geometry
+is interpreted.  SI Sec.~S2 gives the exact atom-order convention and the
+frozen rows of the 51-coordinate norbornane example.
 
 \begin{figure}[htbp]
 \centering
@@ -2092,32 +2065,12 @@ workstation with ORCA and Molpro at PBE0/def2-SVP, a different level from
 the B3LYP/6-31+G* Gaussian check.  The absolute energies differ slightly
 between codes, as expected from independent DFT implementations and defaults,
 but the relative fixed-frame puckering profile is the same at the level needed
-for this export test (Table~\ref{tab:external-codes}).  This verifies the
+for this export test; the complete energies and relative-energy comparison are
+reported in SI Sec.~S5.  This verifies the
 intended division of labor: \SONIC\ constructs the model and coordinates, while
 external electronic-structure programs consume the resulting Cartesian
 geometries or GIC serializations.  It confirms that the coordinate definition is
 independent of the electronic-structure implementation.
-
-\begin{table}[htbp]
-\centering
-\caption{Portable cyclohexane puckering coordinates evaluated by non-Gaussian
-codes on a local workstation.  Energies are PBE0/def2-SVP single points on the same
-\SONIC{}-generated Cartesian geometries; relative energies are in kJ mol\(^{-1}\)
-with respect to \(p00\).  The labels are the same interpolation points used in
-Fig.~\ref{fig:cyclohexane-puckering-equivalence}: \(p00\) corresponds to
-\(\lambda=0.00\), \(p02\) to \(\lambda=0.50\), and \(p04\) to
-\(\lambda=1.00\).}
-\label{tab:external-codes}
-\begin{tabular}{lrrrr}
-\toprule
-Point & ORCA \(E_h\) & ORCA \(\Delta E\) & Molpro \(E_h\) & Molpro \(\Delta E\) \\
-\midrule
-\(p00\) & -235.422463982 & 0.000 & -235.422142275 & 0.000 \\
-\(p02\) & -235.321345943 & 265.485 & -235.321038853 & 265.447 \\
-\(p04\) & -235.103704314 & 836.903 & -235.103335256 & 837.028 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \begin{figure}[htbp]
 \centering
@@ -2437,22 +2390,12 @@ naturally be built.
 
 \section*{Reproducibility}
 
-The calculations reported in the validation and application sections were
-generated with standalone \SMITH\ and Python 3.13.11.  The immutable standalone
-manuscript snapshot is tagged \texttt{v0.1.0rc6}.  Its dependency lock and
-checksums are recorded with the archived submission.  Gaussian
-optimization jobs used Gaussian 16; other Gaussian-family probes use the local
-executable documented in the accompanying scripts.  The method and basis set
-are stated with each probe.  The reported
-construction tests use fixed inputs and no stochastic seeds.  The
-Python implementation is checked against a separate Fortran control
-implementation for the corpus rows where that comparison is applicable.  The
-local-pseudosymmetry data can be regenerated with
-\texttt{scripts/run\_local\_salc\_validation.py}; it records the descriptor and
-distance tolerances, all final ranks, the rigid-rotation check and the
-Fortran center-classification result.
-The plain-XYZ water regression additionally verifies the embedded perception
-boundary by requiring a $C_{2v}$ label and four serialized symmetry operations.
+All reported construction tests use fixed inputs and no stochastic seeds.  The
+immutable standalone snapshot is tagged \texttt{v0.1.0rc6}; methods and basis
+sets are stated with each external probe.  Complete commands, dependency
+versions, revision identifiers, checksums and regeneration instructions are
+given in SI Sec.~S7.  The Python implementation is checked against a separate
+Fortran control path wherever that comparison is applicable.
 
 \section*{Data and Code Availability}
 

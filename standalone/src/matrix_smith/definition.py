@@ -3376,6 +3376,24 @@ def _apply_local_symmetrization(
     def with_operation_margins(
         result: tuple[tuple[FrozenGIC, ...], GICSymmetrizationDiagnostics],
     ) -> tuple[tuple[FrozenGIC, ...], GICSymmetrizationDiagnostics]:
+        projected_rank = _frozen_gic_b_matrix_rank(
+            result[0],
+            primitive_by_id={primitive.identifier: primitive for primitive in primitives},
+            reference_coordinates_angstrom=reference_coordinates_angstrom,
+        )
+        has_native_ring_out_of_plane = any(
+            primitive.family == "RING_PUCKER_COMPONENT" and primitive.function == "U"
+            for primitive in primitives
+        )
+        if (
+            has_native_ring_out_of_plane
+            and projected_rank is not None
+            and projected_rank < len(result[0])
+        ):
+            raise GICForgeContractError(
+                "symmetry projection produced a rank-deficient global SONIC B matrix: "
+                f"rank {projected_rank} for {len(result[0])} coordinates"
+            )
         return (
             result[0],
             _diagnostics_with_operation_margins(
@@ -3472,6 +3490,35 @@ def _apply_local_symmetrization(
     ))
 
 
+def _frozen_gic_b_matrix_rank(
+    gics: tuple[FrozenGIC, ...],
+    *,
+    primitive_by_id: dict[str, GICPrimitive],
+    reference_coordinates_angstrom: tuple[tuple[float, float, float], ...] | None,
+) -> int | None:
+    """Return the Cartesian rank of a complete frozen SONIC set when evaluable."""
+    if reference_coordinates_angstrom is None:
+        return None
+    coords = np.asarray(reference_coordinates_angstrom, dtype=float)
+    rows: list[np.ndarray] = []
+    for gic in gics:
+        row = np.zeros(coords.size, dtype=float)
+        for primitive_id, coefficient in (
+            gic.coefficients or ((gic.primitive_id, 1.0),)
+        ):
+            primitive = primitive_by_id.get(primitive_id)
+            if primitive is None:
+                return None
+            try:
+                row += float(coefficient) * _analytic_b_row(primitive, coords)
+            except (FloatingPointError, GICForgeContractError, ValueError):
+                return None
+        rows.append(row)
+    if not rows:
+        return 0
+    return int(np.linalg.matrix_rank(np.vstack(rows), tol=1.0e-8))
+
+
 def _apply_point_group_projector(
     gics: tuple[FrozenGIC, ...],
     primitives: tuple[GICPrimitive, ...],
@@ -3500,7 +3547,11 @@ def _apply_point_group_projector(
         )
         if projected is not None:
             return projected
-    use_global_b_selection = group_key in {
+    has_native_ring_out_of_plane = any(
+        primitive.family == "RING_PUCKER_COMPONENT" and primitive.function == "U"
+        for primitive in primitives
+    )
+    use_global_b_selection = has_native_ring_out_of_plane or group_key in {
         "T",
         "TD",
         "O",
@@ -3571,6 +3622,18 @@ def _apply_point_group_projector(
         diagnostics.append(block_diagnostics)
 
     output_tuple = tuple(output)
+    if coords_for_global is not None:
+        projected_rank = _frozen_gic_b_matrix_rank(
+            output_tuple,
+            primitive_by_id=primitive_by_id,
+            reference_coordinates_angstrom=reference_coordinates_angstrom,
+        )
+        if (
+            has_native_ring_out_of_plane
+            and projected_rank is not None
+            and projected_rank < len(output_tuple)
+        ):
+            return None
     return (
         output_tuple,
         GICSymmetrizationDiagnostics(
@@ -4533,6 +4596,38 @@ def _primitive_projector_key_index(
     return out
 
 
+def _primitive_projector_orientation_sign(primitive: GICPrimitive) -> float:
+    """Return the phase relating an oriented primitive to its canonical key."""
+    if (
+        primitive.family == "RING_PUCKER_COMPONENT"
+        and primitive.function == "U"
+        and len(primitive.atoms) == 4
+    ):
+        center, first, second, third = primitive.atoms
+        _canonical, sign = _canonical_torsion_key_and_sign(
+            (first, center, third, second)
+        )
+        return sign
+    if (
+        primitive.family
+        in {
+            "TORSION",
+            "CYCLIC_TORSION",
+            "CONDENSED_RING_TORSION",
+            "BUTTERFLY",
+            "RING_PUCKER_COMPONENT",
+        }
+        and primitive.function == "D"
+        and len(primitive.atoms) == 4
+    ):
+        _canonical, sign = _canonical_torsion_key_and_sign(primitive.atoms)
+        return sign
+    if primitive.family in {"OUT_OF_PLANE", "IMPROPER_DIHEDRAL"} and len(primitive.atoms) == 4:
+        substituents = primitive.atoms[1:]
+        return _permutation_parity_sign(substituents, tuple(sorted(substituents)))
+    return 1.0
+
+
 def _operation_primitive_transform(
     primitives: tuple[GICPrimitive, ...],
     *,
@@ -4566,7 +4661,10 @@ def _operation_primitive_transform(
             target_index = primitive_key_index.get(target_key)
             if target_index is None:
                 return None
-            matrix[target_index, source_index] += float(coefficient)
+            target_orientation = _primitive_projector_orientation_sign(
+                primitives[target_index]
+            )
+            matrix[target_index, source_index] += float(coefficient) * target_orientation
     return matrix
 
 
@@ -4887,7 +4985,12 @@ def _mapped_primitive_projector_terms(
         and len(mapped_atoms) == 4
     ):
         canonical, sign = _canonical_torsion_key_and_sign(mapped_atoms)
-        return (((primitive.family, canonical), sign * _operation_pseudoscalar_sign(operation)),)
+        return (
+            (
+                (primitive.family, canonical),
+                sign * _operation_pseudoscalar_sign(operation),
+            ),
+        )
     if primitive.family == "RING_PUCKER_COMPONENT" and primitive.function == "RPCK":
         pseudoscalar_sign = _operation_pseudoscalar_sign(operation)
         mapped_terms = []

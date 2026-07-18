@@ -55,7 +55,7 @@ PRESERVED_STANDALONE_SECTIONS = (
     "INTERACTION_CENTERS",
 )
 PROVENANCE_SCHEMA = "smith.sonic.standalone.v1"
-IMPLEMENTATION_REVISION = "4003cd7b8607446036134ca52386397138a9b957"
+IMPLEMENTATION_REVISION = "bc6d62140aab5fbcef8dd6fa7bc6c468debba69a"
 DEFAULT_G16_ROUTE = "#p hf/sto-3g opt=(readallgic,calcfc,maxcycle=80)"
 EXAMPLES = {
     "water": ("water.smith.xyz", False),
@@ -63,6 +63,7 @@ EXAMPLES = {
     "formic-acid-water": ("formic_acid_water.smith.xyz", False),
     "water-dimer": ("water_dimer.smith.xyz", False),
     "benzene-water": ("benzene_water.smith.xyz", False),
+    "saccharin": ("saccharin.smith.xyz", False),
     "eta3-allyl-palladium": ("eta3_allyl_palladium.frozen.xyzin", True),
 }
 

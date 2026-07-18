@@ -1,7 +1,7 @@
 {
   "method": "SMITH/SONIC local-pseudosymmetry SALC validation",
-  "matrix_revision": "4aca962fe5a09ef92f40e5f0610f45e2961001cd",
-  "matrix_worktree_dirty": true,
+  "matrix_revision": "9ffaa9f7007ac7689822193b9e7a3c359eaa2e75",
+  "matrix_worktree_dirty": false,
   "python": "3.13.11",
   "settings": {
     "local_salc": true,
@@ -546,8 +546,8 @@
         "NON_A1_1",
         "NON_A1_2"
       ],
-      "kept": 18,
-      "pruned": 1
+      "kept": 17,
+      "pruned": 2
     },
     {
       "system": "benzene",
@@ -613,11 +613,7 @@
         "FOURIER_1",
         "FOURIER_2",
         "FOURIER_3",
-        "NON_A1_1",
-        "NON_A1_2",
-        "NON_A1_3",
-        "NON_A1_4",
-        "NON_A1_5"
+        "NON_A1_1"
       ],
       "kept": 39,
       "pruned": 1
@@ -653,14 +649,10 @@
         "FOURIER_2",
         "FOURIER_3",
         "FOURIER_4",
-        "NON_A1_1",
-        "NON_A1_2",
-        "NON_A1_3",
-        "NON_A1_4",
-        "NON_A1_5"
+        "NON_A1_1"
       ],
-      "kept": 45,
-      "pruned": 4
+      "kept": 39,
+      "pruned": 10
     }
   ],
   "notes": [
