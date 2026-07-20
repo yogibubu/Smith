@@ -95,11 +95,13 @@ Every output receives a `#SMITH_PROVENANCE` section recording whether SMITH
 consumed a complete state, supplied topology, supplied primitives, or its
 minimal Cartesian frontend.  The package deliberately limits its surface to
 SONIC contract construction and inspection.  Each build
-also writes a `.smith.out` coordinate report and a `.g16.gjf` Gaussian 16 input.
-Gaussian 16 is used because `ReadAllGIC` provides a general independent
-interpreter for SONIC expressions.  The G16 profile is the default, and
-non-totally symmetric coordinates are written as `Frozen`.  Because commercial
-G16 has no native SONIC out-of-plane primitive and cannot safely represent every
+also writes a `.smith.out` coordinate report and a `.g16.gjf` Gaussian 16
+Rev. C.01 input.  Gaussian 16 Rev. C.01 is used because `ReadAllGIC` provides a general independent
+interpreter for SONIC expressions.  SONIC serialization is one particular use
+among the many coordinate definitions supported by the GIC language.  The G16
+profile is the default, and
+non-totally symmetric coordinates are written as `Frozen`.  Because Gaussian
+16 Rev. C.01 has no native SONIC out-of-plane primitive and cannot safely represent every
 special or multi-periodic composite coordinate, the exporter translates
 out-of-plane rows to improper dihedrals and emits supported component
 coordinates where necessary.  The native SONIC contract and human report are

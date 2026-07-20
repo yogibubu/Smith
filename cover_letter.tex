@@ -1,0 +1,68 @@
+\documentclass[10pt]{letter}
+
+\usepackage[margin=0.80in]{geometry}
+\usepackage[hidelinks]{hyperref}
+\emergencystretch=2em
+
+\signature{Vincenzo Barone}
+\address{Vincenzo Barone\\
+INSTM, National Interuniversity Consortium for Materials Science and Technology\\
+via G. Giusti 9, 50121 Firenze, Italy\\
+\href{mailto:vincebarone52@gmail.com}{vincebarone52@gmail.com}}
+
+\begin{document}
+
+\begin{letter}{Editor-in-Chief\\
+Journal of Chemical Theory and Computation\\
+American Chemical Society}
+
+\opening{Dear Editor-in-Chief,}
+
+Please find enclosed the manuscript ``SONIC: Symmetry-Oriented Non-redundant
+Internal Coordinates,'' submitted for consideration as an Article in the
+\emph{Journal of Chemical Theory and Computation}.
+
+The manuscript addresses a persistent constructive problem in computational
+chemistry: how to obtain a chemically interpretable, non-redundant and
+symmetry-adapted internal-coordinate model without molecule-specific coordinate
+editing or arbitrary cross-family weights. It introduces SONIC and its SMITH
+implementation, which organize ordinary and special internal coordinates in
+homogeneous families, protect ring and fragment semantics, enforce analytic
+Wilson-B rank closure, and apply local and exact molecular symmetry before
+freezing a portable coordinate contract.
+
+The work is aligned with the scope of JCTC because it presents new computational
+methodology together with an independently installable implementation and
+quantitative validation. The tests span acyclic, cyclic, fused, bridged,
+high-symmetry, high-coordination, non-covalent and metal--ligand systems. They
+include analytic-versus-finite-difference derivative checks, rigid-motion and
+atom-permutation covariance, local-SALC validation, serialization of one SONIC
+coordinate model through the general Gaussian 16 GIC syntax, and ORCA/Molpro
+cross-code probes. The frozen SONIC contract is a
+reusable representation for downstream optimization, vibrational, force-field
+and structural-refinement methods, whose algorithms remain explicitly outside
+the scope of the present construction paper.
+
+An earlier version of the manuscript has been submitted to arXiv and is
+currently awaiting processing and assignment of its public identifier. The
+present journal version records substantial post-upload improvements: it
+uses signed curvilinear native out-of-plane sources for ring construction,
+corrects phase-covariant symmetry projection and full-rank treatment of
+puckering coordinates, adds the independent indane and saccharin regression
+cases, expands the provider-neutral standalone interfaces, and freezes the
+validated SMITH 0.1.0rc7 implementation and reproducibility bundle. The arXiv
+record will be linked to the journal article if the manuscript is published.
+
+The manuscript is original, has not been published previously, and is not
+under consideration elsewhere. I am the sole author. No external funding was
+received for this work, and I declare no competing financial interest. The
+source, versioned standalone package, validation data and reproduction scripts
+are available through the repository identified in the manuscript.
+
+Thank you for considering this submission.
+
+\closing{Sincerely,}
+
+\end{letter}
+
+\end{document}

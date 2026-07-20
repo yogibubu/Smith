@@ -141,8 +141,15 @@ realization service constructed direction matrices of dimensions
 \subsection{\texttt{ReadAllGIC} route and generated syntax}
 
 Gaussian 16 is used as an external interpreter because its GIC syntax accepts
-general symbolic coordinate expressions.  The compatibility route has the
-form
+general symbolic coordinate expressions.  The SONIC blocks examined here are
+one particular application of that substantially broader syntax; they do not
+define or delimit the other coordinate models and workflows supported by GIC.
+All calculations and parser tests in this Supporting Information use the
+commercial Gaussian 16 Rev. C.01 installation.  The broader GIC functionality
+reported by Marenich et al. was implemented and tested in a development version
+of the Gaussian suite; those new capabilities are scientifically interesting
+but were not available to, and were not used in, the present validation.
+The compatibility route has the form
 
 \begin{lstlisting}
 #p method/basis opt=(readallgic,calcfc,maxcycle=80)
@@ -165,7 +172,7 @@ U(j;a,b,c)=\arcsin\!\left[
 {|\hat r_{jb}\times\hat r_{jc}|}\right],
 \]
 
-with the stored atom order fixing the sign.  Commercial Gaussian 16 has no
+with the stored atom order fixing the sign.  Gaussian 16 Rev. C.01 has no
 native \(U\) primitive, so serialization alone applies
 \(U(I,J,K,L)\mapsto D(J,I,L,K)\).  Multi-\(U\) ring-puckering combinations
 remain in the frozen SONIC contract, while the Gaussian file receives their
@@ -385,18 +392,6 @@ these six rows from six to five.  The regression therefore checks the complete
 post-symmetry Cartesian \(\Bmat\), rather than accepting six individually
 well-formed but collectively dependent expressions.
 
-The distributed native-GDV input below is generated from this corrected
-contract with the commercial-G16 compatibility translation disabled.  It
-therefore retains all signed \(U\) out-of-plane primitives: five composite
-ring-puckering rows and six local out-of-plane rows.  The file contains exactly
-45 SONIC definitions, has analytic Cartesian rank 45 at the reference
-geometry, and uses the accompanying \texttt{3F12red.gbs} basis file.  The
-electronic-structure route is the same one used for the end-to-end optimization
-and frequency calculation; its completed output is treated separately from
-the construction evidence and will be archived only after normal termination.
-
-\lstinputlisting[caption={Native-GDV saccharin input generated from the corrected full-rank SONIC contract.}]{si/saccharin_native_gdv.gjf}
-
 Central finite differences of every final SONIC row give maximum absolute
 analytic-row errors of \(4.02\times10^{-10}\) for pagodane and
 \(4.77\times10^{-10}\) for indane, and \(3.91\times10^{-10}\) for saccharin.
@@ -467,8 +462,6 @@ Artifact & SHA-256 \\
 \texttt{si/norbornane\_smith\_input.xyzin} & \nolinkurl{e5feb34cf4c2b1114b65456704342e0c22b687fce85bdb7d4c1e45bbd05885c6} \\
 \texttt{si/norbornane\_g16\_readallgic.gjf} & \nolinkurl{140742865ae2662c5f74099d78d099e83ab3b65c2a27c75b5d1c4a15996e3857} \\
 \texttt{si/norbornane\_g16\_output\_excerpt.txt} & \nolinkurl{93e21fe46c4d197079221fc5875d1994e5cfcadad2f0c252dd7789709107c4f5} \\
-\texttt{si/saccharin\_native\_gdv.gjf} & \nolinkurl{6bc29dfdda6a013be2df13f7a645db406a629ba954c99400cb1f6d0c8f28eab8} \\
-\texttt{si/3F12red.gbs} & \nolinkurl{2d7ebacd714e73a56f0695a0be1e7f5a18fabf32e2f851e22926f05acf4f2ecb} \\
 \bottomrule
 \end{tabularx}
 \end{table}

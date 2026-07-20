@@ -42,65 +42,29 @@
 \maketitle
 
 \begin{abstract}
-Internal coordinates are the natural language of molecular structure, yet their
-automatic construction remains uneven across the use cases required by modern
-spectroscopy and structure refinement.  Primitive redundant internals are robust
-for geometry optimization but do not define a unique active space.  Global
-non-redundant coordinates obtained from the singular-value or eigenvalue
-decomposition of a full primitive Wilson matrix remove the redundancy, but the
-resulting variables are often delocalized and sensitive to arbitrary weights
-assigned to stretches, bends, torsions and non-covalent contacts.  Natural
-internal coordinates provide the best chemical interpretation, especially for
-force-field and vibrational work, but existing constructions are usually tied to
-particular bonding patterns and do not provide a general, reproducible treatment
-of fused rings, high coordination, point-group symmetry and weakly bound
-fragments.
-
-We present \SONIC\ (Symmetry-Oriented Non-redundant Internal Coordinates) as a general
-construction of non-redundant, symmetry-adapted generalized internal
-coordinates.  The \SMITH\ (Symmetry-Mapped Internal-coordinate Template
-Handler) implementation starts
-from Cartesian geometry and one of four provider-neutral input profiles: a
-complete frozen molecular state, user-supplied topology, user-supplied
-redundant primitives, or a standalone perception kernel that constructs
-ordinary topology, molecular point-group operations and primitive coordinates.
-It validates and classifies
-the ordinary primitive rows, augments them with chemically typed special or
-composite families, protects coordinates for rings and fragments, and reduces the coordinate space using analytic Wilson
-\(\Bmat\)-row rank tests.  A local-pseudosymmetry layer first orders
-center-, ring- and bond-domain coordinates with the locally totally symmetric
-combination first; the exact molecular point-group projector is then applied
-inside homogeneous coordinate blocks.  The result is a deterministic constructive protocol and a
-frozen coordinate contract, rather than an arbitrary non-redundant basis.  The
-contract can also incorporate optional user-defined protected semantic
-coordinates and derived observables.  The published SMITH boundary ends with
-the coordinate definitions, their human-readable decomposition, symmetry and
-rank diagnostics, and analytic Wilson \(\Bmat\) rows.  Optimization policies,
-finite internal-to-Cartesian realization, force-field models and higher-order
-Hessian transformations are consumers of this contract, not parts of its
-construction.  The method
-therefore provides a constructive counterpart to natural internal coordinates:
-it preserves their locality and interpretability while extending them to the
-topological and symmetry cases that usually require manual intervention.
-In MATRIX, molecular symmetry and ordinary PICs are authoritative ORACLE input
-and are never reperceived by SMITH.  To remain independently installable, the
-standalone distribution embeds a revision-pinned subset of the same ORACLE
-perception kernel.  The duplication is therefore a packaging boundary, not a
-second symmetry method, and its provenance is recorded with the SONIC contract.
-The numerical evidence reported here validates the construction invariants,
-sparse first-derivative machinery and external serialization path.  Gaussian 16
-is used because its unusually general GIC language can evaluate the generated
-SONIC expressions directly, providing an independent parser and solver test
-without molecule-specific transcription.  It is not used as a competing
-coordinate generator.  Its export limitations are explicit: native
-out-of-plane and special composite coordinates remain in the SONIC contract
-but must be translated to supported improper-dihedral or component expressions,
-or omitted from the commercial input when no exact GIC representation exists.
-Standalone probes include formic-acid--water, water-dimer and benzene--water
-complexes with six protected intermolecular degrees of freedom, together with
-an $\eta^3$ allyl--palladium complex in which a supplied ligand center is
-retained as a protected metal--center coordinate.  We also discuss the
-intended scope of the method and its current limitations.
+Internal coordinates are the natural language of molecular structure, yet
+automatic constructions either retain redundancy or produce delocalized,
+weight-dependent bases and remain difficult to generalize to fused and bridged
+rings, high coordination, exact and local symmetry, and weakly bound
+fragments.  We introduce \SONIC\ (Symmetry-Oriented Non-redundant Internal
+Coordinates), implemented in \SMITH\ (Symmetry-Mapped Internal-coordinate
+Template Handler), as a deterministic protocol that accepts a frozen molecular
+state or provider-neutral Cartesian, topology, or primitive-coordinate input;
+organizes ordinary and special coordinates in chemically homogeneous families;
+protects ring and fragment semantics; and applies analytic Wilson
+\(\Bmat\)-row rank tests followed by local and molecular symmetry projection.
+Validation across acyclic, cyclic, fused, bridged, high-symmetry,
+high-coordination, non-covalent, and metal--ligand systems gives complete target
+rank, analytic-versus-finite-difference first-derivative agreement,
+rotation/permutation covariance, stable local symmetry-adapted combinations,
+and reproducible external serialization.  Gaussian 16 is used as an independent
+parser and solver, with SONIC serialization representing one particular use of
+its much more general GIC syntax.
+The resulting frozen contract retains chemically readable decomposition,
+symmetry, rank diagnostics, analytic first derivatives, and provenance, thereby
+providing a constructive counterpart to natural internal coordinates while
+leaving optimization, finite internal-to-Cartesian realization, force fields,
+and higher derivatives to downstream consumers.
 \end{abstract}
 
 \begin{tocentry}
@@ -284,7 +248,9 @@ implementations already provide expressive syntax for nonlinear and mixed
 coordinate expressions.  The novelty here is the preceding step: a
 deterministic generator that converts a frozen molecular state into a
 rank-complete, symmetry-consistent coordinate basis that can be serialized as
-Gaussian-readable GICs or consumed directly by downstream modules.  The
+Gaussian-16-readable GICs or consumed directly by downstream modules.  Such a
+SONIC serialization is only one of the many possible uses of the general GIC
+language.  The
 standalone command-line tool is named \SMITH\ (Symmetry-Mapped
 Internal-coordinate Template Handler).  Symmetry is used in the classical molecular sense: point-group
 operations map coordinate rows into the same space with the corresponding atom
@@ -311,7 +277,7 @@ assembled into one frozen, reusable coordinate object.
 \label{tab:context}
 \begin{tabular}{p{0.19\linewidth}p{0.31\linewidth}p{0.39\linewidth}}
 \toprule
-Strategy & Strength & Limitation addressed by \SONIC \\
+Strategy & Strength & Relationship to \SONIC \\
 \midrule
 Z matrices & Compact, local and interpretable for small molecules. & Tree
 dependence, singularities, and manual choices make them fragile for rings,
@@ -341,17 +307,14 @@ them as a protected, typed and symmetry-labelled source family; alternatively,
 the intermolecular model may be constructed from typed pseudo-bonds and
 pseudo-cycles. \\
 \midrule
-Gaussian GIC syntax & Very general symbolic coordinate expressions, including
+Gaussian 16 GIC syntax & Very general symbolic coordinate expressions, including
 nontraditional geometric parameters, sparse derivative rows and automatic
-symbolic differentiation, can be evaluated by an external optimizer; the recent
-Gaussian implementation is the most direct general-purpose
-comparison.\cite{Marenich2025GIC} & Standard internals can be generated from
-connectivity and user-defined GIC expressions can be parsed and differentiated,
-but the chemically specialized examples remain coordinates that are explicitly
-specified in input or activated through dedicated options.  The syntax does not
-define a complete natural-coordinate generator with protected rank reduction,
-homogeneous point-group projectors and reusable symmetry-labelled blocks for
-refinement or force-field analysis. \\
+symbolic differentiation, can be evaluated by the optimizer.  The recent work
+substantially extends this general framework.\cite{Marenich2025GIC} & \SONIC{}
+supplies one particular, automatically constructed family of definitions that
+can be passed to GIC syntax; the present tests use only features available in
+the commercial Gaussian 16 Rev. C.01 installation, not the development-version
+extensions reported in the recent work. \\
 \midrule
 \SONIC & Builds a rank-complete, type-labelled, symmetry-adapted coordinate basis
 from a validated molecular state. & Weak complexes can be represented either
@@ -379,33 +342,41 @@ into a frozen construction for spectroscopy and refinement by combining
 chemically typed primitive generation, block-local rank reduction,
 special-coordinate protection and point-group projectors.
 
-The recent Gaussian GIC paper is therefore the closest comparison and also
-clarifies the remaining gap.  Its Supporting Information demonstrates the
-power of the GIC language with nonlinear water coordinates, formamide
+The recent Gaussian 16 GIC paper provides the most direct complementary
+framework for external serialization.  Its Supporting Information demonstrates
+the broad scope of the GIC language with nonlinear water coordinates, formamide
 proton-transfer sum and difference variables, methane and ammonia
 \(XY_3\)-type symmetrized combinations, polar and elliptic Li\(_2\)--Ar scan
 variables, fragment rotor coordinates for benzene dimers and water clusters,
 and quaternion fragment coordinates for ferrocene.\cite{Marenich2025GIC}
-These examples clarify the distinction between an expressive coordinate
-language and an automatic generator.  Gaussian can evaluate and differentiate
-such expressions once they have been supplied or selected.  \SONIC\ instead aims
-to generate the corresponding objects whenever they follow from topology, local
-equivalence, point-group symmetry, fragments, ring centers, bond centers or
-semantic coordinate requests.
+These new capabilities are particularly interesting and provide natural targets
+for future interoperability tests.  They were not used in the present work:
+the cited study states that its calculations employed a development version of
+the Gaussian suite, whereas all external tests reported here were restricted to
+the functionality available in the commercial Gaussian 16 Rev. C.01
+installation.  Accordingly, the examples below are motif-level construction
+tests or Rev. C.01 serialization tests, not validations of the new
+development-version implementation.
+These examples illustrate the generality of an expressive coordinate language.
+Within that broader setting, Gaussian 16 can evaluate and differentiate the
+SONIC expressions once they have been supplied, just as it can treat many other
+GIC definitions.  \SONIC\ provides an optional automatic route to one such set of
+objects when they follow from topology, local equivalence, point-group symmetry,
+fragments, ring centers, bond centers or semantic coordinate requests.
 
-This distinction is central to the positioning of the method.  Gaussian GIC is
-an expressive coordinate-description language: a user can write arbitrary
-primitive, nonlinear, redundant or mixed expressions and let Gaussian evaluate
-them.  \SONIC\ addresses a different problem.  It constructs the coordinate model
-before any optimizer, force-field fit or refinement sees it, and records why
-each special or ordinary coordinate was accepted.  The Gaussian syntax is
-therefore a serialization target for \SONIC, not the theoretical object being
-introduced.
+This complementarity is central to the positioning of the method.  The Gaussian
+16 GIC facility is a general coordinate-description language in which a user can
+define primitive, nonlinear, redundant or mixed expressions.  \SONIC\ constructs
+one possible coordinate model before an optimizer, force-field fit or refinement
+uses it, and records why each special or ordinary coordinate was accepted.  GIC
+syntax is therefore one supported serialization route for \SONIC; \SONIC\ neither
+restricts the scope of that syntax nor replaces the other ways in which it can
+be used.
 
-In practical terms, the user should not have to write pages of molecule-specific
-GIC definitions to obtain chemically natural variables such as local
+For repeated automatic workflows, molecule-specific GIC definitions for local
 \(XY_n\)-type combinations, proton-transfer sums and differences, fragment
-translations or ring-puckering components.  When those variables are consequences
+translations or ring-puckering components can instead be generated from the
+frozen molecular state.  When those variables are consequences
 of the frozen molecular state, \SONIC\ can generate and protect them
 automatically; when they are requested explicitly, the request is recorded as a
 semantic coordinate rather than as an opaque handwritten expression.
@@ -1624,12 +1595,13 @@ Local-pseudosymmetry corpus, Table~\ref{tab:local-salc-validation} & Local
 records and independent Python/Fortran classification. & Replacement of the
 exact molecular point group or a complete local-irrep decomposition. \\
 \midrule
-Gaussian-GIC motifs, Table~\ref{tab:frisch-si} & Automatic construction of
-coordinate objects that otherwise appear as explicit GIC examples or dedicated
-motifs. & A benchmark of Gaussian's internal optimizer. \\
+Gaussian-16-GIC-inspired motifs, Table~\ref{tab:frisch-si} & Automatic
+construction of selected coordinate objects related to examples in the recent
+GIC work. & Use or validation of its development-version implementation, or a
+benchmark of the Gaussian 16 internal optimizer. \\
 \midrule
-Gaussian \texttt{ReadAllGIC} optimizations, Table~\ref{tab:readallgic-opt} &
-Whether a commercial Gaussian 16 parser and optimizer can consume the generated
+Gaussian 16 Rev. C.01 \texttt{ReadAllGIC} optimizations,
+Table~\ref{tab:readallgic-opt} & Whether the released parser and optimizer can consume the generated
 coordinate block. & A universal iteration-count advantage for every molecule. \\
 \midrule
 Puckering and portable-export probes, Figs.~\ref{fig:puckering-scan} and
@@ -1858,11 +1830,11 @@ CN 5--9 centers & \(C_1\) & ten local polyhedral templates & 12--24 & 20 ideal/d
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:frisch-si} gives a representative validation slice aimed directly at
-the recent Gaussian GIC examples.  These are not comparisons of optimizer
-performance; they test whether the chemically meaningful variables illustrated
-in the Supporting Information can be produced as \SONIC\ contract objects or
-coordinate functions without hand-writing a molecule-specific GIC input block.
+Table~\ref{tab:frisch-si} gives a representative validation slice inspired by
+examples of the general Gaussian 16 GIC facility.  These are not comparisons of
+optimizer performance; they test whether one particular subset of chemically
+meaningful variables illustrated in that Supporting Information can also be
+produced automatically as \SONIC\ contract objects or coordinate functions.
 The complete motif table and numerical checks are reported in SI Sec.~S4.
 For the ferrocene row, the lower cyclopentadienyl ring is rotated through a
 five-point torsional scan from the eclipsed \(D_{5h}\) form to the staggered
@@ -1880,10 +1852,11 @@ diagnostic for the sparse representation, not an additional rank criterion.
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\caption{Targeted tests inspired by the Gaussian GIC Supporting Information.
-The purpose is to test automatic \SONIC\ construction of the same kind of
-coordinate object that Gaussian can evaluate when supplied as a GIC expression
-or through a dedicated option.}
+\caption{Targeted tests inspired by the Gaussian 16 GIC Supporting Information.
+The purpose is to test automatic \SONIC\ construction of selected coordinate
+objects that Gaussian 16 can evaluate when supplied as GIC expressions or
+through dedicated options; these objects represent only a subset of the uses
+supported by the general GIC syntax.}
 \label{tab:frisch-si}
 \begin{tabular}{@{}p{0.20\linewidth}p{0.31\linewidth}p{0.41\linewidth}@{}}
 \toprule
@@ -1918,24 +1891,29 @@ potential-energy-surface algorithm belonging to SMITH.
 
 \subsection{Gaussian 16 as an external GIC interpreter}
 
-The most direct external test is to let Gaussian use the \SONIC\ coordinates as its
-optimization coordinate system.  In this probe \SONIC\ generates the
-Gaussian-readable \texttt{ReadAllGIC} block, and Gaussian reads that block,
+The most direct external test is to let Gaussian 16 use one serialization of the
+\SONIC\ coordinates as its optimization coordinate system.  In this probe
+\SONIC\ generates the Gaussian-16-readable \texttt{ReadAllGIC} block, and
+Gaussian 16 reads that block,
 evaluates the GIC derivatives with its own machinery and performs the
 optimization.  Gaussian 16 is used specifically because its GIC language is
 general enough to express sums, differences and nonlinear coordinate functions
 and therefore tests SONIC definitions directly rather than through a bespoke
-adapter.  No hand-written surrogate coordinates are introduced.  The three
+adapter.  This use of GIC is only a compatibility probe and is not intended to
+characterize the full range of coordinate definitions supported by Gaussian 16.
+No hand-written surrogate coordinates are introduced.  The three
 systems in Table~\ref{tab:readallgic-opt} were chosen because they exercise
 ring and cage coordinates while remaining small enough for repeated external
 checks.  The native \SONIC\ contract includes signed out-of-plane rows and
-block-local multi-\(U\) \(RPck\) coordinates.  Because commercial Gaussian 16
+block-local multi-\(U\) \(RPck\) coordinates.  Because Gaussian 16 Rev. C.01
 cannot represent these objects natively, they are translated only at the
 terminal serialization boundary; the optimized Cartesian structure is then
 re-evaluated in the frozen native contract.  Exact \texttt{ReadAllGIC} route
 syntax, the \(U\)-to-improper convention and the treatment of non-totally
 symmetric rows are documented in SI Sec.~S2.  The calculations reported here
-used Gaussian 16 at HF/STO-3G.
+used the commercial Gaussian 16 Rev. C.01 installation at HF/STO-3G.  No feature
+available only in the development version described in
+Ref.~\citenum{Marenich2025GIC} was used.
 
 The relevant observations are that Gaussian 16 accepts the automatically
 generated coordinate block and reaches a stationary point in three to nine
@@ -1979,8 +1957,8 @@ structure theory or a claim that one coordinate choice always minimizes the
 iteration count.  The \SONIC\ Gaussian input uses an initial force-constant
 evaluation, as is common for difficult non-redundant coordinate optimizations.
 They test the narrower point that \SMITH\ can generate a
-Gaussian-readable \SONIC\ coordinate model without manual GIC transcription and
-that Gaussian can optimize from it using the commercial \texttt{ReadAllGIC}
+Gaussian-16-readable \SONIC\ coordinate model without manual GIC transcription and
+that Gaussian 16 can optimize from it using the \texttt{ReadAllGIC}
 parser.  At HF/STO-3G, water and hydrogen peroxide give the same or nearly the
 same iteration counts across the tested coordinate choices.  Norbornane
 converges in four steps with Gaussian redundant internals and Cartesians, six
@@ -1991,9 +1969,9 @@ sequential Z matrix.  Table~\ref{tab:gaussian-coordinate-comparison} gives the
 numerical values plotted in Fig.~\ref{fig:gaussian-coordinate-comparison}, so
 the prose, table and figure refer to the same diagnostic set.  The point of this
 diagnostic is therefore not that
-\SONIC\ is always the shortest optimizer path in Gaussian, but that the
-automatic generated GIC block is accepted by the commercial Gaussian
-\texttt{ReadAllGIC} parser and remains competitive.  The commercial run is a
+\SONIC\ is always the shortest optimizer path in Gaussian 16, but that the
+automatically generated GIC block is accepted by the Gaussian 16
+\texttt{ReadAllGIC} parser and remains competitive.  The Gaussian 16 run is a
 parser/optimizer compatibility probe, not a change in the scientific coordinate
 contract: the non-redundant \SONIC\ rows remain the reference used to interpret
 and compare output geometries.
@@ -2020,7 +1998,7 @@ Camphor & \(C_1\) & 75/75 & 8 & 14 & 33 & 4 \\
 A separate native-coordinate check retains the curvilinear \(U\)
 representation throughout.  Camphor contains one native \(U(6,4,7,8)\) row
 and converges in eight HF/STO-3G steps with the internal test evaluator.  The
-corresponding commercial-Gaussian input is necessarily less compact because
+corresponding Gaussian 16 input is necessarily less compact because
 \(U\) and multi-\(U\) ring combinations are terminally translated into
 supported improper and periodic-dihedral objects.  This translation does not
 redefine the scientific contract: \(U\), multi-\(U\) \(RPck\), \(QPck\) and
@@ -2186,13 +2164,13 @@ symmetry-projector normalization and Python--Fortran row-space equivalence for
 representative cases.  This is an implementation-level cross-check inside
 the same development lineage, not a comparison with an external published
 natural-coordinate program.  Table~\ref{tab:frisch-si} addresses the more
-external-facing question raised by the Gaussian GIC Supporting Information: can
-the same kinds of chemically specialized variables be generated without
-hand-writing molecule-specific GIC expressions?  Gaussian supplies a powerful
-expression and derivative language; \SONIC\ supplies automatic construction,
-semantic interning of generated coordinates, sparse derivative propagation and
-frozen provenance.  In this sense, GIC syntax is a serialization and solver
-interface for \SONIC, not a competing coordinate-generation theory.  The
+external-facing question inspired by the Gaussian 16 GIC Supporting Information:
+can a selected set of chemically specialized variables also be generated
+automatically as SONIC objects?  Gaussian 16 supplies a general expression and
+derivative language supporting many kinds of coordinate definitions; \SONIC\
+supplies one optional source of definitions, together with semantic interning,
+sparse derivative propagation and frozen provenance.  In this work, GIC syntax
+is used as a serialization and solver interface for that particular source.  The
 cyclohexane check makes this distinction concrete: the Gaussian-style puckering
 model is available to the external solver, but its coordinate definitions are
 not typed by hand.
@@ -2409,17 +2387,18 @@ the pseudo-cycle validation corpus for intermolecular systems, using the same
 rank, symmetry and analytic-\(\Bmat\) invariants used by the rest of \SONIC.
 The local-SALC validation additionally shows that center and ring
 pseudosymmetry can order coordinates without changing the exact molecular
-point group.  The Gaussian \texttt{ReadAllGIC} probes show that the present
+point group.  The Gaussian 16 \texttt{ReadAllGIC} probes show that the present
 contract is usable by an independent, general symbolic-coordinate evaluator.
 Gaussian 16 is chosen for this direct test because its GIC syntax is unusually
-general, not because SMITH depends on Gaussian or seeks to replace its internal
-coordinate generator.
+general.  SONIC definitions exercise only one part of that general syntax;
+SMITH neither depends on Gaussian 16 nor modifies, restricts or seeks to replace
+its internal-coordinate facilities.
 The puckering and portable chair-to-boat export probes illustrate why the same
 stored definition is relevant to large-amplitude work within the scope defined
 above.  Full application benchmarks remain outside the present construction
 paper.  The cyclohexane export check further shows
 that a \SONIC{}-generated puckering path can be represented either as ordinary
-Cartesians or as Gaussian \texttt{ReadAllGIC} input with numerically identical
+Cartesians or as Gaussian 16 \texttt{ReadAllGIC} input with numerically identical
 energies.  The frozen \SONIC\ contract should therefore be viewed not only as a
 coordinate representation, but as a reusable molecular representation on which
 future force-field, multilevel and potential-energy-surface methodologies can
@@ -2454,12 +2433,28 @@ application is not required.  The reproducible standalone environment is tagged
 \texttt{v0.1.0rc7}. Repository revisions, the dependency lock and
 \texttt{\#SMITH\_PROVENANCE} record the code and input profile.
 
+\section*{Supporting Information}
+
+Standalone input/output reference and executable examples; Gaussian 16
+serialization details; extended local-pseudosymmetry and Gaussian-GIC motif
+validation; ORCA/Molpro cross-code verification; pagodane, indane and saccharin
+ring-coordinate fixtures; software environments, checksums and complete
+reproduction commands (PDF).
+
 \section*{Author Contributions}
 
 Vincenzo Barone conceived the method, designed the \SONIC\ coordinate
 contract, implemented the active code paths used here, performed the
 calculations and wrote the manuscript.  External refinement and PES-fitting
 consumers are discussed only as downstream uses of the coordinate definition.
+
+\section*{Funding}
+
+No external funding was received for this work.
+
+\section*{Notes}
+
+The author declares no competing financial interest.
 
 \section*{Acknowledgments}
 
