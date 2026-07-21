@@ -6,7 +6,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from matplotlib.patches import Arc, FancyArrowPatch
+from matplotlib.patches import Arc, FancyArrowPatch, FancyBboxPatch
 import numpy as np
 
 from build_molecule_panel import (
@@ -141,93 +141,135 @@ def center_marker(ax, xy: np.ndarray, color: str = TEAL) -> None:
 
 
 def build_atlas() -> None:
-    fig, axes = plt.subplots(1, 4, figsize=(10.0, 2.95), dpi=320, facecolor=WARM_WHITE)
-    for ax in axes:
-        ax.set_facecolor(WARM_WHITE)
-
-    # Stretch and bend: water.
-    path = ROOT / "calculations/coordinate_comparison/water/water.xyzin"
-    symbols, coords = read_xyz_like(path)
-    bonds = read_bonds(path) or infer_bonds(symbols, coords)
-    xy = molecule(axes[0], symbols, coords, bonds, azimuth=0.0, elevation=90.0)
-    double_arrow(axes[0], xy[0], xy[1], AMBER)
-    v0 = xy[0] - xy[1]
-    v2 = xy[2] - xy[1]
-    theta0 = float(np.degrees(np.arctan2(v0[1], v0[0])))
-    theta2 = float(np.degrees(np.arctan2(v2[1], v2[0])))
-    if theta2 < theta0:
-        theta2 += 360.0
-    axes[0].add_patch(
-        Arc(xy=xy[1], width=0.48, height=0.48, theta1=theta0, theta2=theta2, color=TEAL, lw=2.0, zorder=5)
+    """Show the complete, inspectable record behind one representative SONIC."""
+    fig = plt.figure(figsize=(10.0, 3.35), dpi=320, facecolor=WARM_WHITE)
+    canvas = fig.add_axes((0, 0, 1, 1))
+    canvas.set_xlim(0, 1)
+    canvas.set_ylim(0, 1)
+    canvas.axis("off")
+    canvas.text(
+        0.035,
+        0.93,
+        "Anatomy of an inspectable SONIC coordinate",
+        ha="left",
+        va="center",
+        color=NAVY,
+        fontsize=14.0,
+        fontweight="bold",
     )
-    title(axes[0], "Local primitives", "stretch and valence bend")
+    canvas.text(
+        0.036,
+        0.865,
+        "Every accepted row retains its chemical sources, coefficients, metadata, analytic derivative and Cartesian fingerprint.",
+        ha="left",
+        va="center",
+        color=SOFT_GREY,
+        fontsize=8.2,
+    )
 
-    # Curvilinear ring out-of-plane source.
+    lefts = (0.035, 0.278, 0.522, 0.765)
+    widths = (0.205, 0.205, 0.205, 0.200)
+    headings = (
+        ("1", "TYPED SOURCES", TEAL),
+        ("2", "FROZEN ROW", AMBER),
+        ("3", "CONTRACT RECORD", BLUE),
+        ("4", "CARTESIAN FINGERPRINT", VIOLET),
+    )
+    for left, width, (number, heading, accent) in zip(lefts, widths, headings, strict=True):
+        canvas.add_patch(
+            FancyBboxPatch(
+                (left, 0.22),
+                width,
+                0.57,
+                boxstyle="round,pad=0.009,rounding_size=0.018",
+                facecolor="white",
+                edgecolor="#d7dde1",
+                linewidth=0.85,
+            )
+        )
+        canvas.text(left + 0.018, 0.745, number, color="white", fontsize=7.4, fontweight="bold",
+                    bbox={"boxstyle": "circle,pad=0.28", "facecolor": accent, "edgecolor": accent})
+        canvas.text(left + 0.050, 0.746, heading, color=accent, fontsize=7.6, fontweight="bold", va="center")
+
+    # The same cyclobutane fixture is used at both ends of the record.
     path = ROOT / "calculations/quick_qm/cyclobutane_hfsto3g.xyzin"
     symbols, coords = read_xyz_like(path)
     bonds = read_bonds(path) or infer_bonds(symbols, coords)
-    xy = molecule(axes[1], symbols, coords, bonds, azimuth=-18.0, elevation=25.0)
+    source_ax = fig.add_axes((0.055, 0.315, 0.165, 0.34))
+    xy = molecule(source_ax, symbols, coords, bonds, azimuth=-18.0, elevation=25.0)
     carbon = [i for i, atom in enumerate(symbols) if atom == "C"][:4]
     for order, idx in enumerate(carbon):
-        dy = 0.15 if order % 2 == 0 else -0.15
-        axes[1].annotate(
+        dy = 0.14 if order % 2 == 0 else -0.14
+        source_ax.annotate(
             "",
             xy=xy[idx] + np.array([0.0, dy]),
             xytext=xy[idx],
-            arrowprops={"arrowstyle": "-|>", "color": VIOLET, "lw": 1.7},
+            arrowprops={"arrowstyle": "-|>", "color": TEAL, "lw": 1.45},
             zorder=6,
         )
-    title(axes[1], "Curvilinear ring source", "$U$ out-of-plane and $RPck$")
+    canvas.text(0.137, 0.285, r"$U_1\quad U_2\quad U_3\quad U_4$", ha="center", color=NAVY, fontsize=8.5)
 
-    # Fused-ring butterfly and puckering phase.
-    path = ROOT / "standalone/examples/saccharin.smith.xyz"
-    symbols, coords = read_xyz_like(path)
-    bonds = infer_bonds(symbols, coords)
-    xy = molecule(axes[2], symbols, coords, bonds, azimuth=-12.0, elevation=28.0)
-    center = xy[[i for i, atom in enumerate(symbols) if atom in {"C", "N", "S"}]].mean(axis=0)
-    axes[2].add_patch(
-        Arc(xy=center, width=0.82, height=0.46, angle=8, theta1=8, theta2=172, color=VIOLET, lw=2.2, zorder=5)
+    coeff_ax = fig.add_axes((0.305, 0.405, 0.150, 0.19))
+    coeff_ax.bar(range(4), [0.5, -0.5, 0.5, -0.5], color=[AMBER, "#e8c785", AMBER, "#e8c785"], width=0.58)
+    coeff_ax.axhline(0.0, color="#83909a", lw=0.65)
+    coeff_ax.set_xticks(range(4), [r"$U_1$", r"$U_2$", r"$U_3$", r"$U_4$"], fontsize=6.7)
+    coeff_ax.set_yticks([-0.5, 0.0, 0.5], [r"$-1/2$", "0", r"$1/2$"], fontsize=6.2)
+    coeff_ax.spines[["top", "right", "left"]].set_visible(False)
+    coeff_ax.tick_params(axis="y", length=0)
+    canvas.text(0.380, 0.645, "RPck001", ha="center", color=NAVY, fontsize=11.0, fontweight="bold")
+    canvas.text(0.380, 0.325, r"$q=\frac{1}{2}(U_1-U_2+U_3-U_4)$", ha="center", color=NAVY, fontsize=8.5)
+
+    records = (
+        ("family", "ring puckering"),
+        ("symmetry", r"$\Gamma_k$ + phase"),
+        ("unit", "radian"),
+        ("protected", "true"),
+        ("Wilson B", "analytic"),
+        ("provenance", "frozen"),
     )
-    axes[2].add_patch(
-        FancyArrowPatch(
-            center + np.array([-0.35, 0.02]),
-            center + np.array([0.35, -0.02]),
-            connectionstyle="arc3,rad=-0.32",
-            arrowstyle="-|>",
-            mutation_scale=10,
-            color=AMBER,
-            lw=1.7,
-            zorder=5,
+    y = 0.645
+    for key, value in records:
+        canvas.text(0.545, y, key, color=SOFT_GREY, fontsize=6.8, va="center")
+        canvas.text(0.705, y, value, color=NAVY, fontsize=7.2, va="center", ha="right", fontweight="bold")
+        canvas.plot([0.543, 0.707], [y - 0.027, y - 0.027], color="#edf0f2", lw=0.65)
+        y -= 0.065
+
+    motion_ax = fig.add_axes((0.785, 0.355, 0.160, 0.30))
+    xy_motion = molecule(motion_ax, symbols, coords, bonds, azimuth=-18.0, elevation=25.0)
+    for order, idx in enumerate(carbon):
+        dy = 0.16 if order % 2 == 0 else -0.16
+        motion_ax.annotate(
+            "",
+            xy=xy_motion[idx] + np.array([0.0, dy]),
+            xytext=xy_motion[idx],
+            arrowprops={"arrowstyle": "-|>", "color": VIOLET, "lw": 1.55},
+            zorder=6,
         )
-    )
-    title(axes[2], "Fused-ring coordinates", "puckering phase and butterfly")
+    canvas.text(0.865, 0.315, r"stored $-h\;/\;0\;/\;+h$ trajectory", ha="center", color=NAVY, fontsize=7.4)
 
-    # Fragment pose.
-    path = ROOT / "standalone/examples/formic_acid_water.smith.xyz"
-    symbols, coords = read_xyz_like(path)
-    bonds = infer_bonds(symbols, coords)
-    xy = molecule(axes[3], symbols, coords, bonds, azimuth=0.0, elevation=0.0, fragment_split=5)
-    c1 = xy[:5].mean(axis=0)
-    c2 = xy[5:].mean(axis=0)
-    center_marker(axes[3], c1, BLUE)
-    center_marker(axes[3], c2, BLUE)
-    double_arrow(axes[3], c1, c2, BLUE, shrink=0.03)
-    axes[3].add_patch(
-        Arc(xy=c2, width=0.37, height=0.37, theta1=30, theta2=300, color=VIOLET, lw=1.7, zorder=5)
-    )
-    axes[3].plot([xy[4, 0], xy[5, 0]], [xy[4, 1], xy[5, 1]], ls="--", lw=1.5, color=TEAL, zorder=2)
-    title(axes[3], "Disconnected fragments", "relative translation and rotation")
+    for x0, x1 in ((0.244, 0.272), (0.487, 0.516), (0.731, 0.759)):
+        canvas.add_patch(FancyArrowPatch((x0, 0.505), (x1, 0.505), arrowstyle="-|>", mutation_scale=9,
+                                         linewidth=1.1, color="#9aa6ae"))
 
-    fig.suptitle(
-        "A visual atlas of SONIC source families",
-        x=0.5,
-        y=0.99,
-        fontsize=12.2,
-        fontweight="bold",
-        color=NAVY,
+    canvas.add_patch(
+        FancyBboxPatch((0.035, 0.075), 0.930, 0.090, boxstyle="round,pad=0.006,rounding_size=0.012",
+                       facecolor="#f0f6f7", edgecolor="#d6e7e7", linewidth=0.75)
     )
-    fig.tight_layout(rect=(0.01, 0.01, 0.99, 0.92), w_pad=0.35)
-    fig.savefig(FIGURES / "sonic_coordinate_atlas.png", bbox_inches="tight", pad_inches=0.05, facecolor=fig.get_facecolor())
+    audit_items = (
+        "human-readable primitive expansion",
+        "ordered coefficient row",
+        "rank and symmetry diagnostics",
+        "reproducible Cartesian motion",
+    )
+    for index, item in enumerate(audit_items):
+        x = 0.060 + index * 0.231
+        canvas.text(x, 0.120, "✓", color=TEAL, fontsize=9.0, fontweight="bold", va="center")
+        canvas.text(x + 0.021, 0.120, item, color=NAVY, fontsize=6.9, va="center")
+
+    for suffix in ("png", "pdf"):
+        fig.savefig(FIGURES / f"sonic_coordinate_atlas.{suffix}", dpi=320, bbox_inches="tight",
+                    pad_inches=0.04, facecolor=fig.get_facecolor())
+    plt.close(fig)
 
 
 def _special_panel(ax, title_text: str, subtitle: str, path: Path, *, az: float, el: float) -> tuple[list[str], np.ndarray, np.ndarray]:

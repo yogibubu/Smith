@@ -1,0 +1,71 @@
+SMITH/SONIC — alternate descriptions for figures and tables
+
+Table 1. Three-row summary separating the input provider, the SMITH/SONIC
+coordinate-construction contract, and downstream applications.
+
+Figure 1. Left-to-right workflow from a frozen molecular state through typed
+primitive rows, protected coordinates, rank reduction and symmetry adaptation
+to a frozen coordinate contract; arrows then lead to downstream applications.
+
+Figure 2. Four-panel anatomy of an inspectable ring-puckering coordinate:
+typed molecular sources, its coefficient row, the stored contract metadata,
+and a small Cartesian displacement fingerprint.
+
+Table 2. Comparison of SONIC with redundant, delocalized, natural,
+translation–rotation, and user-defined generalized internal-coordinate models.
+
+Table 3. Representative six-membered-ring rows showing source primitives,
+coefficients, symmetry labels, and human-readable coordinate forms.
+
+Figure 3. Molecular drawings illustrating protected ring, ligand-center,
+fragment, and weak-contact coordinates used by the construction.
+
+Table 4. Weak-complex and pseudo-cycle fixtures, with point group, coordinate
+mode, and the diagnostic role of each system.
+
+Table 5. Coordinate-family inventory summarizing construction rules,
+protection policy, and validated scope.
+
+Table 6. Validation map pairing each evidence class with the claim it tests
+and the broader claim it deliberately does not make.
+
+Figure 4. Eight molecular validation panels covering bridged rings,
+center-based coordinates, a weak complex, an eta-cubed ligand center, and
+three points on a cyclohexane chair-to-boat path.
+
+Table 7. Representative validation results: final versus target rank and
+Python–Fortran, symmetry-adaptation, or finite-difference diagnostics.
+
+Table 8. Local-pseudosymmetry tests listing exact molecular point group,
+local domain, rank, and invariance or ordering checks.
+
+Table 9. Automatically constructed coordinate motifs compatible with the
+general Gaussian internal-coordinate language and the diagnostic tested by
+each motif.
+
+Table 10. Gaussian ReadAllGIC optimizations for cyclohexane, norbornane, and
+cubane, reporting SONIC rank, optimization steps, and final energy.
+
+Table 11. Optimization-step comparison for Gaussian built-in redundant,
+Cartesian, Z-matrix, and generated SONIC coordinate choices.
+
+Figure 5. Grouped bar chart of optimization steps for water, hydrogen
+peroxide, camphor, and norbornane using four coordinate choices.
+
+Figure 6. Cyclobutane fixed-frame puckering scan, with energy rising smoothly
+away from the optimized region along the named ring-puckering coordinate.
+
+Figure 7. Two-panel comparison of cyclohexane chair-to-boat energies from
+Cartesian and generated ReadAllGIC inputs; the lower panel shows their
+near-zero numerical difference.
+
+Table 12. Construction and analytic Wilson-row evaluation timings and memory
+diagnostics for aromatic, cage, and metallocene test systems.
+
+Figure 8. Scaling plots corresponding to Table 12, separating coordinate
+construction cost from subsequent sparse analytic row evaluation.
+
+TOC graphic. A faceted blue coordinate object stands between molecular
+structures on the left and right; colored curves connect equivalent local
+motions, conveying transformation into an inspectable symmetry-oriented
+coordinate contract.

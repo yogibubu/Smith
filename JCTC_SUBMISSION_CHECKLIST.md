@@ -16,7 +16,7 @@ Prepared for the *Journal of Chemical Theory and Computation* as an ACS
 
 ## Final portal checks
 
-- [ ] Add the arXiv identifier if it is assigned before the ACS submission is finalized.
+- [x] Add the permanent arXiv identifier (arXiv:2607.16550) to the cover letter.
 - [ ] Enter the same Data and Code Availability statement in ACS Publishing Center.
 - [ ] Report that no external funding supported the work.
 - [ ] Confirm the no-competing-financial-interest declaration.

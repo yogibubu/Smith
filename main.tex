@@ -34,7 +34,7 @@
 
 \title{\SONIC: Symmetry-Oriented Non-redundant Internal Coordinates}
 \author{Vincenzo Barone}
-\affiliation{INSTM, National Interuniversity Consortium for Materials Science and Technology, via G. Giusti 9, 50121 Firenze, Italy}
+\affiliation{National Interuniversity Consortium for Materials Science and Technology (INSTM), via G. Giusti 9, 50121 Firenze, Italy}
 \email{vincebarone52@gmail.com}
 \keywords{internal coordinates, molecular symmetry, Wilson B matrix, Gaussian GIC, natural internal coordinates, vibrational analysis}
 
@@ -46,21 +46,18 @@ Internal coordinates are the natural language of molecular structure, yet
 automatic constructions either retain redundancy or produce delocalized,
 weight-dependent bases and remain difficult to generalize to fused and bridged
 rings, high coordination, exact and local symmetry, and weakly bound
-fragments.  We introduce \SONIC\ (Symmetry-Oriented Non-redundant Internal
-Coordinates), implemented in \SMITH\ (Symmetry-Mapped Internal-coordinate
-Template Handler), as a deterministic protocol that accepts a frozen molecular
+fragments.  We introduce a deterministic protocol that accepts a frozen molecular
 state or provider-neutral Cartesian, topology, or primitive-coordinate input;
 organizes ordinary and special coordinates in chemically homogeneous families;
-protects ring and fragment semantics; and applies analytic Wilson
-\(\Bmat\)-row rank tests followed by local and molecular symmetry projection.
+protects ring and fragment semantics; and applies analytic Wilson-matrix row
+rank tests followed by local and molecular symmetry projection.
 Validation across acyclic, cyclic, fused, bridged, high-symmetry,
 high-coordination, non-covalent, and metal--ligand systems gives complete target
 rank, analytic-versus-finite-difference first-derivative agreement,
 rotation/permutation covariance, stable local symmetry-adapted combinations,
-and reproducible external serialization.  Gaussian 16 is used as an independent
-parser and solver, with SONIC serialization representing one particular use of
-its much more general GIC syntax.
-The resulting frozen contract retains chemically readable decomposition,
+and reproducible external serialization; Gaussian 16 provides an independent
+parser and solver for one external representation of the generated coordinates.
+The resulting frozen contract retains chemically readable decompositions,
 symmetry, rank diagnostics, analytic first derivatives, and provenance, thereby
 providing a constructive counterpart to natural internal coordinates while
 leaving optimization, finite internal-to-Cartesian realization, force fields,
@@ -89,11 +86,13 @@ coordinate model is expected to support symmetry-constrained optimization,
 semi-experimental structural refinement, ring puckering, weak complexes and
 metal or high-coordination environments.
 
-\SONIC\ is designed to make this choice explicit and reproducible.  Table~\ref{tab:framework-roles}
+Symmetry-Oriented Non-redundant Internal Coordinates (SONIC) are designed to
+make this choice explicit and reproducible.  Table~\ref{tab:framework-roles}
 defines the permanent boundary used below.  The essential separation is that
-\SMITH\ is the standalone tool that constructs \SONIC\ contracts, while
+the Symmetry-Mapped Internal-coordinate Template Handler (\SMITH) is the
+standalone tool that constructs \SONIC\ contracts, while
 \SONIC\ is the coordinate family: the non-redundant generalized
-internal-coordinate basis, analytic
+internal-coordinate (GIC) basis, analytic
 Wilson matrix and symmetry labels.  Applications choose how those coordinates
 are displaced, optimized, fitted or differentiated beyond first order.
 
@@ -142,6 +141,11 @@ therefore infer symmetry from an XYZ file without installing ORACLE, but the
 algorithm, thresholds and schema remain those of the pinned ORACLE revision.
 If a complete frozen state or an explicit symmetry section is supplied, that
 record is authoritative and the embedded kernel does not replace it.
+Figure~\ref{fig:workflow} summarizes this construction boundary and its
+downstream applications.  In the figure, GF/PED denotes the Wilson \(GF\)
+matrix method and potential-energy-distribution analysis, DVR denotes
+discrete-variable representation and PES denotes potential-energy-surface
+fitting.
 
 \begin{figure}[htbp]
 \centering
@@ -205,32 +209,27 @@ record is authoritative and the embedded kernel does not replace it.
   \draw[arrow] (\target.north |- bus) -- (\target.north);
 \end{tikzpicture}
 }
-\caption{Constructive workflow implemented by \SMITH\ for \SONIC\ coordinates,
-starting from Cartesian geometry and an optional topology or redundant
-primitive/B contract.  Standalone SMITH can construct the minimal input state
-or accept richer provider-generated sections without changing its own boundary.
-The model-building stage
-ends at the frozen coordinate contract; downstream modules reuse that object
-but their algorithms are not part of SMITH.}
+\caption{SMITH/SONIC construction boundary.  Cartesian geometry and optional
+topology or redundant primitive/Wilson-row data lead to a frozen coordinate
+contract; downstream algorithms consume but do not modify that object.}
 \label{fig:workflow}
 \end{figure}
 
-Figure~\ref{fig:coordinate-atlas} anchors the construction in four recurring
-geometrical motifs.  Ordinary stretches and bends, curvilinear ring
-out-of-plane sources, fused-ring puckering/butterfly rows and relative
-fragment pose coordinates enter different homogeneous source families.  Their
-separation is preserved during reduction even when two rows carry the same
-global irreducible-representation label.
+The frozen coordinate contract is directly inspectable rather than an opaque
+numerical basis.  For every accepted SONIC, SMITH retains the ordered primitive
+sources, the corresponding coefficient row, family and symmetry labels, unit,
+protection status, analytic Wilson row, rank diagnostics and provenance.  It
+also writes a human-readable expansion and an optional stored
+$-h,0,+h$ Cartesian trajectory, so the algebraic definition and the molecular
+motion can be checked independently (Figure~\ref{fig:coordinate-atlas}).
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/sonic_coordinate_atlas.png}
-\caption{Visual atlas of representative \SONIC\ source families, drawn on the
-actual molecular geometries used by the implementation fixtures.  Amber marks
-stretching or butterfly-like displacement, teal a valence-angle or weak-contact
-relation, violet the signed curvilinear out-of-plane/puckering family, and blue
-relative fragment translation.  The overlays identify coordinate differentials;
-they are not a prescription for a finite internal-to-Cartesian step.}
+\caption{Inspectable SONIC ring-puckering record.  Typed sources and stored
+coefficients define a named coordinate; metadata, analytic Wilson row,
+provenance and an optional $-h,0,+h$ Cartesian fingerprint audit it.  Arrows are
+enlarged and do not prescribe a finite back-transformation.}
 \label{fig:coordinate-atlas}
 \end{figure}
 
@@ -255,7 +254,8 @@ standalone command-line tool is named \SMITH\ (Symmetry-Mapped
 Internal-coordinate Template Handler).  Symmetry is used in the classical molecular sense: point-group
 operations map coordinate rows into the same space with the corresponding atom
 permutation and vector or pseudovector signs.  Orthogonality enters through
-normalized Wilson-row rank selection and orthonormal SALC coefficient vectors
+normalized Wilson-row rank selection and orthonormal symmetry-adapted
+linear-combination (SALC) coefficient vectors
 inside homogeneous blocks, not through global orthogonality in the kinetic
 \(\Gmat\) metric.
 
@@ -298,7 +298,8 @@ variables for well understood local motifs.\cite{Berces1997NaturalMetal,VonArnim
 & General construction is difficult for fused or bridged rings, high
 coordination, fragments, interaction centers and arbitrary point groups. \\
 \midrule
-TRIC/geomeTRIC coordinates & Explicitly represents collective fragment
+Translation--rotation internal-coordinate (TRIC)/geomeTRIC coordinates &
+Explicitly represents collective fragment
 translations and rotations, with the rotations described by an exponential map
 of quaternions.\cite{WangSong2016GeomeTRIC} & \SONIC\ adopts this
 exponential-map parametrization, but not the complete TRIC construction: it
@@ -392,8 +393,9 @@ continuous chemical-perception descriptors.  If those data are already
 present in the \texttt{xyzin} file, \SONIC\ consumes them as part of the frozen
 state.  The provider may be the bundled perception frontend, another program or a
 hand-audited input; its identity is not part of the SONIC theory.  The bundled
-frontend includes the revision-pinned symmetry, topology and ordinary-PIC
-subset required for standalone construction.  A rich state
+frontend includes the revision-pinned symmetry, topology and ordinary
+primitive-internal-coordinate (PIC) subset required for standalone
+construction.  A rich state
 can define the molecular graph and cycle basis, point-group operations and atom
 permutations, atom equivalence, effective atomic numbers, continuous charge,
 covalency, delocalization and strain descriptors, bond-order components and
@@ -412,7 +414,7 @@ file conforming to \texttt{matrix.smith.input.v1}.  Four provider-neutral
 profiles are accepted: a complete frozen state, supplied topology, supplied
 primitives or a minimal Cartesian geometry processed by the bundled perception
 frontend.  Their exact syntax, validation rules and executable examples are
-given in Supporting Information Sec.~S1.  Thus SMITH is operationally
+given in the Supporting Information (SI), Sec.~S1.  Thus SMITH is operationally
 standalone while preserving a precise boundary between perception and
 coordinate construction: the embedded subset provides the frozen input state,
 and SMITH proper constructs the SONIC chart from that state.
@@ -437,7 +439,8 @@ templates and the one-dihedral exocyclic torsion rule.  In particular, ring
 puckering diagnostics report the first- and second-$\pi$ indices of every
 endocyclic central bond alongside its topological order and flexibility factor.
 Triple-bond character is therefore not collapsed into the same aggregate
-$\max(\mathrm{BO}-1,0)$ used historically for all multiple bonds.
+$\max(\mathrm{BO}-1,0)$, where BO denotes bond order, used historically for
+all multiple bonds.
 The reproducibility statements below are conditional on these descriptors being
 part of the frozen input state.  In other words, \SONIC\ does not assume an
 unstated human perception step: the descriptor values, perception version,
@@ -470,7 +473,8 @@ functions without changing topology, rank selection or symmetry labels.
 Examples include \(r^{-1}\), \(\exp(-\alpha r)\) and damped contact functions
 for distances; \(\sin\theta\), \(\cos\theta\), \(\sin n\phi\) and
 \(\cos n\phi\) for bends and torsions; and Cremer--Pople-like \(q\) and
-\(\phi\) descriptors derived from linear \(RPck\) components.  The same layer
+\(\phi\) descriptors derived from linear ring-puckering (\(RPck\)) components.
+The same layer
 also covers the practical variables used in the Gaussian GIC examples:
 bond-sum and bond-difference coordinates for proton transfer, symmetrized
 \(XY_n\) local combinations, polar or elliptic functions of intermolecular
@@ -487,7 +491,8 @@ redistribution, treatment of rigid or multiple bonds and invariant local
 references for substituents.\cite{LemaSaavedraFernandezRamos2026RingCP}  The
 active Gaussian-readable coordinate basis should remain linear and rank
 complete, while such nonlinear functions become named observables or model
-variables in GF/PED, DVR, PES-fitting or refinement workflows.
+variables in the Wilson \(GF\) matrix method, potential-energy-distribution
+(PED) analysis, DVR, PES-fitting or refinement workflows.
 
 Conformational reconstruction from puckering variables is therefore not external
 to this workflow.  In the DVR layer, a one- or multidimensional grid in
@@ -631,7 +636,8 @@ path, equivalent stretch and angle orbits are replaced by a canonical
 orthonormal SALC block with the local \(A_1\) row first.
 \item Exocyclic torsions are generated only for non-ring central bonds with
 non-terminal substituents.  The default intramolecular path keeps one
-representative torsional coordinate per exocyclic bond, selected by a CIP-like
+representative torsional coordinate per exocyclic bond, selected by a
+Cahn--Ingold--Prelog (CIP)-like
 priority based on the continuous effective atomic numbers and local
 connectivity.  Symmetry-equivalent alternatives are averaged when they belong
 to the same local orbit.
@@ -660,7 +666,7 @@ blocks.
 
 This ordering differs from a global diagonalization of the full primitive
 metric, whether expressed as \( \Bmat \Bmat^T \), as a row-space projector such
-as \( \Bmat \Bmat^+ \), or as a single SVD of every redundant primitive at
+as \( \Bmat \Bmat^+ \), or as a single singular value decomposition (SVD) of every redundant primitive at
 once.  Such decompositions are mathematically useful, but their eigenvectors
 depend on how the primitive rows have been scaled.  A stretch measured in
 angstrom, a bend measured in radians, a torsion, a fragment translation and a
@@ -711,12 +717,13 @@ partitioned by the continuous effective atomic number or synthon descriptor
 and by radial shell.  The current validated defaults are
 \(5\times10^{-4}\) for the effective-atomic-number descriptor and
 \(10^{-3}\)~\AA\ for the center--ligand distance.  These are construction
-tolerances, not physical constants; they can be selected in the CLI or GUI and
+tolerances, not physical constants; they can be selected in the command-line
+interface (CLI) or graphical user interface (GUI) and
 are written to the diagnostic record.
 The multiplicity pattern and ligand geometry then identify the local template,
 for example \(C_{3v}\) for a \(WXY_3\) center or \(T_d\) for \(XY_4\).
 Coordination numbers 5--9 are treated by the same path.  The current template
-pairs are trigonal-bipyramidal/square-pyramidal (CN 5),
+pairs are trigonal-bipyramidal/square-pyramidal (coordination number, CN 5),
 octahedral/trigonal-prismatic (CN 6), pentagonal-bipyramidal/capped-octahedral
 (CN 7), square-antiprismatic/dodecahedral-like (CN 8), and
 tricapped-trigonal-prismatic/capped-square-antiprismatic (CN 9).  If no
@@ -738,7 +745,8 @@ identity is therefore retained in every use of the contract rather than
 reclassifying the center at each evaluation.
 The diagnostic additionally stores the signed headroom from both acceptance
 boundaries.  Assignments within ten percent of a selected threshold are marked
-as near the RMS boundary, near the margin boundary, or near both.  This warning
+as near the root-mean-square (RMS) boundary, near the margin boundary, or near
+both.  This warning
 does not rebuild the basis; it makes a potentially sensitive local decision
 visible before a geometry trajectory is started.
 Angles are partitioned separately according to the pair of ligand classes and,
@@ -884,12 +892,9 @@ different orthonormal pair spans the same symmetry subspace.
 \begin{table}[htbp]
 \centering
 \small
-\caption{Representative six-membered-ring rows generated by \SONIC.  The
-examples show the kind of coordinate stored in the contract rather than only
-the family count.  A symmetry-preserving optimization or semiexperimental fit
-may request only the totally symmetric subset, e.g. the \(A_{1g}\) rows for the
-\(D_{3d}\) example, while GF/PED, DVR and full-rank checks can retain the full
-symmetry-labelled basis.}
+\caption{Representative six-membered-ring SONIC rows.  Symmetry-preserving
+applications may select the totally symmetric subset; full-rank vibrational
+and sampling analyses retain the complete symmetry-labelled basis.}
 \label{tab:ring-coordinate-examples}
 \begin{tabular}{@{}p{0.20\linewidth}p{0.14\linewidth}p{0.58\linewidth}@{}}
 \toprule
@@ -1320,13 +1325,10 @@ $\eta^3$ ligand center.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/special_coordinate_structures.png}
-\caption{Structures used to exercise protected special coordinates.  Diamonds
-denote stored ring, ligand or fragment centers; dashed teal segments denote
-center--atom or selected contact coordinates; blue elements denote relative
-fragment pose.  Ferrocene uses two Cp centers, formic-acid--water and the water
-dimer use disconnected-fragment rows, benzene--water combines a ring center
-with a fragment pose, and $\eta^3$ allyl--PdCl retains the supplied allyl center
-without introducing a fictitious atom into the covalent topology.}
+\caption{Protected special-coordinate fixtures.  Diamonds mark ring, ligand or
+fragment centers; dashed teal segments mark center--atom or contact
+coordinates; blue elements mark relative fragment pose.  The $\eta^3$ complex
+retains its supplied center without a fictitious covalent atom.}
 \label{fig:special-coordinate-structures}
 \end{figure}
 
@@ -1405,6 +1407,7 @@ or suppress them explicitly.
 Additional pseudo-bond and intermolecular fixtures were added to keep this
 baseline close to the weak-complex cases used by geomeTRIC-style
 translation--rotation coordinates (Table~\ref{tab:pseudo-cycle-fixtures}).
+Here and below, point group (PG) refers to the exact molecular point group.
 The point of the table is deliberately modest: these systems verify that typed
 contacts, fragment-center variables and pseudo-cycle rows can be constructed
 and labelled without collapsing the fragment model into a covalent molecule.
@@ -1415,9 +1418,8 @@ They do not yet establish full generality for arbitrary non-covalent networks.
 \scriptsize
 \setlength{\tabcolsep}{3pt}
 \renewcommand{\arraystretch}{0.95}
-\caption{Additional weak-complex and pseudo-cycle fixtures used to define the
-current validated baseline.  Nontrivial symmetry cases are included to test
-that fragment and pseudo-bond rows can coexist with point-group perception.}
+\caption{Weak-complex and pseudo-cycle fixtures used to test coexistence of
+fragment, contact and point-group models.}
 \label{tab:pseudo-cycle-fixtures}
 \begin{tabular}{@{}p{0.20\linewidth}p{0.10\linewidth}p{0.24\linewidth}p{0.36\linewidth}@{}}
 \toprule
@@ -1570,7 +1572,8 @@ The broader scientific motivation includes vibrational analysis, sampling and
 semi-experimental refinement, but the validation layers must be separated.  The
 present paper validates the coordinate contract itself and tests whether an
 external Gaussian 16 calculation can consume \SONIC{}-generated coordinates.
-The scope of the numerical evidence retained here is stated explicitly in
+Table~\ref{tab:validation-map} summarizes the claim supported by each evidence
+layer.  The scope of the numerical evidence retained here is stated explicitly in
 Sec.~\ref{sec:scope-limitations}.
 
 \begin{table}[htbp]
@@ -1629,17 +1632,10 @@ the cyclohexane sequence tests portable puckering paths.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/validation_molecule_panel.png}
-\caption{Three-dimensional views of representative systems used in the
-validation and application probes.
-Norbornane and camphor test bridged-ring coordinate construction and
-Gaussian-compatible improper-coordinate export; ferrocene tests center-based
-special coordinates; formic acid--water tests relative fragment coordinates;
-and $\eta^3$ allyl--PdCl tests a protected multi-atom ligand center.  Dashed
-turquoise segments identify intermolecular contacts or a protected
-center--metal coordinate, and the turquoise marker denotes the supplied
-$\eta^3$ center.  The cyclohexane panels show three points along the chair-to-boat
-puckering path used for the portable Cartesian/Gaussian \texttt{ReadAllGIC}
-comparison.}
+\caption{Representative validation systems for bridged rings, center-based
+coordinates, relative fragment pose and a protected $\eta^3$ ligand center.
+Dashed turquoise segments mark contacts or center--metal coordinates; the
+cyclohexane panels sample the chair-to-boat path.}
 \label{fig:validation-molecules}
 \end{figure}
 
@@ -1659,7 +1655,7 @@ Table~\ref{tab:validation} gives a representative self-consistency slice; the
 complete validation table is reported in SI Sec.~S6.  The first three molecular
 rows shown here include comparisons with a separate Fortran control
 implementation; the reported residual is the
-Wilson-row-space residual between two internally maintained non-redundant bases
+Python--Fortran (PF) Wilson-row-space residual between two internally maintained non-redundant bases
 that share the same scientific specification but not the same implementation
 path.
 The narrow range of
@@ -1684,13 +1680,10 @@ protected-prefix rule.
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\caption{Representative internal validation of the present \SONIC\ construction.
-Ranks are final/target ranks.  \(\Delta_\mathrm{PF}\) is the Python--Fortran
-Wilson-row-space residual where the Fortran control comparison is applicable.
-\(\epsilon_\mathrm{SALC}\) is the maximum norm error of nontrivial saved SALC
-coefficient vectors, and \(\epsilon_\mathrm{FD}\) is the maximum componentwise
-difference between a final analytic SONIC row and its central Cartesian finite
-difference.}
+\caption{Representative SONIC validation.  Ranks are final/target;
+\(\Delta_\mathrm{PF}\) is the Python--Fortran row-space residual,
+\(\epsilon_\mathrm{SALC}\) the saved-coefficient norm error and
+\(\epsilon_\mathrm{FD}\) the analytic--finite-difference row error.}
 \label{tab:validation}
 \begin{tabular}{@{}p{0.17\linewidth}p{0.25\linewidth}p{0.07\linewidth}p{0.16\linewidth}p{0.27\linewidth}@{}}
 \toprule
@@ -1768,7 +1761,8 @@ canonical ring order and primitive coefficients, which are highlighted with
 their displacement arrows in the viewer.  The tests consume every generated
 three-frame XYZ trajectory and vector table through the same data loader used
 by the GUI.  The versioned \texttt{matrix.smith.sonic\_diagnostics.v2}
-manifest has a distributed JSON Schema and dependency-free validator; the GUI
+manifest has a distributed JavaScript Object Notation (JSON) Schema and
+dependency-free validator; the GUI
 loader remains compatible with archived version-1 manifests.  For large
 coordinate sets the same viewer can filter by coordinate family, local domain,
 local pseudogroup and local or global total-symmetry character.
@@ -1811,9 +1805,8 @@ an implicit relabelling.
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\caption{Local-pseudosymmetry validation with the local-SALC path enabled.
-The PG column is the exact molecular point group; the local column reports only
-the center or ring domain relevant to the test.}
+\caption{Local-pseudosymmetry validation.  The point group is exact; the local
+domain identifies only the tested center or ring.}
 \label{tab:local-salc-validation}
 \begin{tabular}{@{}p{0.19\linewidth}p{0.08\linewidth}p{0.22\linewidth}p{0.12\linewidth}p{0.29\linewidth}@{}}
 \toprule
@@ -1852,11 +1845,8 @@ diagnostic for the sparse representation, not an additional rank criterion.
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\caption{Targeted tests inspired by the Gaussian 16 GIC Supporting Information.
-The purpose is to test automatic \SONIC\ construction of selected coordinate
-objects that Gaussian 16 can evaluate when supplied as GIC expressions or
-through dedicated options; these objects represent only a subset of the uses
-supported by the general GIC syntax.}
+\caption{Automatic SONIC construction of selected coordinate objects supported
+by the general Gaussian 16 GIC syntax.}
 \label{tab:frisch-si}
 \begin{tabular}{@{}p{0.20\linewidth}p{0.31\linewidth}p{0.41\linewidth}@{}}
 \toprule
@@ -1866,8 +1856,8 @@ Formamide proton transfer & Generated \(R_{\mathrm{NH}}\), \(R_{\mathrm{OH}}\)
 primitive signatures plus \(\Sigma r\) and \(\Delta r\) functions & Function
 values and sparse chain-rule rows reproduce the sum and difference derivatives. \\
 \midrule
-Ferrocene Cp torsion & Ring-center/Fe special coordinates retained through a
-\(0,9,18,27,36^\circ\) Cp rotation scan & Each grid point has rank
+Ferrocene cyclopentadienyl torsion & Ring-center/Fe special coordinates retained through a
+\(0,9,18,27,36^\circ\) ring rotation scan & Each grid point has rank
 \(57/57\), analytic \(\Bmat\) rank \(57\), stable ring-center identities and
 sparse \(\Bmat\) density \(0.095\)--\(0.101\). \\
 \midrule
@@ -1911,7 +1901,8 @@ terminal serialization boundary; the optimized Cartesian structure is then
 re-evaluated in the frozen native contract.  Exact \texttt{ReadAllGIC} route
 syntax, the \(U\)-to-improper convention and the treatment of non-totally
 symmetric rows are documented in SI Sec.~S2.  The calculations reported here
-used the commercial Gaussian 16 Rev. C.01 installation at HF/STO-3G.  No feature
+used the commercial Gaussian 16 Rev. C.01 installation at the Hartree--Fock
+(HF)/STO-3G level.  No feature
 available only in the development version described in
 Ref.~\citenum{Marenich2025GIC} was used.
 
@@ -1921,11 +1912,9 @@ steps for saturated ring and cage systems with different symmetry and rank.
 
 \begin{table}[htbp]
 \centering
-\caption{Gaussian \texttt{ReadAllGIC} optimizations using \SONIC{}-generated
-coordinate definitions.  The route was HF/STO-3G
-\texttt{Opt=(ReadAllGIC,MaxCycle=80) NoSymm}.  Gaussian 16 does not print the
-same \(NTRed/NRank\) diagnostic in these logs, so the Gaussian-rank column is
-left blank.}
+\caption{Gaussian \texttt{ReadAllGIC} optimizations with SONIC coordinates at
+HF/STO-3G.  The Gaussian-rank column is blank because these logs do not report
+the \(NTRed/NRank\) diagnostic.}
 \label{tab:readallgic-opt}
 \begin{tabular}{lccccc}
 \toprule
@@ -1978,10 +1967,9 @@ and compare output geometries.
 
 \begin{table}[htbp]
 \centering
-\caption{Gaussian 16 HF/STO-3G optimization-step comparison shown in
-Fig.~\ref{fig:gaussian-coordinate-comparison}.  The default column is Gaussian's
-built-in redundant internal-coordinate optimizer.  The \SONIC{} column uses the
-automatically generated Gaussian \texttt{ReadAllGIC} block.}
+\caption{Gaussian 16 HF/STO-3G optimization steps from
+Fig.~\ref{fig:gaussian-coordinate-comparison}: built-in redundant coordinates
+versus the generated SONIC \texttt{ReadAllGIC} block.}
 \label{tab:gaussian-coordinate-comparison}
 \begin{tabular}{lccrrrr}
 \toprule
@@ -2009,13 +1997,9 @@ frozen rows of the 51-coordinate norbornane example.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.72\linewidth]{figures/gaussian_coordinate_comparison.png}
-\caption{Gaussian 16 HF/STO-3G optimization-step comparison for built-in
-Gaussian coordinates and automatically generated \SONIC\ \texttt{ReadAllGIC}
-coordinates.  The dataset shown here contains only completed runs; the plotting
-script marks any future non-completed run with a cross rather than a zero-height
-bar.  The water and hydrogen-peroxide tests verify solver consumption and input
-portability; norbornane and camphor probe bridged-ring cases where a naive
-sequential Z matrix is less efficient.}
+\caption{Gaussian 16 HF/STO-3G optimization steps for built-in and generated
+SONIC \texttt{ReadAllGIC} coordinates.  Water and hydrogen peroxide test input
+portability; norbornane and camphor test bridged-ring cases.}
 \label{fig:gaussian-coordinate-comparison}
 \end{figure}
 
@@ -2076,7 +2060,8 @@ energy surface being sampled.
 
 Because the Cartesian branch is ordinary molecular geometry, it is not tied to
 Gaussian.  The same three representative points were also evaluated on a local
-workstation with ORCA and Molpro at PBE0/def2-SVP, a different level from
+workstation with ORCA and Molpro at the PBE0/def2-SVP density-functional-theory
+(DFT) level, a different level from
 the B3LYP/6-31+G* Gaussian check.  The absolute energies differ slightly
 between codes, as expected from independent DFT implementations and defaults,
 but the relative fixed-frame puckering profile is the same at the level needed
@@ -2090,11 +2075,9 @@ independent of the electronic-structure implementation.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.78\linewidth]{figures/cyclohexane_puckering_equivalence.png}
-\caption{Cyclohexane fixed-frame chair-to-boat puckering export test
-(Gaussian B3LYP/6-31+G*).  The upper panel compares the same five geometries
-evaluated from portable Cartesian inputs and from \SONIC{}-generated
-\texttt{ReadAllGIC} inputs.  The lower panel gives the energy difference in
-microhartree.}
+\caption{Cyclohexane fixed-frame chair-to-boat export at B3LYP/6-31+G*.  The
+upper panel compares Cartesian and generated SONIC \texttt{ReadAllGIC} inputs;
+the lower panel gives their energy difference.}
 \label{fig:cyclohexane-puckering-equivalence}
 \end{figure}
 
@@ -2194,12 +2177,14 @@ transformation or internal-to-Cartesian realization benchmark.
 Table~\ref{tab:construction-cost} and Figure~\ref{fig:construction-scaling}
 give a first scaling study for the present implementation.  The values are
 median wall times from five Python runs on a Linux workstation
-(two AMD EPYC 7543 32-core processors, 128 logical
-CPUs with simultaneous multithreading, and 1.0~TiB RAM), measured with
+(two AMD EPYC 7543 32-core processors, 128 logical central processing units
+(CPUs) with simultaneous multithreading, and 1.0~TiB random-access memory
+(RAM)), measured with
 \texttt{tracemalloc}; they are therefore engineering diagnostics rather than
 hardware-independent constants.  The timings were collected as single-process
 Python construction jobs, not as parallel throughput benchmarks.  The test set
-contains three slices: a controlled fused-PAH series from benzene to coronene,
+contains three slices: a controlled fused polycyclic-aromatic-hydrocarbon (PAH)
+series from benzene to coronene,
 a ring/cage topology set, and two metallocene special-coordinate cases.  The
 intended split is visible.  Once the coordinate contract exists, one analytic
 Wilson-\(\Bmat\) evaluation costs milliseconds to a few \(10^{-2}\)~s for the
@@ -2226,11 +2211,9 @@ reducing to the 57-dimensional active contract.
 \centering
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\caption{Construction and \(\Bmat\)-evaluation scaling study for the present
-\SMITH/\SONIC\ implementation.  Times are medians of five local Python runs.
-The build column includes construction, rank reduction, optional symmetry
-projection and section writing.  The \(\Bmat\) column is one analytic
-Wilson-\(\Bmat\) evaluation from the stored contract.}
+\caption{SMITH/SONIC scaling.  Times are medians of five Python runs; build
+includes construction, rank reduction, optional symmetry projection and output,
+whereas \(\Bmat\) is one analytic evaluation of the stored contract.}
 \label{tab:construction-cost}
 \begin{tabular}{@{}llrrrrrr@{}}
 \toprule
@@ -2256,12 +2239,9 @@ Special & Ferrocene \(D_{5d}\) & 21 & 656 & 57 & 3.182 & 0.0653 & 2.59 \\
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/construction_scaling_benchmark.png}
-\caption{Scaling diagnostics from Table~\ref{tab:construction-cost}.  The left
-panel shows build time versus primitive-candidate count; the middle panel shows
-one \(\Bmat\) evaluation versus sparse nonzero entries; the right panel shows
-peak traced Python memory versus stored primitive rows.  The special-coordinate
-ferrocene cases are separated because they deliberately keep a much larger
-semantic source space than the final active rank.}
+\caption{Scaling diagnostics from Table~\ref{tab:construction-cost}: build time,
+analytic \(\Bmat\)-evaluation time and peak traced memory.  Ferrocene is
+separated because its semantic source space greatly exceeds its active rank.}
 \label{fig:construction-scaling}
 \end{figure}
 
@@ -2311,7 +2291,8 @@ lighter optimizer-specific representation.
 The construction is conditional on a fixed molecular-state stratum.  Bond
 breaking or forming, proton transfer that changes the covalent graph, and
 coordination rearrangements require separate contracts or a future
-state-interpolation model.  An EVB-like or subspace-interpolation layer may be
+state-interpolation model.  An empirical-valence-bond (EVB)-like or
+subspace-interpolation layer may be
 possible, but it is not part of the present theory.
 
 The coordinate definitions remain frozen, whereas their Wilson rows are
@@ -2439,7 +2420,7 @@ Standalone input/output reference and executable examples; Gaussian 16
 serialization details; extended local-pseudosymmetry and Gaussian-GIC motif
 validation; ORCA/Molpro cross-code verification; pagodane, indane and saccharin
 ring-coordinate fixtures; software environments, checksums and complete
-reproduction commands (PDF).
+reproduction commands (portable document format, PDF).
 
 \section*{Author Contributions}
 

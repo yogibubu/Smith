@@ -25,33 +25,36 @@ Internal Coordinates,'' submitted for consideration as an Article in the
 The manuscript addresses a persistent constructive problem in computational
 chemistry: how to obtain a chemically interpretable, non-redundant and
 symmetry-adapted internal-coordinate model without molecule-specific coordinate
-editing or arbitrary cross-family weights. It introduces SONIC and its SMITH
-implementation, which organize ordinary and special internal coordinates in
+editing or arbitrary cross-family weights. It introduces SONIC and its
+Symmetry-Mapped Internal-coordinate Template Handler (SMITH) implementation,
+which organize ordinary and special internal coordinates in
 homogeneous families, protect ring and fragment semantics, enforce analytic
 Wilson-B rank closure, and apply local and exact molecular symmetry before
 freezing a portable coordinate contract.
 
-The work is aligned with the scope of JCTC because it presents new computational
+The work is aligned with the scope of the journal because it presents new computational
 methodology together with an independently installable implementation and
 quantitative validation. The tests span acyclic, cyclic, fused, bridged,
 high-symmetry, high-coordination, non-covalent and metal--ligand systems. They
 include analytic-versus-finite-difference derivative checks, rigid-motion and
-atom-permutation covariance, local-SALC validation, serialization of one SONIC
-coordinate model through the general Gaussian 16 GIC syntax, and ORCA/Molpro
+atom-permutation covariance, local symmetry-adapted linear-combination validation,
+serialization of one SONIC coordinate model through the general Gaussian 16
+generalized internal-coordinate syntax, and ORCA/Molpro
 cross-code probes. The frozen SONIC contract is a
 reusable representation for downstream optimization, vibrational, force-field
 and structural-refinement methods, whose algorithms remain explicitly outside
 the scope of the present construction paper.
 
-An earlier version of the manuscript has been submitted to arXiv and is
-currently awaiting processing and assignment of its public identifier. The
+An earlier version of the manuscript is publicly available as
+\href{https://arxiv.org/abs/2607.16550}{arXiv:2607.16550}. The
 present journal version records substantial post-upload improvements: it
 uses signed curvilinear native out-of-plane sources for ring construction,
 corrects phase-covariant symmetry projection and full-rank treatment of
 puckering coordinates, adds the independent indane and saccharin regression
 cases, expands the provider-neutral standalone interfaces, and freezes the
 validated SMITH 0.1.0rc7 implementation and reproducibility bundle. The arXiv
-record will be linked to the journal article if the manuscript is published.
+record will be updated with the journal reference if the manuscript is
+published.
 
 The manuscript is original, has not been published previously, and is not
 under consideration elsewhere. I am the sole author. No external funding was
