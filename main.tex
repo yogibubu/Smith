@@ -6,6 +6,7 @@
 \usepackage{longtable}
 \usepackage{microtype}
 \usepackage{tikz}
+\usepackage{xcolor}
 \usetikzlibrary{arrows.meta,calc,positioning}
 
 \providecommand{\href}[2]{#2}
@@ -960,6 +961,26 @@ dihedral is never selected during primitive generation or SMITH reduction.  Only
 the Gaussian~16 \texttt{.gjf} writer translates
 \(U(I,J,K,L)\mapsto D(J,I,L,K)\).  Thus Gaussian compatibility is a terminal
 serialization step and cannot change the native coordinate model.
+
+\textcolor{red}{For a tricoordinate center, atom ordering is part of the
+native coordinate definition: in $U(I,J,K,L)$, $I$ is the center,
+$J$ and $K$ define the local plane, and $L$ is the displaced atom.
+Accordingly, an $XY_2Z$ domain is written $U(X,Y_1,Y_2,Z)$, so that the
+equivalent pair defines the plane and the distinct substituent moves out of
+it.  For three equivalent substituents, the complete oriented primitive orbit
+is retained and symmetry projected.  When the three substituents are
+different, SMITH compares local $C_{3v}$-like and $C_{2v}$-like patterns:
+a clearly separated pair defines the plane in the latter case, whereas an
+ambiguous or $C_{3v}$-like environment uses the normalized oriented cyclic mean
+$\{U(I,J,K,L)+U(I,K,L,J)+U(I,L,J,K)\}/\sqrt{3}$.  Its Wilson row is the same
+linear combination of the three analytic primitive rows.  This choice is
+made once when the frozen contract is built and is never changed by a
+planarity threshold along an optimization, displacement, or inversion path;
+therefore the coordinate and its analytic derivative remain continuous
+through the planar geometry.  As a final covariance audit, normalized
+analytic Wilson rows assigned to each irreducible representation must span an
+invariant subspace under every stored point-group operation within the stored
+tolerance.}
 
 \section{Rank Reduction}
 
