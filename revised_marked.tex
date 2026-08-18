@@ -1451,6 +1451,20 @@ covalent bonds.  The selected construction is recorded in the contract, so the
 two descriptions remain explicit alternatives rather than indistinguishable
 members of one primitive pool.
 
+\textcolor{red}{The frozen topology can also certify a hydrogen shared by
+two B, N, O, P, or S centers.  \SMITH\ consumes both contacts as one complete
+bridge domain: the associated stretches and cycle coordinates are generated
+together, while provenance distinguishes proton-transfer and borane bridges
+from ordinary covalent bonds and intermolecular hydrogen bonds.  The
+symmetry-adapted Wilson matrix is audited against the full molecular target
+rank for every point group.  If independent blockwise SALC choices lose a
+Cartesian direction, the existing global rank-revealing point-group projector
+is applied to the symmetry-projected candidates; every returned row remains
+within a single coordinate family, and construction fails if full rank cannot
+be recovered.  The same procedure therefore treats, for example, a
+\(C_{2v}\) central proton and the two B--H--B bridges of
+\(D_{2h}\) diborane without a molecule-dependent exception.}
+
 Fragment centers, body frames and orientation-chart references are serialized
 with the coordinate definition.  Relative orientations use the exponential-map
 chart on \(\mathrm{SO}(3)\), with the same finite-rotation parametrization as
