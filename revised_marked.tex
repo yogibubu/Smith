@@ -1050,6 +1050,57 @@ a family are resolved by topology, continuous-perception equivalence and
 CIP-like priority keys stored in \(\mathcal{M}\).  Thus the construction works on a
 fixed total order that extends a chemically motivated partial order.
 
+{\color{red}
+\paragraph{Typed torsional-complement construction.}
+The final torsional block is obtained as a non-null complement to the selected
+non-torsional space.  Let \(\Bmat_N\in\mathbb{R}^{r_N\times 3N}\) contain the
+normalized Wilson rows already retained from all non-torsional families, and
+let \(\Bmat_T\in\mathbb{R}^{m_T\times 3N}\) contain the normalized candidate
+rows of one homogeneous torsional family.  The Cartesian row-space projector
+associated with the non-torsional block and the residual torsional matrix are
+\begin{equation}
+  \mathbf{P}_N=
+  \Bmat_N^{\mathsf T}
+  (\Bmat_N\Bmat_N^{\mathsf T})^{+}\Bmat_N,
+  \qquad
+  \mathbf{R}_T=\Bmat_T(\mathbf{I}-\mathbf{P}_N),
+  \label{eq:torsional-complement-projector}
+\end{equation}
+where the superscript \(+\) denotes the Moore--Penrose inverse evaluated with
+the stored rank tolerance.  Diagonalization of the residual metric gives
+\begin{equation}
+  \mathbf{R}_T\mathbf{R}_T^{\mathsf T}\mathbf{U}
+  =\mathbf{U}\boldsymbol{\Lambda}.
+  \label{eq:torsional-complement-metric}
+\end{equation}
+Columns of \(\mathbf{U}_r\) are retained when
+\(\lambda_i>\max(\tau_{\mathrm{abs}},
+\tau_{\mathrm{rel}}\lambda_{\max})\).  The stored torsional coordinates and
+their Wilson rows are
+\begin{equation}
+  \q_T^{\mathrm{SONIC}}=\mathbf{U}_r^{\mathsf T}\q_T,
+  \qquad
+  \Bmat_T^{\mathrm{SONIC}}=\mathbf{U}_r^{\mathsf T}\Bmat_T.
+  \label{eq:torsional-complement-coordinates}
+\end{equation}
+The coefficient transformation acts exclusively inside the torsional family,
+and \(\mathbf{U}_r^{\mathsf T}\mathbf{R}_T\) has full row rank relative to the
+selected non-torsional span.  Pseudo-edges, fused-ring closures, and other
+topologies that generate excess torsional candidates therefore yield exactly
+\(\operatorname{rank}(\mathbf{R}_T)\) typed torsional coordinates.  For a
+nontrivial molecular point group, the construction is applied to homogeneous
+torsional source blocks using the stored atom permutations and orientation
+signs; the established block-local symmetry projector then resolves the
+retained subspace into irreducible representations.  Coordinate families are
+never mixed by this operation.
+
+For the formic-acid--water pseudobond fixture, ten candidate torsional rows
+produce six non-null complementary coordinates and four null combinations.
+The complete Wilson-matrix condition number changes from approximately 91 to
+53, the target vibrational rank is retained, and the same construction passes
+the nontrivial-point-group covariance fixtures.
+}
+
 The following design invariants are consequences of that ordered protocol.
 They are stated explicitly to make the construction verifiable, not to claim
 uniqueness over all possible internal-coordinate bases.
@@ -1251,10 +1302,23 @@ symmetric coordinate export.  Each operation \(h\in G_{\mathrm{pt}}\) is represe
 Cartesian rotation matrix, an atom permutation and the signs required for
 oriented coordinates such as torsions, out-of-plane bends and axial fragment
 rotations.  For a homogeneous accepted coordinate block \(H\), with coefficient
-space \(V_H\), the stored operations map the block into itself.  Since each
-homogeneous block admitted to the projector is invariant under this permutation
-and sign representation, its coefficient space carries a finite-dimensional
-representation of the point group,
+space \(V_H\), the stored operations map the block into itself.
+\textcolor{red}{Before any projector is formed, the frozen finite action is
+audited for identity, the order expected from the declared group, inverses,
+and closure of both its Cartesian matrices and atom permutations.  This audit
+is applied to the complete supported finite-group families
+\(C_n,C_{nv},C_{nh},D_n,D_{nd},D_{nh}\) for \(n=2,\ldots,6\),
+\(S_4,\ldots,S_{12}\), \(C_1,C_s,C_i\), and the tetrahedral,
+octahedral and icosahedral families; linear groups are handled separately and
+are not forced into a fictitious finite closure.  Whether the operation table
+is supplied by ORACLE or built by the standalone frontend, the same matrices
+and permutations determine the character sequence used by \SMITH.  No
+independent name-based reconstruction or lower-order surrogate subgroup is
+introduced, so high-order groups and degenerate SALC blocks are treated by the
+same general construction.}
+Homogeneous blocks admitted to the projector are invariant under this
+permutation and sign representation; their coefficient spaces therefore carry
+finite-dimensional representations of the point group,
 \[
   \Gamma_H:G_{\mathrm{pt}}\rightarrow GL(V_H).
 \]
@@ -1468,6 +1532,19 @@ distance as an active square-root expression.  This is deliberately an
 interface and rank-closure test rather than an optimized electronic-structure
 benchmark: definition of the $\eta^3$ center belongs to the input provider,
 whereas its retention, first differentiation and serialization belong to \SMITH.
+
+\textcolor{red}{The same contract applies without case-specific rules to a
+general \(\eta^n\) interaction.  When a canonical metal--ligand center is
+present, the active SONIC source contains one metal--center coordinate rather
+than a redundant fan of metal--member distances.  The individual contacts may
+remain available as chemical diagnostics, but they do not generate duplicate
+active stretches, bends or torsions.  A downstream local force-field or
+Lindh-type guess Hessian first constructs its interaction graph with the
+corresponding pseudo-bonds and then suppresses the metal--member valence terms
+represented by the protected center coordinate; the \(\eta^n\) curvature is
+therefore counted once.  The rule covers \(\eta^3\), \(\eta^5\), and higher
+hapticities uniformly, whereas a quantum-mechanical Hessian is transformed
+directly in the coordinate basis selected for the optimization.}
 
 In the current validated \texttt{PSEUDO\_BONDS} baseline, selected
 non-covalent contacts are inserted into the construction graph as typed
