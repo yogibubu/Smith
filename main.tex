@@ -2418,21 +2418,30 @@ Fortran control path wherever that comparison is applicable.
 \section*{Data and Code Availability}
 
 The manuscript repository at
-\url{https://github.com/yogibubu/Smith} contains the scripts, JSON data files,
-figures and Supporting Information used to generate the tables and application
-plots, including \texttt{data/local\_salc\_validation.json} and its generating
-script.  The same repository contains a reduced standalone Python package,
-installation instructions and water, norbornane, formic-acid--water,
+\url{https://github.com/yogibubu/Smith/tree/9f34f832d6f0a9ca200efec9b93d50cec62871f4}
+contains the scripts, JSON data files, figures and Supporting Information used
+to generate the tables and application plots, including
+\texttt{data/construction\_scaling\_benchmark.json},
+\texttt{data/local\_salc\_validation.json},
+\texttt{data/cyclohexane\_puckering\_equivalence.json},
+\texttt{data/gaussian\_coordinate\_comparison.json},
+\texttt{data/native\_out\_of\_plane\_probe.json},
+\texttt{data/readallgic\_optimization\_results.json} and
+\texttt{data/application\_results.json}, together with their generating
+scripts.  The same repository contains a reduced standalone Python package,
+installation instructions and the water, norbornane, formic-acid--water,
 water-dimer, benzene--water and $\eta^3$ allyl--palladium examples.  Its
 \texttt{smith-sonic build} command accepts a complete validated \texttt{xyzin}
 state, an extended XYZ carrying \texttt{TOPOLOGY} or \texttt{PRIMITIVES}, or a
 plain Cartesian input through the bundled perception frontend.  The provider-neutral
 \texttt{--require-frozen-state} option requires the complete contract.  The
-standalone distribution includes the revision-pinned topology, point-group
+standalone distribution at tag
+\url{https://github.com/yogibubu/Smith/tree/v0.1.0rc7/standalone} includes the revision-pinned topology, point-group
 symmetry and ordinary-primitive frontend and
 optional Gaussian \texttt{ReadAllGIC} export; installing or running another
 application is not required.  The reproducible standalone environment is tagged
-\texttt{v0.1.0rc7}. Repository revisions, the dependency lock and
+\texttt{v0.1.0rc7}; the repository revision containing the cited manuscript
+artifacts is pinned above. Repository revisions, the dependency lock and
 \texttt{\#SMITH\_PROVENANCE} record the code and input profile.
 
 \section*{Supporting Information}
